@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "status": "preregistered_initial_defaults_not_results",
+  "base_model": "Qwen/Qwen2.5-3B-Instruct",
+  "benchmarks": ["alfworld", "webshop", "search_qa"],
+  "extension": "appworld",
+  "cycles": 3,
+  "candidates_per_cycle": 2,
+  "modules_retired_per_cycle_max": 1,
+  "total_optimizer_steps": 300,
+  "teacher_refresh": "each_batch_behavior_policy_before_update",
+  "module_signal": "same_behavior_policy_H_plus_logprob_minus_cached_H_minus_old_logprob",
+  "kl_reference_refresh": "between_cycles_only",
+  "information": "identical_student_visible_public_history",
+  "supervision": "targeted_trigger_and_persistence",
+  "attribution_policy_file": "configs/attribution.json",
+  "attribution_rule": "task_cluster_paired_gain_lower_bound_strictly_above_min_external_gain",
+  "model_acceptance_rule": "rollback_if_C_minus_A_CI_upper_below_negative_performance_margin_or_insufficient_tasks",
+  "model_acceptance_policy": "shared_with_retirement_policy_fixed_before_run",
+  "retirement": {
+    "performance_margin": 0.02,
+    "confidence": 0.95,
+    "bootstrap_samples": 2000,
+    "min_tasks": 30,
+    "min_token_saving_fraction": 0.05,
+    "seed": 42
+  },
+  "baselines_to_run": [
+    "fixed_model_evolved_full_harness",
+    "budget_matched_RL",
+    "budget_matched_original_OPID",
+    "fixed_harness_distillation_OPHSD_style",
+    "SLIM_skill_lifecycle",
+    "same_strategy_text_skill",
+    "no_retirement",
+    "all_step_supervision",
+    "single_distillation_phase"
+  ],
+  "budget_note": "Optimizer steps are the initial scheduler unit. Report and match actual samples, generation/scoring tokens, GPU time and search costs; equal steps alone are not equal compute."
+}

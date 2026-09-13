@@ -1,0 +1,6 @@
+{
+  "tests/test_core.py": "ec8ed9084e29d132a777f657a765422955abc6c32236fd83c57e31986723c293",
+  "tests/test_opid_bridge.py": "9d882766037002b01ee30a55c848e679ea3a7c9a3f68cea460aa0507ef43f835",
+  "tests/test_outer_loop.py": "3a09123de281d2dd8707056ccb9d501363919a41b62e4be273a58de419ac5aae",
+  "tests/test_student_harness.py": "2cf4b76fe3905fcd3421856a3c69255f6b35e8bc85874192a075a4aa99efeee7"
+}

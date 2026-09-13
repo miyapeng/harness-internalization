@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "verified_date": "2026-09-13",
+  "repositories": [
+    {
+      "name": "OPID",
+      "url": "https://github.com/jinyangwu/OPID.git",
+      "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+      "local_path": "upstream/OPID"
+    },
+    {
+      "name": "meta-harness",
+      "url": "https://github.com/stanford-iris-lab/meta-harness.git",
+      "commit": "0cbc31e97c9e6d24232d1dc754827c02e1ec415c",
+      "local_path": "upstream/meta-harness"
+    }
+  ],
+  "opid_patch": "patches/opid-integration.patch"
+}

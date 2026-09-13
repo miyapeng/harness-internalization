@@ -1,0 +1,11 @@
+{
+  "benchmark": "swebench_pro",
+  "catalog": "${HI_BENCHMARK_CATALOG}",
+  "max_steps": 30,
+  "options": {
+    "python": "${HI_BENCHMARK_PYTHON}",
+    "evaluator_root": "${SWE_PRO_EVALUATOR_ROOT}",
+    "evaluator_commit": "${SWE_PRO_EVALUATOR_COMMIT}",
+    "dockerhub_username": "${SWE_PRO_DOCKERHUB_USERNAME}"
+  }
+}

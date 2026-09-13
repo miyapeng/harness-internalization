@@ -1,0 +1,60 @@
+{
+  "patch_installer": {
+    "exit_code": 0,
+    "stdout": "Validated OPID patch; 0 files needed updates\n",
+    "stderr": ""
+  },
+  "patch_reverse_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "shell_syntax": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "python_ast": {
+    "files": 20,
+    "passed": true
+  },
+  "synthetic_smoke": {
+    "synthetic": true,
+    "run": "runs/cpu-smoke-002",
+    "cycles": [
+      {
+        "cycle": "cycle_00",
+        "success": {
+          "A": 0.3333333333333333,
+          "B": 0.0,
+          "C": 0.3333333333333333,
+          "D": 0.3333333333333333
+        },
+        "decision": "retire",
+        "all_checks_passed": true
+      },
+      {
+        "cycle": "cycle_01",
+        "success": {
+          "A": 0.6666666666666666,
+          "B": 0.3333333333333333,
+          "C": 0.6666666666666666,
+          "D": 0.6666666666666666
+        },
+        "decision": "retire",
+        "all_checks_passed": true
+      },
+      {
+        "cycle": "cycle_02",
+        "success": {
+          "A": 1.0,
+          "B": 0.6666666666666666,
+          "C": 1.0,
+          "D": 1.0
+        },
+        "decision": "retire",
+        "all_checks_passed": true
+      }
+    ]
+  }
+}

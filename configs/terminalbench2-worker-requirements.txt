@@ -1,0 +1,2 @@
+# Dedicated Python >=3.12 worker; Docker/Compose also required.
+harbor==0.23.0

@@ -1,0 +1,21 @@
+test_arbitrary_code_is_never_executed (test_core.CoreTests.test_arbitrary_code_is_never_executed) ... ok
+test_no_placeholder_task_ids_or_split_overlap (test_core.CoreTests.test_no_placeholder_task_ids_or_split_overlap) ... ok
+test_no_teacher_guidance_in_public_state_and_persistence (test_core.CoreTests.test_no_teacher_guidance_in_public_state_and_persistence) ... ok
+test_response_tokens_only (test_core.CoreTests.test_response_tokens_only) ... ok
+test_teacher_refresh_rejected (test_core.CoreTests.test_teacher_refresh_rejected) ... ok
+test_joint_degradation_does_not_retire (test_core.RetirementTests.test_joint_degradation_does_not_retire) ... ok
+test_many_seeds_are_not_independent_tasks (test_core.RetirementTests.test_many_seeds_are_not_independent_tasks) ... ok
+test_positive_evidence_retires (test_core.RetirementTests.test_positive_evidence_retires) ... ok
+test_preexisting_redundancy_is_not_internalization (test_core.RetirementTests.test_preexisting_redundancy_is_not_internalization) ... ok
+test_token_increase_prevents_retirement (test_core.RetirementTests.test_token_increase_prevents_retirement) ... ok
+test_unpaired_missing_and_duplicate_results_rejected (test_core.RetirementTests.test_unpaired_missing_and_duplicate_results_rejected) ... ok
+test_input_parity_mismatch_fails_closed (test_opid_bridge.OPIDBridgeTests.test_input_parity_mismatch_fails_closed) ... ok
+test_nontraining_task_fails_closed (test_opid_bridge.OPIDBridgeTests.test_nontraining_task_fails_closed) ... ok
+test_only_selected_student_tokens_receive_teacher_scores (test_opid_bridge.OPIDBridgeTests.test_only_selected_student_tokens_receive_teacher_scores) ... ok
+test_phase_cannot_change_midbatch (test_opid_bridge.OPIDBridgeTests.test_phase_cannot_change_midbatch) ... ok
+test_teacher_error_propagates (test_opid_bridge.OPIDBridgeTests.test_teacher_error_propagates) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.672s
+
+OK

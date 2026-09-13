@@ -1,0 +1,39 @@
+{
+  "cwd": ".",
+  "timeout_s": 86400,
+  "propose": [
+    "python",
+    "scripts/propose.py",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "evaluate": [
+    "python",
+    "-m",
+    "internalization.training.entrypoint",
+    "evaluate",
+    "--benchmark",
+    "lawbench",
+    "--env-config",
+    "configs/lawbench.json",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "train": [
+    "python",
+    "scripts/train.py",
+    "--benchmark",
+    "lawbench",
+    "--env-config",
+    "configs/lawbench.json",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "benchmark": "lawbench"
+}

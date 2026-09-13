@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "harness-internalization"
+version = "0.2.0"
+description = "Versioned executable harness evolution and selective internalization"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+teacher = ["torch>=2.6", "transformers>=4.51,<5"]
+training = ["verl==0.5.0", "torch>=2.6", "transformers>=4.51,<5", "omegaconf>=2.3"]
+alfworld = ["alfworld", "PyYAML>=6"]
+
+[project.scripts]
+hi = "internalization.cli:main"
+
+[project.urls]
+Repository = "https://github.com/miyapeng/harness-internalization"
+
+[tool.setuptools]
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "licenses/*.txt"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,98 @@
+# 版本化 Harness：接口、运行与验收
+
+本次是已有工程的增量扩展，没有迁移训练框架、加入上游目录或新增 benchmark。修改前文件哈希、100 项测试日志和关键文件副本位于 `docs/history/revision-baseline/`。已有测试断言未改；旧接口默认仍走原模块路径。
+
+## 接口迁移
+
+| 文件 | 新接口或变化 | 原接口兼容性 |
+| --- | --- | --- |
+| `harness/revision.py` | `WorkspacePolicy`、`FileEdit`、`RevisionStore`、`HarnessRevision`、`InternalizationTarget` | 不改变原 `Harness` / `HarnessModule` |
+| `evolution/candidate.py` | 新增 `HarnessCandidate`，记录 parent/patch/runnable full revision/rationale/hash | 原 `Candidate` 保留 |
+| `evolution/code_proposer.py` | `CodeProposer.propose`、`propose_target`；独立 mock 或既有 API transport | 不再用三种 kind 验证代码候选 |
+| `evolution/proposer.py` | 增加可复用 `request_json` transport | 原模块 proposer 方法保留 |
+| `evolution/revision_search.py` | 实际 search/dev 运行与选择；候选失败独立归档；公开历史过滤 | 复用原 paired interval 和评分规则 |
+| `harness/code_runtime.py` | `CodeRuntime.prepare/execute`、受保护 `CapabilityBroker`、`augment_context` | 实际使用 revision 的代码、prompt 和工具注册 |
+| `harness/sandbox.py`、`sandbox_worker.py` | 每次入口调用独立进程、Landlock、seccomp、资源限额 | 不把原 AST 模板限制当作任意代码沙箱 |
+| `training/rollout.py`、`revision_rollout.py` | `rollout(..., harness=HarnessRevision, ...)`；显式 path/hash、独立 memory/tool registry | 旧 Harness 分支保留 |
+| `training/teacher_scoring.py`、`revision_scoring.py` | `InternalizationTarget` 分派；可执行兼容性检查和同状态增强评分 | 原旧策略同步、token mask、优势构造均保留 |
+| `core/interfaces.py`、`serialization.py` | 类型联合、可选 `Components.targets` 和版本格式 `code_revision_v1` | 旧调用签名及模块序列化仍接受 |
+| `outer_loop.py`、`revision_loop.py` | `initial_harness=revision` 启用新循环，先接受改进再尝试内化 | 未提供 revision 时保持旧三周期逻辑 |
+| `command_backend.py`、`training/entrypoint.py` | JSON 传输 revision/target；增加 `target` / `check_internalization` stage | 训练器仍由原外部 veRL adapter 提供 |
+| `cli.py` | `--harness-workspace` 或 `--harness-revision`，以及 `--revision-store` | 原命令不变 |
+| `revision_demo.py`、`scripts/demo_versioned_harness.py` | 新增明确标注 mock 的 CPU 生命周期演示 | 不作为真实 benchmark 或学习效果证据 |
+
+训练器 `training/trainer.py`、`module_advantage.py`、`behavior_policy.py`、`verl_backend.py`、归因/退役统计实现和所有 benchmark 文件本次未修改。新增目标通过 `HarnessRevision.without(target)` 与原训练器对接；没有引入第二个阶段冻结 scorer。
+
+## 可执行工作区与权限
+
+起始实例在 `examples/versioned_harness/base/`。可编辑前缀默认是 `agent/`、`prompts/`、`tools/`、`controls/`、`config/`；可多文件修改，支持 Python、JSON、文本与 Markdown，总计最多 64 文件、256 KiB。补丁是 `FileEdit(path, before_hash, content)` 列表：原文件 UTF-8 文本 SHA256 防止套错父版本，新增文件 before_hash=null，content=null 只从新快照排除文件。不会原地删除父快照文件。
+
+完整树连同固定权限配置一起计算版本哈希；每个候选写入独立的新目录，文件设为只读。`config/harness.json` 指定 `entrypoint: "agent/main.py:run"`、`schema: 1` 和可选 `supervision`。入口必须真实返回以下协议：
+
+* prepare 输入公开 history/step/memory，返回 prompt/tools/memory。
+* execute 输入学生 action/history/step/memory/tools，返回 observation/memory/stop。
+* 评分 hook 输入学生实际 context/step，返回 suffix/selected；非目标上下文由核心复用，不重跑 prepare。
+
+工具描述进入真实动作 prompt。示例入口根据注册表导入并调用 `tools.log_query:run`，因此新增工具不是 archive 中未执行的源码。候选也可以自行实现其他合法注册和分派策略。局部工具、broker 模型及环境调用分别计数；成功率和 reward 仅来自受保护环境，候选返回值不能覆盖。
+
+任意候选代码只在 `python -I -S` 子进程执行。每次调用清空 import/global 状态，每个 episode 独立 memory 和工具注册。Linux Landlock ABI 至少 3、`libseccomp.so.2` 是必需条件；本机实际检测 ABI=4。只允许读取本次快照及 Python 标准库树，禁止直接写文件、联网、fork/exec/ptrace，通过 syscall 限制和资源限额执行；环境和模型只能调用父进程 broker。运行目录和学生任务解答目录分开，不向子进程传凭据、模型对象、隐藏标签或环境句柄。缺少隔离则报错，没有不受控宿主回退。
+
+默认每入口 30 秒 wall deadline、5 秒 CPU、256 MiB 地址空间、16 次 broker 请求、1 MiB 输出上限。broker 的同步模型/环境调用仍由现有 backend 的超时机制约束；本地 wall deadline 在 broker 返回后检查，不能抢占已阻塞的父进程 backend。此限制有明确边界，不能把路径白名单、单一子进程或上述 smoke 测试称为完整安全审计。内核接口参照 [Landlock 官方文档](https://docs.kernel.org/userspace-api/landlock.html) 和 [libseccomp 手册](https://man7.org/linux/man-pages/man3/seccomp_init.3.html)，此处集成代码为项目自写，未复制第三方实现。
+
+## 选择性内化范围
+
+当前桥只支持旁路 `config.supervision` 指定的一个内部控制 hook。H_plus 与 H_minus 的其他文件、注册、prompt、配置保持一致，hook 源码保留归档但 H_minus 不调用。它可以多次调用当前 policy 做内部计算，但在 teacher scoring 中不能接触环境；要求新观察的候选可用于正常任务运行，同时被判为不支持当前训练桥。
+
+兼容性检查使用 search 任务的一条真实 H_minus rollout 和同 token 评分；实际训练继续逐状态检查。预检查不等于穷尽所有状态。如果随后遇到不兼容、timeout 或训练/评价异常，保留旧模型和已接受的 H_plus，并记录失败；不部署部分训练 checkpoint。
+
+每 batch 的公式仍为 `A_outcome + lambda * g * (logp_old(enhanced, response_ids) - old_log_prob)`，默认 lambda=0.001。H_minus 实际 prompt 和 response IDs 缓存用于监督，H_plus scorer 与 rollout 共用 `BehaviorPolicySnapshot`；优势构造结束后才 actor update。新增 hook 的工具返回和内部模型 token 不进入 response loss。原有上下文溢出拒绝、禁止隐式截断约束保持。
+
+## 可运行命令
+
+以下 CPU 演示已运行；需要 Python 3.12、CPU torch（兼容性快照使用）和上述 Linux 内核隔离。输出目录必须不存在，重复运行请使用新的目录名。
+
+```bash
+cd /data/miyapeng/harness-internalization
+PYTHONPATH=src python3.12 scripts/demo_versioned_harness.py \
+  --config configs/versioned_demo.json \
+  --output runs/versioned-demo-new
+PYTHONPATH=src python3.12 -m unittest discover -s tests -v
+```
+
+可用 `--scenario tool_only`、`unsupported`、`rollback`、`attribution_failed` 分别复核其余路径，仍使用原统计阈值。默认 mixed 为三个周期、每轮两个候选、三 seeds、每 cohort 30 个独立 task；300 是 mock 训练预算分配标记，**演示实际 optimizer update 数为 0**。诊断 mock 显式等待 20ms 模拟辅助调用，延迟字段按实际 wall time 记录；模型、token 和任务成功来自脚本 fixture，不能解释为真实部署收益。
+
+已有 ALFWorld 的真实后端配置入口是 `configs/versioned_alfworld_backend.json`，本次**未运行**。准备已有模型/veRL/环境依赖和授权 proposer 环境变量后，可使用：
+
+```bash
+PYTHONPATH=src python -m internalization.cli run \
+  --manifest /absolute/path/to/predeclared-manifest.json \
+  --backend configs/versioned_alfworld_backend.json \
+  --checkpoint /absolute/path/to/student-checkpoint \
+  --harness-workspace examples/versioned_harness/base \
+  --revision-store runs/alfworld-code-revisions \
+  --output runs/alfworld-code-experiment --train-steps 300
+```
+
+此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2、**acceptance_0..2**；不能借用 retirement/test 填充 acceptance，也不会自动重新划分既有数据。该要求只针对新模式，原模式 manifest 不变。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。恢复运行可传 `--harness-revision .../deployment.json` 并给相同 checkpoint，以及全新未使用的独立评价 cohort 和输出目录；脚本不负责自动再划分数据或断点续跑。
+
+## 产物与验收证据
+
+最终三周期产物在 `runs/versioned-harness-final/`（首次验证另存于 `runs/versioned-harness-mixed/`）：
+
+| 产物 | 内容 |
+| --- | --- |
+| `revisions/` | 父版本、完整候选和精简版本的可执行全文件快照 |
+| `experiment/cycle_00/candidate_0/candidate.json` | candidate_id、parent_revision、完整 patch、full_revision、rationale |
+| `experiment/cycle_00/internalization_target.json` | full/reduced 路径和 hash、待撤除行为、可执行 hook |
+| `experiment/cycle_00/harness_acceptance.json` | 独立 Harness 接受门槛 |
+| `experiment/cycle_00/compatibility/` | 实际 H_minus action IDs、同状态 hook 执行检查 |
+| `experiment/cycle_00/A/` 至 `D/` | 各版本实际代码执行轨迹、任务、模型、hash、分数和成本 |
+| `experiment/cycle_00/retirement.json` | 四格能力、成本与模型接受的独立判定 |
+| `experiment/deployment.json`、`events.jsonl` | 正式接受状态及完整历史；proposer 只收到过滤后的 search 历史 |
+| `proof.json` | mock 边界、零实际 optimizer updates、跨周期 parent/checkpoint |
+
+混合例首轮 A=1/B=0/C=1/D=1，accept/retire 后日志工具仍在；第二、三轮从该 checkpoint + reduced revision 搜索，没有进一步收益则不训练。这些数值是合成生命周期证据。源代码演化、实际工具调用、内核隔离是真实执行；学习结论、真实 API proposer、HF/veRL/GPU、官方任务均未验证。
+
+`tests/test_versioned_harness.py` 验证实际工具、混合四格版本、unsupported 保留、失败隔离、回滚及门槛；`test_revision_decisions.py` 验证独立接受、无收益、无目标跨周期、非法目标和独立 proposer mock；`test_revision_training.py` 用 CPU 小模型真实 SGD 更新验证两批同步、零效应、inactive mask、非目标上下文只生成一次。原 100 项测试保留，旧三周期 90 文件逐字节一致。最终机器记录见 `docs/validation/versioned-harness-report.json`。
+
+保留的范围限制：没有自动模块分解、DAG 搜索、可内化性分类器、任意代码差异编译器或旧 retained 目标的自动再审计调度；当前版本只支持上述可执行 hook 桥。没有降低统计阈值来让演示退役。

@@ -1,0 +1,52 @@
+{
+  "module_validation": {
+    "exit_code": 0,
+    "stdout": "{\n  \"name\": \"recovery\",\n  \"kind\": \"recovery\",\n  \"version\": \"9d481db024cb937e5e513e1dd2048cb6b3b688c832754307881b2430a1d56b2b\"\n}\n",
+    "stderr": ""
+  },
+  "proposer_help": {
+    "exit_code": 0,
+    "stdout": "usage: propose.py [-h] --request REQUEST --response RESPONSE [--device DEVICE]\n                  [--env-config ENV_CONFIG]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE\n  --env-config ENV_CONFIG\n",
+    "stderr": ""
+  },
+  "trainer_help": {
+    "exit_code": 0,
+    "stdout": "usage: train.py [-h] --request REQUEST --response RESPONSE [--device DEVICE]\n                [--env-config ENV_CONFIG]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE\n  --env-config ENV_CONFIG\n",
+    "stderr": ""
+  },
+  "evaluator_help": {
+    "exit_code": 0,
+    "stdout": "usage: evaluate_alfworld.py [-h] --request REQUEST --response RESPONSE\n                            [--device DEVICE] [--env-config ENV_CONFIG]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE\n  --env-config ENV_CONFIG\n",
+    "stderr": ""
+  },
+  "shell_syntax": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "whole_project_old_path_hits_outside_history": [],
+  "environment": {
+    "python": "3.12.3 (main, Feb  4 2025, 14:48:35) [GCC 13.3.0]",
+    "dependencies": {
+      "torch": true,
+      "numpy": true,
+      "yaml": true,
+      "transformers": false,
+      "verl": false,
+      "ray": false,
+      "alfworld": false
+    }
+  },
+  "not_run": [
+    "GPU training",
+    "external veRL optimizer execution",
+    "real API proposer",
+    "real ALFWorld data",
+    "WebShop",
+    "Search-QA",
+    "AppWorld",
+    "SWE-bench",
+    "Terminal-Bench",
+    "paper baselines"
+  ]
+}

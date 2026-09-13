@@ -1,0 +1,12 @@
+{
+  "python_env_var": "HI_APPWORLD_PYTHON",
+  "root_env_var": "APPWORLD_ROOT",
+  "max_steps": 30,
+  "max_api_calls_per_step": 1000,
+  "execution_timeout_s": 100,
+  "rpc_timeout_s": 180,
+  "max_context": 32768,
+  "max_prompt_tokens": 28672,
+  "max_action_tokens": 1024,
+  "max_new_tokens": 256
+}

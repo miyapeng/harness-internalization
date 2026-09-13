@@ -1,0 +1,7 @@
+{
+  "min_external_gain": 0.0,
+  "confidence": 0.95,
+  "bootstrap_samples": 2000,
+  "min_tasks": 30,
+  "seed": 42
+}

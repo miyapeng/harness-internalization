@@ -1,0 +1,61 @@
+{
+  "change": "P0-1 batch behavior-policy alignment",
+  "tests": {
+    "passed": 39,
+    "original_tests_unchanged": 20,
+    "new_alignment_tests": 7,
+    "log": "docs/validation/batch-policy-tests.txt"
+  },
+  "same_policy_updates": [
+    {
+      "update": 0,
+      "behavior_snapshot": "policy-0",
+      "teacher_snapshot": "policy-0",
+      "student_snapshot": "policy-1",
+      "kl_reference_snapshot": "phase-reference"
+    },
+    {
+      "update": 1,
+      "behavior_snapshot": "policy-1",
+      "teacher_snapshot": "policy-1",
+      "student_snapshot": "policy-2",
+      "kl_reference_snapshot": "phase-reference"
+    },
+    {
+      "update": 2,
+      "behavior_snapshot": "policy-2",
+      "teacher_snapshot": "policy-2",
+      "student_snapshot": "policy-3",
+      "kl_reference_snapshot": "phase-reference"
+    }
+  ],
+  "proof": "runs/batch-policy-training-proof/training.jsonl",
+  "proof_type": "CPU_torch_mock_not_veRL",
+  "demo_regression": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 85,
+    "original_demo_differences": [],
+    "additional_demo_files": [
+      "candidate_archive.jsonl"
+    ],
+    "python_files_parsed": 62,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "module_formula": "detach(H_plus_logprob(theta_old) - cached_H_minus_old_logprob(theta_old))",
+  "module_scorer": "same_policy_instance_read_only_before_each_update",
+  "KL_reference": "phase_initial_frozen_unchanged",
+  "remaining_gaps": [
+    "pre-training attribution gate",
+    "degradation rollback",
+    "retained-module re-audit"
+  ],
+  "not_run": [
+    "real HF model",
+    "external veRL PPO optimizer",
+    "GPU",
+    "real benchmark",
+    "API proposer",
+    "distributed synchronization"
+  ]
+}

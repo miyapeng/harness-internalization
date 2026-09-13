@@ -1,0 +1,21 @@
+{
+  "checkpoint": "/data/miyapeng/harness-internalization/runs/versioned-harness-final/experiment/cycle_00/training/mock_checkpoint",
+  "harness_revision": "0921b06cea62b098aebe58727d6c9fdd6bf66453ba8a4c2c1632dd5721138c93",
+  "cycles": [
+    {
+      "reason": "internalization_audited",
+      "model": "accept",
+      "behavior": "retire"
+    },
+    {
+      "reason": "no_useful_candidate",
+      "model": "unchanged",
+      "behavior": "unchanged"
+    },
+    {
+      "reason": "no_useful_candidate",
+      "model": "unchanged",
+      "behavior": "unchanged"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "checkpoint": "toy:checkpoint:3",
+  "active_modules": [],
+  "harness_version": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "archive": [
+    {
+      "cycle": 0,
+      "module": "planner_0",
+      "version": "506860900397270e69a7f0134b9a3c4a9344f5dc1d44ff64dc627fd288ad3f39",
+      "source": "NAME = \"planner_0\"\nKIND = \"planner\"\nINSTRUCTION = \"Provide planner guidance.\"\nPERSISTENCE = 0\ndef trigger(history, step):\n    return \"stage=planner\" in history\n",
+      "decision": "retire"
+    },
+    {
+      "cycle": 1,
+      "module": "review_1",
+      "version": "8224ed2c3a3161490b64686fe92a1c394c21a5e2cf7a19e5b1540c3f4e156626",
+      "source": "NAME = \"review_1\"\nKIND = \"review\"\nINSTRUCTION = \"Provide review guidance.\"\nPERSISTENCE = 0\ndef trigger(history, step):\n    return \"stage=review\" in history\n",
+      "decision": "retire"
+    },
+    {
+      "cycle": 2,
+      "module": "recovery_2",
+      "version": "d4211c82930fd9051394c6bea86ec04ce65b051a32d878e2031d46deacf68917",
+      "source": "NAME = \"recovery_2\"\nKIND = \"recovery\"\nINSTRUCTION = \"Provide recovery guidance.\"\nPERSISTENCE = 0\ndef trigger(history, step):\n    return \"stage=recovery\" in history\n",
+      "decision": "retire"
+    }
+  ]
+}

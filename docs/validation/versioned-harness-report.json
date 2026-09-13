@@ -1,0 +1,210 @@
+{
+  "date": "2026-09-13",
+  "scope": "versioned executable Harness evolution plus optional selective internalization",
+  "baseline_tests": 100,
+  "full_suite": {
+    "passed": 127,
+    "skipped": 0,
+    "log": "versioned-harness-tests.txt"
+  },
+  "final_targeted_checks": {
+    "passed": 21,
+    "log": "versioned-harness-focused-tests.txt",
+    "reason": "Final consumed-call logging and explicit isolation-startup error diagnostics"
+  },
+  "existing_files_changed": [
+    "src/internalization/cli.py",
+    "src/internalization/outer_loop.py",
+    "src/internalization/command_backend.py",
+    "src/internalization/core/serialization.py",
+    "src/internalization/core/interfaces.py",
+    "src/internalization/evolution/candidate.py",
+    "src/internalization/evolution/proposer.py",
+    "src/internalization/training/rollout.py",
+    "src/internalization/training/teacher_scoring.py",
+    "src/internalization/training/entrypoint.py"
+  ],
+  "protected_algorithm_files_unchanged": [
+    "src/internalization/training/trainer.py",
+    "src/internalization/training/module_advantage.py",
+    "src/internalization/training/behavior_policy.py",
+    "src/internalization/training/verl_backend.py",
+    "src/internalization/evaluation/attribution.py",
+    "src/internalization/evaluation/retirement.py"
+  ],
+  "baselined_test_and_fixture_files_unchanged": 13,
+  "original_demo_parity": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 90,
+    "original_demo_differences": [],
+    "original_demo_files_byte_equal": 90,
+    "acceptance_schema_only_changes": [],
+    "additional_demo_files": [],
+    "python_files_parsed": 93,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "new_tests": [
+    "tests/test_versioned_harness.py",
+    "tests/test_revision_decisions.py",
+    "tests/test_revision_training.py"
+  ],
+  "candidate_sandbox": {
+    "actual_execution": true,
+    "observed_landlock_abi": 4,
+    "libseccomp": true,
+    "host_read_write_network_fork_denied": true,
+    "fresh_import_state": true,
+    "timeout_and_rpc_budget_checked": true,
+    "missing_isolation_fails_closed": true,
+    "limitation": "Synchronous broker calls use existing backend timeouts; parent wall deadline is checked after broker returns."
+  },
+  "acceptance_cases": [
+    {
+      "case": "new tool with no target",
+      "result": "PASS: actual registered tool called; mock lifecycle keeps old checkpoint and full revision; next-cycle mock runner sees accepted revision"
+    },
+    {
+      "case": "mixed tool plus diagnosis",
+      "result": "PASS: actual A/C full vs B/D reduced; reduction differs from parent; diagnosis bypassed and tool retained"
+    },
+    {
+      "case": "teacher needs new environment observation",
+      "result": "PASS: normal Harness execution allowed; scoring rejects environment capability; keep full and skip trainer"
+    },
+    {
+      "case": "failure isolation",
+      "result": "PASS: unauthorized patch, syntax, timeout, evaluation failure, no import cache contamination; protected broker budgets"
+    },
+    {
+      "case": "model rollback",
+      "result": "PASS: mock trained model with C=0 vs A=1 rolls back checkpoint while retaining accepted full revision and tool"
+    },
+    {
+      "case": "backward compatibility",
+      "result": "PASS: existing 100 tests unmodified; original 20 SHA256 unchanged; old 90 demo files byte-equal"
+    }
+  ],
+  "final_three_cycle_demo": {
+    "path": "runs/versioned-harness-final",
+    "two_distinct_candidates": true,
+    "policy": {
+      "performance_margin": 0.02,
+      "confidence": 0.95,
+      "bootstrap_samples": 2000,
+      "min_tasks": 30,
+      "min_token_saving_fraction": 0.05,
+      "seed": 42
+    },
+    "results": [
+      {
+        "reason": "internalization_audited",
+        "model_decision": "accept",
+        "module_decision": "retire"
+      },
+      {
+        "reason": "no_useful_candidate",
+        "model_decision": "unchanged",
+        "module_decision": "unchanged"
+      },
+      {
+        "reason": "no_useful_candidate",
+        "model_decision": "unchanged",
+        "module_decision": "unchanged"
+      }
+    ],
+    "four_cells": {
+      "A": 1.0,
+      "B": 0.0,
+      "C": 1.0,
+      "D": 1.0
+    },
+    "subsequent_parents_match_accepted_checkpoint_revision": true,
+    "actual_optimizer_updates": 0,
+    "model_and_trainer": "scripted mock",
+    "environment": "synthetic",
+    "candidate_code_and_tool_execution": "actual Linux sandbox execution"
+  },
+  "cpu_training_bridge": {
+    "actual_sgd_updates": true,
+    "real_language_model": false,
+    "batch_alignment_noop_masks_detach_shared_context": "PASS"
+  },
+  "not_run": [
+    "real API proposer",
+    "real HF model",
+    "external veRL training",
+    "GPU",
+    "official benchmark tasks"
+  ],
+  "limits": [
+    "Only explicit internal-computation hook bypass currently supported for InternalizationTarget",
+    "Compatibility precheck samples search states; all training states continue to be guarded",
+    "No automatic retained-target re-audit scheduler, decomposition, DAG search, or arbitrary code-to-supervision conversion"
+  ],
+  "artifacts": {
+    "candidate": "runs/versioned-harness-final/experiment/cycle_00/candidate_0/candidate.json",
+    "target": "runs/versioned-harness-final/experiment/cycle_00/internalization_target.json",
+    "full_revision": {
+      "format": "code_revision_v1",
+      "version": "554b0b7aadd7d8fd4b937344df177c73fffacd845901268b00153c8b23d3dd97",
+      "path": "/data/miyapeng/harness-internalization/runs/versioned-harness-final/revisions/554b0b7aadd7d8fd4b937344df177c73fffacd845901268b00153c8b23d3dd97-c4736b8cb52e",
+      "policy": {
+        "editable_prefixes": [
+          "agent/",
+          "prompts/",
+          "tools/",
+          "controls/",
+          "config/"
+        ],
+        "capabilities": [
+          "model",
+          "environment"
+        ],
+        "max_files": 64,
+        "max_bytes": 262144
+      }
+    },
+    "reduced_revision": {
+      "format": "code_revision_v1",
+      "version": "0921b06cea62b098aebe58727d6c9fdd6bf66453ba8a4c2c1632dd5721138c93",
+      "path": "/data/miyapeng/harness-internalization/runs/versioned-harness-final/revisions/0921b06cea62b098aebe58727d6c9fdd6bf66453ba8a4c2c1632dd5721138c93-d20e3a5d9f08",
+      "policy": {
+        "editable_prefixes": [
+          "agent/",
+          "prompts/",
+          "tools/",
+          "controls/",
+          "config/"
+        ],
+        "capabilities": [
+          "model",
+          "environment"
+        ],
+        "max_files": 64,
+        "max_bytes": 262144
+      }
+    }
+  },
+  "new_implementation_files": [
+    "configs/versioned_alfworld_backend.json",
+    "configs/versioned_demo.json",
+    "scripts/demo_versioned_harness.py",
+    "src/internalization/evolution/code_proposer.py",
+    "src/internalization/evolution/revision_search.py",
+    "src/internalization/harness/code_runtime.py",
+    "src/internalization/harness/revision.py",
+    "src/internalization/harness/sandbox.py",
+    "src/internalization/harness/sandbox_worker.py",
+    "src/internalization/revision_demo.py",
+    "src/internalization/revision_loop.py",
+    "src/internalization/training/revision_rollout.py",
+    "src/internalization/training/revision_scoring.py"
+  ],
+  "baseline_hash_coverage": {
+    "src": 68,
+    "configs": 16,
+    "tests_and_fixtures": 13,
+    "note": "Historical scripts were not included in the initial hash manifest; only the new demo script is listed as an addition."
+  }
+}

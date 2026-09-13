@@ -1,0 +1,10 @@
+{
+  "benchmark": "hotpotqa",
+  "catalog": "${HI_BENCHMARK_CATALOG}",
+  "max_steps": 30,
+  "options": {
+    "python": "${HI_BENCHMARK_PYTHON}",
+    "setting": "distractor",
+    "top_k": 3
+  }
+}

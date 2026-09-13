@@ -1,0 +1,46 @@
+{
+  "original_test_files_unchanged": 4,
+  "original_demo_files_equal": 85,
+  "original_demo_differences": [],
+  "additional_demo_files": [
+    "candidate_archive.jsonl"
+  ],
+  "python_files_parsed": 61,
+  "private_import_or_path_hits": [],
+  "removal_required": true,
+  "date": "2026-09-13",
+  "tests": {
+    "original": 20,
+    "added": 12,
+    "passed": 32,
+    "skipped": 0,
+    "log": "docs/validation/tests-after-removal.txt"
+  },
+  "cpu_demo": {
+    "cycles": 3,
+    "decisions": [
+      "retire",
+      "retire",
+      "retire"
+    ],
+    "model": "synthetic_tabular",
+    "cost": "synthetic_not_benchmark_evidence"
+  },
+  "whole_project_old_path_hits_outside_history": [],
+  "explicit_removal_targets_absent": 4,
+  "not_run": [
+    "GPU training",
+    "external veRL optimizer execution",
+    "real API proposer",
+    "real ALFWorld data",
+    "WebShop",
+    "Search-QA",
+    "AppWorld",
+    "SWE-bench",
+    "Terminal-Bench",
+    "paper baselines"
+  ],
+  "default_training_execution": "serial_rollout_with_external_verl_single_process_PPO_actor",
+  "distributed_execution": "requires_injected_standard_verl_backend_not_validated",
+  "third_party_notices": "THIRD_PARTY_NOTICES.md"
+}

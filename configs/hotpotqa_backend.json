@@ -1,0 +1,39 @@
+{
+  "cwd": ".",
+  "timeout_s": 86400,
+  "propose": [
+    "python",
+    "scripts/propose.py",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "evaluate": [
+    "python",
+    "-m",
+    "internalization.training.entrypoint",
+    "evaluate",
+    "--benchmark",
+    "hotpotqa",
+    "--env-config",
+    "configs/hotpotqa.json",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "train": [
+    "python",
+    "scripts/train.py",
+    "--benchmark",
+    "hotpotqa",
+    "--env-config",
+    "configs/hotpotqa.json",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "benchmark": "hotpotqa"
+}

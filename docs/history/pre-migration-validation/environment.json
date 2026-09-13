@@ -1,0 +1,17 @@
+{
+  "date": "2026-09-13",
+  "python_executable": "/usr/bin/python3.12",
+  "python_version": "3.12.3 (main, Feb  4 2025, 14:48:35) [GCC 13.3.0]",
+  "dependencies": {
+    "torch": true,
+    "transformers": false,
+    "numpy": true,
+    "ray": false,
+    "alfworld": false
+  },
+  "gpu_diagnostic": {
+    "exit_code": 9,
+    "stdout": "NVIDIA-SMI has failed because it couldn't communicate with the NVIDIA driver. Make sure that the latest NVIDIA driver is installed and running.\n\n",
+    "stderr": ""
+  }
+}

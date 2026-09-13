@@ -1,0 +1,8 @@
+{
+  "benchmark": "terminalbench2",
+  "catalog": "${HI_BENCHMARK_CATALOG}",
+  "max_steps": 30,
+  "options": {
+    "python": "${HI_BENCHMARK_PYTHON}"
+  }
+}

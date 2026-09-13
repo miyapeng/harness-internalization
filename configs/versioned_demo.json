@@ -1,0 +1,5 @@
+{
+  "scenario": "mixed",
+  "loop": {"cycles": 3, "candidates_per_cycle": 2, "total_train_steps": 300, "seeds": [0, 1, 2]},
+  "note": "Synthetic lifecycle proof. Actual isolated candidate execution, scripted model and trainer. Statistical policy defaults are not relaxed."
+}

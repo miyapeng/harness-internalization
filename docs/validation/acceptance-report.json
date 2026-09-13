@@ -1,0 +1,1246 @@
+{
+  "date": "2026-09-13",
+  "change": "P0-3 independent model acceptance and module retirement",
+  "tests": {
+    "passed": 58,
+    "skipped": 0,
+    "original": 20,
+    "migration": 12,
+    "batch_policy": 7,
+    "attribution": 9,
+    "model_acceptance_and_regression": 10,
+    "log": "docs/validation/acceptance-tests.txt"
+  },
+  "acceptance_policy": {
+    "source": "RetirementPolicy; protocol.json.retirement",
+    "performance_margin": 0.02,
+    "confidence": 0.95,
+    "bootstrap_samples": 2000,
+    "min_tasks": 30,
+    "seed": 42,
+    "degradation_rule": "upper_CI(C-A) < -performance_margin",
+    "insufficient_tasks": "rollback with separate reason",
+    "acceptance_is_proof_of_noninferiority": false
+  },
+  "cpu_mock_proof": {
+    "accept_retire": {
+      "checkpoint": "after-1",
+      "active_modules": [],
+      "trainer_calls": 1,
+      "training_checkpoints": [
+        "before"
+      ],
+      "next_proposal_checkpoints": [
+        "before"
+      ],
+      "verdicts": [
+        {
+          "decision": "retire",
+          "module_decision": "retire",
+          "model_decision": "accept",
+          "model_acceptance": {
+            "decision": "accept",
+            "reason": "no_significant_full_degradation",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": true
+            },
+            "interval": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": true,
+          "cost_improved": true,
+          "retirement_eligible": true,
+          "retirement_accepted": true,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": true,
+            "preserves_original_capability": true,
+            "small_remaining_dependence": true,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 1.0,
+            "D": 1.0
+          },
+          "before_checkpoint": "before",
+          "proposed_checkpoint": "after-1",
+          "accepted_checkpoint": "after-1"
+        }
+      ]
+    },
+    "accept_retain": {
+      "checkpoint": "after-1",
+      "active_modules": [
+        "m0_0"
+      ],
+      "trainer_calls": 1,
+      "training_checkpoints": [
+        "before"
+      ],
+      "next_proposal_checkpoints": [
+        "before"
+      ],
+      "verdicts": [
+        {
+          "decision": "retain",
+          "module_decision": "retain",
+          "model_decision": "accept",
+          "model_acceptance": {
+            "decision": "accept",
+            "reason": "no_significant_full_degradation",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": true
+            },
+            "interval": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": false,
+          "cost_improved": true,
+          "retirement_eligible": false,
+          "retirement_accepted": false,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": false,
+            "preserves_original_capability": false,
+            "small_remaining_dependence": false,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 1.0,
+            "D": 0.0
+          },
+          "before_checkpoint": "before",
+          "proposed_checkpoint": "after-1",
+          "accepted_checkpoint": "after-1"
+        }
+      ]
+    },
+    "rollback_retain": {
+      "checkpoint": "before",
+      "active_modules": [
+        "m0_0"
+      ],
+      "trainer_calls": 1,
+      "training_checkpoints": [
+        "before"
+      ],
+      "next_proposal_checkpoints": [
+        "before"
+      ],
+      "verdicts": [
+        {
+          "decision": "retain",
+          "module_decision": "retain",
+          "model_decision": "rollback",
+          "model_acceptance": {
+            "decision": "rollback",
+            "reason": "full_harness_degraded",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": false
+            },
+            "interval": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": false,
+          "cost_improved": true,
+          "retirement_eligible": false,
+          "retirement_accepted": false,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": false,
+            "preserves_original_capability": false,
+            "small_remaining_dependence": true,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 0.0,
+            "D": 0.0
+          },
+          "before_checkpoint": "before",
+          "proposed_checkpoint": "after-1",
+          "accepted_checkpoint": "before"
+        }
+      ]
+    },
+    "rollback_precedence": {
+      "checkpoint": "before",
+      "active_modules": [
+        "m0_0"
+      ],
+      "trainer_calls": 1,
+      "training_checkpoints": [
+        "before"
+      ],
+      "next_proposal_checkpoints": [
+        "before"
+      ],
+      "verdicts": [
+        {
+          "decision": "retain",
+          "module_decision": "retain",
+          "model_decision": "rollback",
+          "model_acceptance": {
+            "decision": "rollback",
+            "reason": "full_harness_degraded",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": false
+            },
+            "interval": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": true,
+          "cost_improved": true,
+          "retirement_eligible": true,
+          "retirement_accepted": false,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": true,
+            "preserves_original_capability": true,
+            "small_remaining_dependence": true,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 0.0,
+            "D": 1.0
+          },
+          "before_checkpoint": "before",
+          "proposed_checkpoint": "after-1",
+          "accepted_checkpoint": "before"
+        }
+      ]
+    },
+    "continuation": {
+      "checkpoint": "after-3",
+      "active_modules": [
+        "m0_0",
+        "m1_0"
+      ],
+      "trainer_calls": 3,
+      "training_checkpoints": [
+        "before",
+        "after-1",
+        "after-1"
+      ],
+      "next_proposal_checkpoints": [
+        "before",
+        "after-1",
+        "after-1",
+        "after-3"
+      ],
+      "verdicts": [
+        {
+          "decision": "retain",
+          "module_decision": "retain",
+          "model_decision": "accept",
+          "model_acceptance": {
+            "decision": "accept",
+            "reason": "no_significant_full_degradation",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": true
+            },
+            "interval": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": false,
+          "cost_improved": true,
+          "retirement_eligible": false,
+          "retirement_accepted": false,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": false,
+            "preserves_original_capability": false,
+            "small_remaining_dependence": false,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 1.0,
+            "D": 0.0
+          },
+          "before_checkpoint": "before",
+          "proposed_checkpoint": "after-1",
+          "accepted_checkpoint": "after-1"
+        },
+        {
+          "decision": "retain",
+          "module_decision": "retain",
+          "model_decision": "rollback",
+          "model_acceptance": {
+            "decision": "rollback",
+            "reason": "full_harness_degraded",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": false
+            },
+            "interval": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": false,
+          "cost_improved": true,
+          "retirement_eligible": false,
+          "retirement_accepted": false,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": false,
+            "preserves_original_capability": false,
+            "small_remaining_dependence": true,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": -1.0,
+              "low": -1.0,
+              "high": -1.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 0.0,
+            "D": 0.0
+          },
+          "before_checkpoint": "after-1",
+          "proposed_checkpoint": "after-2",
+          "accepted_checkpoint": "after-1"
+        },
+        {
+          "decision": "retire",
+          "module_decision": "retire",
+          "model_decision": "accept",
+          "model_acceptance": {
+            "decision": "accept",
+            "reason": "no_significant_full_degradation",
+            "checks": {
+              "enough_independent_tasks": true,
+              "no_significant_full_degradation": true
+            },
+            "interval": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "policy": {
+              "performance_margin": 0.02,
+              "confidence": 0.95,
+              "bootstrap_samples": 100,
+              "min_tasks": 30,
+              "min_token_saving_fraction": 0.05,
+              "seed": 42
+            }
+          },
+          "capability_preserved": true,
+          "cost_improved": true,
+          "retirement_eligible": true,
+          "retirement_accepted": true,
+          "checks": {
+            "enough_independent_tasks": true,
+            "module_was_useful": true,
+            "student_improved_without_module": true,
+            "preserves_original_capability": true,
+            "small_remaining_dependence": true,
+            "total_tokens_vs_A": true,
+            "auxiliary_calls_vs_A": true,
+            "model_calls_vs_A": true,
+            "tool_calls_vs_A": true,
+            "latency_s_vs_A": true,
+            "total_tokens_vs_C": true,
+            "auxiliary_calls_vs_C": true,
+            "model_calls_vs_C": true,
+            "tool_calls_vs_C": true,
+            "latency_s_vs_C": true
+          },
+          "intervals": {
+            "A-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-B": {
+              "mean": 1.0,
+              "low": 1.0,
+              "high": 1.0,
+              "tasks": 30
+            },
+            "D-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "D-C": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-A": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-A": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-A": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_total_tokens_D-C": {
+              "mean": -60,
+              "low": -60,
+              "high": -60,
+              "tasks": 30
+            },
+            "cost_auxiliary_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_model_calls_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "cost_tool_calls_D-C": {
+              "mean": 0,
+              "low": 0,
+              "high": 0,
+              "tasks": 30
+            },
+            "cost_latency_s_D-C": {
+              "mean": -2,
+              "low": -2,
+              "high": -2,
+              "tasks": 30
+            },
+            "C-A": {
+              "mean": 0.0,
+              "low": 0.0,
+              "high": 0.0,
+              "tasks": 30
+            }
+          },
+          "policy": {
+            "performance_margin": 0.02,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "min_token_saving_fraction": 0.05,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0,
+            "C": 1.0,
+            "D": 1.0
+          },
+          "before_checkpoint": "after-1",
+          "proposed_checkpoint": "after-3",
+          "accepted_checkpoint": "after-3"
+        }
+      ]
+    }
+  },
+  "cpu_demo": {
+    "path": "runs/acceptance-regression",
+    "verification": {
+      "original_test_files_unchanged": 4,
+      "original_demo_files_equal": 85,
+      "original_demo_differences": [],
+      "original_demo_files_byte_equal": 77,
+      "acceptance_schema_only_changes": [
+        "cycle_00/retirement.json",
+        "cycle_00/state.json",
+        "cycle_01/retirement.json",
+        "cycle_01/state.json",
+        "cycle_02/retirement.json",
+        "cycle_02/state.json",
+        "deployment.json",
+        "events.jsonl"
+      ],
+      "additional_demo_files": [
+        "attribution_policy.json",
+        "candidate_archive.jsonl",
+        "cycle_00/attribution.json",
+        "cycle_01/attribution.json",
+        "cycle_02/attribution.json"
+      ],
+      "python_files_parsed": 63,
+      "private_import_or_path_hits": [],
+      "removal_required": true
+    }
+  },
+  "not_run": [
+    "GPU",
+    "real HF model",
+    "external veRL optimizer",
+    "real benchmark",
+    "API proposer"
+  ],
+  "outstanding": [
+    "retained module later retirement audit",
+    "real model end-to-end checkpoint reload and rollback validation",
+    "unified experiment config loading"
+  ]
+}

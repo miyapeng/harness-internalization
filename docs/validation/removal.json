@@ -1,0 +1,6 @@
+{
+  "authorized_removal": "four explicit user targets, after pre-removal tests and demo parity",
+  "targets_removed": 4,
+  "recoverable_backup": "/tmp/hi-migration-recovery-0nwnqgew/removed-sources.tar.gz",
+  "gate": "docs/validation/removal-gate.json"
+}

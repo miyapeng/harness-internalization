@@ -1,0 +1,30 @@
+{
+  "cwd": ".",
+  "timeout_s": 86400,
+  "propose": [
+    "python",
+    "scripts/propose.py",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "evaluate": [
+    "python",
+    "scripts/evaluate_alfworld.py",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}",
+    "--device",
+    "cuda:0"
+  ],
+  "train": [
+    "python",
+    "scripts/train.py",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ]
+}

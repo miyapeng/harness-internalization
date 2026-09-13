@@ -1,0 +1,11 @@
+{
+  "original_test_files_unchanged": 4,
+  "original_demo_files_equal": 85,
+  "original_demo_differences": [],
+  "additional_demo_files": [
+    "candidate_archive.jsonl"
+  ],
+  "python_files_parsed": 61,
+  "private_import_or_path_hits": [],
+  "removal_required": false
+}

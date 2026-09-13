@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "verified_date": "2026-09-13",
+  "repositories": [
+    {
+      "name": "OPID",
+      "url": "https://github.com/jinyangwu/OPID.git",
+      "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756"
+    },
+    {
+      "name": "meta-harness",
+      "url": "https://github.com/stanford-iris-lab/meta-harness.git",
+      "commit": "0cbc31e97c9e6d24232d1dc754827c02e1ec415c"
+    }
+  ],
+  "purpose": "provenance_only_not_runtime_dependencies",
+  "external_training_dependency": {
+    "package": "verl",
+    "version": "0.5.0",
+    "url": "https://github.com/volcengine/verl/tree/v0.5.0"
+  }
+}

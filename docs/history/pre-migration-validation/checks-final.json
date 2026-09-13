@@ -1,0 +1,34 @@
+{
+  "patch_installer": {
+    "exit_code": 0,
+    "stdout": "Validated OPID patch; 0 files needed updates\n",
+    "stderr": ""
+  },
+  "patch_reverse_check": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "upstream_whitespace": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "shell_syntax": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "python_ast": {
+    "files": 23,
+    "passed": true
+  },
+  "json_configs": {
+    "passed": true
+  },
+  "tests": {
+    "passed": true,
+    "count": 20,
+    "log": "docs/validation/tests-final.txt"
+  }
+}

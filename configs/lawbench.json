@@ -1,0 +1,10 @@
+{
+  "benchmark": "lawbench",
+  "catalog": "${HI_BENCHMARK_CATALOG}",
+  "max_steps": 1,
+  "options": {
+    "python": "${HI_BENCHMARK_PYTHON}",
+    "evaluator_root": "${LAWBENCH_EVALUATOR_ROOT}",
+    "evaluator_commit": "${LAWBENCH_EVALUATOR_COMMIT}"
+  }
+}

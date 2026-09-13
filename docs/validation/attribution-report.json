@@ -1,0 +1,296 @@
+{
+  "date": "2026-09-13",
+  "change": "P0-2 pre-training attribution gate",
+  "tests": {
+    "passed": 48,
+    "skipped": 0,
+    "original": 20,
+    "migration": 12,
+    "batch_policy": 7,
+    "attribution": 9,
+    "log": "docs/validation/attribution-tests.txt"
+  },
+  "default_policy": {
+    "min_external_gain": 0.0,
+    "confidence": 0.95,
+    "bootstrap_samples": 2000,
+    "min_tasks": 30,
+    "seed": 42
+  },
+  "cpu_mock_proof": {
+    "equal_ab": {
+      "trainer_calls": 0,
+      "checkpoint": "before",
+      "active_modules": [],
+      "decisions": [
+        "discard"
+      ],
+      "attribution": [
+        {
+          "passed": false,
+          "decision": "discard",
+          "reason": "no_external_contribution",
+          "delta_external": {
+            "mean": 0.0,
+            "low": 0.0,
+            "high": 0.0,
+            "tasks": 30
+          },
+          "checks": {
+            "enough_independent_tasks": true,
+            "external_contribution": false
+          },
+          "policy": {
+            "min_external_gain": 0.0,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "seed": 42
+          },
+          "success": {
+            "A": 0.5,
+            "B": 0.5
+          },
+          "checkpoint": "before",
+          "candidate_id": "e8448f872cac5e35dd39c988ee53e3715be7a55195ca2269e664740282f6c83f",
+          "parent": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "module": "m0_0",
+          "module_version": "95748df39603f32769bdf0775324f6e04dd0bf32e6a7b8a662d187298d49dfe4",
+          "h_plus": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "h_minus": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "manifest_hash": "913aaec49a7d0484b422604deeda23c69ebbb8b394cee54bcf833d77bd013ba1",
+          "partition": "retirement_0",
+          "seeds": [
+            0
+          ],
+          "evaluations": {
+            "A": "A/episodes.json",
+            "B": "B/episodes.json"
+          }
+        }
+      ]
+    },
+    "positive": {
+      "trainer_calls": 1,
+      "checkpoint": "after-1",
+      "active_modules": [],
+      "decisions": [
+        "retire"
+      ],
+      "attribution": [
+        {
+          "passed": true,
+          "decision": "internalize",
+          "reason": null,
+          "delta_external": {
+            "mean": 1.0,
+            "low": 1.0,
+            "high": 1.0,
+            "tasks": 30
+          },
+          "checks": {
+            "enough_independent_tasks": true,
+            "external_contribution": true
+          },
+          "policy": {
+            "min_external_gain": 0.0,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0
+          },
+          "checkpoint": "before",
+          "candidate_id": "e8448f872cac5e35dd39c988ee53e3715be7a55195ca2269e664740282f6c83f",
+          "parent": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "module": "m0_0",
+          "module_version": "95748df39603f32769bdf0775324f6e04dd0bf32e6a7b8a662d187298d49dfe4",
+          "h_plus": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "h_minus": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "manifest_hash": "913aaec49a7d0484b422604deeda23c69ebbb8b394cee54bcf833d77bd013ba1",
+          "partition": "retirement_0",
+          "seeds": [
+            0
+          ],
+          "evaluations": {
+            "A": "A/episodes.json",
+            "B": "B/episodes.json"
+          }
+        }
+      ]
+    },
+    "residual": {
+      "trainer_calls": 1,
+      "checkpoint": "after-1",
+      "active_modules": [
+        "m0_0"
+      ],
+      "decisions": [
+        "retain",
+        "discard",
+        "discard"
+      ],
+      "attribution": [
+        {
+          "passed": true,
+          "decision": "internalize",
+          "reason": null,
+          "delta_external": {
+            "mean": 1.0,
+            "low": 1.0,
+            "high": 1.0,
+            "tasks": 30
+          },
+          "checks": {
+            "enough_independent_tasks": true,
+            "external_contribution": true
+          },
+          "policy": {
+            "min_external_gain": 0.0,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "seed": 42
+          },
+          "success": {
+            "A": 1.0,
+            "B": 0.0
+          },
+          "checkpoint": "before",
+          "candidate_id": "e8448f872cac5e35dd39c988ee53e3715be7a55195ca2269e664740282f6c83f",
+          "parent": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "module": "m0_0",
+          "module_version": "95748df39603f32769bdf0775324f6e04dd0bf32e6a7b8a662d187298d49dfe4",
+          "h_plus": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "h_minus": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "manifest_hash": "817f4f20574584f97ef3bb398ae4e1dedb505f4f6c0af0a629837410ea544760",
+          "partition": "retirement_0",
+          "seeds": [
+            0
+          ],
+          "evaluations": {
+            "A": "A/episodes.json",
+            "B": "B/episodes.json"
+          }
+        },
+        {
+          "passed": false,
+          "decision": "discard",
+          "reason": "no_external_contribution",
+          "delta_external": {
+            "mean": 0.0,
+            "low": 0.0,
+            "high": 0.0,
+            "tasks": 30
+          },
+          "checks": {
+            "enough_independent_tasks": true,
+            "external_contribution": false
+          },
+          "policy": {
+            "min_external_gain": 0.0,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "seed": 42
+          },
+          "success": {
+            "A": 0.5,
+            "B": 0.5
+          },
+          "checkpoint": "after-1",
+          "candidate_id": "7c9dda18a62dc5837d67c530eeb580ea894e693affe6c90f70542fd33ebb962b",
+          "parent": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "module": "m1_0",
+          "module_version": "32c25ecc3f1ffe91a18ee8f08b3e0ceb94a325ab4037c83c8030aeadc7a5dbbe",
+          "h_plus": "b697cee529b3a64c062562386f03f8751382ff25182a11ca517dc554602ee1e7",
+          "h_minus": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "manifest_hash": "817f4f20574584f97ef3bb398ae4e1dedb505f4f6c0af0a629837410ea544760",
+          "partition": "retirement_1",
+          "seeds": [
+            0
+          ],
+          "evaluations": {
+            "A": "A/episodes.json",
+            "B": "B/episodes.json"
+          }
+        },
+        {
+          "passed": false,
+          "decision": "discard",
+          "reason": "no_external_contribution",
+          "delta_external": {
+            "mean": 0.0,
+            "low": 0.0,
+            "high": 0.0,
+            "tasks": 30
+          },
+          "checks": {
+            "enough_independent_tasks": true,
+            "external_contribution": false
+          },
+          "policy": {
+            "min_external_gain": 0.0,
+            "confidence": 0.95,
+            "bootstrap_samples": 100,
+            "min_tasks": 30,
+            "seed": 42
+          },
+          "success": {
+            "A": 0.5,
+            "B": 0.5
+          },
+          "checkpoint": "after-1",
+          "candidate_id": "4342321dfc9ee49e0eba007ffef873618d7ad0fe210bee98528cf56cce0b472a",
+          "parent": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "module": "m2_0",
+          "module_version": "c6010439523ebc065baa7ba1953ce43d6b2f3af20bb921f4a440197ffd40f307",
+          "h_plus": "87311ba5c148492a1e2d721b9a2668b4eac98ca30bc927723b785c69f455af62",
+          "h_minus": "33b9eec51d0ea05697c12122fd1a012cda9353b7452bcaf086d7657e5e5c4a17",
+          "manifest_hash": "817f4f20574584f97ef3bb398ae4e1dedb505f4f6c0af0a629837410ea544760",
+          "partition": "retirement_2",
+          "seeds": [
+            0
+          ],
+          "evaluations": {
+            "A": "A/episodes.json",
+            "B": "B/episodes.json"
+          }
+        }
+      ]
+    }
+  },
+  "cpu_demo": {
+    "path": "runs/attribution-regression",
+    "verification": {
+      "original_test_files_unchanged": 4,
+      "original_demo_files_equal": 85,
+      "original_demo_differences": [],
+      "additional_demo_files": [
+        "attribution_policy.json",
+        "candidate_archive.jsonl",
+        "cycle_00/attribution.json",
+        "cycle_01/attribution.json",
+        "cycle_02/attribution.json"
+      ],
+      "python_files_parsed": 63,
+      "private_import_or_path_hits": [],
+      "removal_required": true
+    }
+  },
+  "cli_attribution_policy_help": "passed",
+  "not_run": [
+    "GPU",
+    "real HF model",
+    "external veRL optimizer",
+    "real benchmark",
+    "API proposer"
+  ],
+  "outstanding": [
+    "P0-3 full-Harness training degradation rollback",
+    "retained module later retirement audit"
+  ]
+}

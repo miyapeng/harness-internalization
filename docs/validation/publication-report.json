@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-13",
+  "target": "https://github.com/miyapeng/harness-internalization",
+  "branch": "main",
+  "validation": {
+    "full_suite_passed": 127,
+    "skipped": 0,
+    "seconds": 226.705,
+    "log": "publication-tests.txt",
+    "wheel_build": "PASS",
+    "wheel_sha256": "b1fc869eafedf9d00978530a4a5cc9f1c20559faa8d1b49e1c2b0c8ee0a38955",
+    "wheel_includes_project_and_third_party_licenses": true,
+    "readme_local_links": "PASS",
+    "credential_pattern_hits": 0,
+    "nested_git_repositories": 0
+  },
+  "publication_changes": [
+    "README describes versioned code evolution and selective internalization with clone-based setup",
+    "Added MIT license for project-owned code, retaining third-party licenses and notices",
+    "Package metadata includes README, repository URL and distributed license files",
+    "Ignore rules exclude runtime artifacts, checkpoints, virtualenv/build caches and credential files"
+  ],
+  "algorithm_changes": false,
+  "benchmark_changes": false,
+  "excluded": [
+    "runs/",
+    "checkpoints/",
+    "upstream/",
+    ".env and local variants",
+    "build/",
+    "dist/",
+    "Python caches",
+    "model weights"
+  ],
+  "not_run": [
+    "real API proposer",
+    "real HF/veRL/GPU training",
+    "official benchmark tasks"
+  ]
+}

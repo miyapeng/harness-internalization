@@ -1,0 +1,28 @@
+test_candidate_import_and_global_state_are_fresh_on_every_call (test_versioned_harness.RevisionExecutionTests.test_candidate_import_and_global_state_are_fresh_on_every_call) ... ok
+test_capability_call_budget_cannot_be_changed_by_candidate (test_versioned_harness.RevisionExecutionTests.test_capability_call_budget_cannot_be_changed_by_candidate) ... ok
+test_core_history_keeps_prior_observations_across_environment_calls (test_versioned_harness.RevisionExecutionTests.test_core_history_keeps_prior_observations_across_environment_calls) ... ok
+test_landlock_seccomp_block_host_files_network_fork_and_write (test_versioned_harness.RevisionExecutionTests.test_landlock_seccomp_block_host_files_network_fork_and_write) ... ok
+test_missing_kernel_isolation_fails_closed (test_versioned_harness.RevisionExecutionTests.test_missing_kernel_isolation_fails_closed) ... ok
+test_mixed_reduction_is_not_parent_and_keeps_tool_source_and_registration (test_versioned_harness.RevisionExecutionTests.test_mixed_reduction_is_not_parent_and_keeps_tool_source_and_registration) ... ok
+test_new_registered_tool_really_runs_and_trace_identifies_revision (test_versioned_harness.RevisionExecutionTests.test_new_registered_tool_really_runs_and_trace_identifies_revision) ... ok
+test_patch_denies_protected_paths_syntax_errors_and_wrong_parent_hash (test_versioned_harness.RevisionExecutionTests.test_patch_denies_protected_paths_syntax_errors_and_wrong_parent_hash) ... ok
+test_search_evaluation_failure_preserves_parent_and_evaluates_sibling (test_versioned_harness.RevisionExecutionTests.test_search_evaluation_failure_preserves_parent_and_evaluates_sibling) ... ok
+test_teacher_fresh_environment_effect_is_unsupported (test_versioned_harness.RevisionExecutionTests.test_teacher_fresh_environment_effect_is_unsupported) ... ok
+test_timeout_does_not_mutate_parent_or_prevent_next_candidate (test_versioned_harness.RevisionExecutionTests.test_timeout_does_not_mutate_parent_or_prevent_next_candidate) ... ok
+test_current_batch_alignment_response_masks_and_gradient_isolation (test_revision_training.RevisionTrainingTests.test_current_batch_alignment_response_masks_and_gradient_isolation) ... /usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py:824: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 304: OS call failed or operation not supported on this OS (Triggered internally at /opt/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:109.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+ok
+test_inactive_hook_has_strictly_zero_teacher_term (test_revision_training.RevisionTrainingTests.test_inactive_hook_has_strictly_zero_teacher_term) ... ok
+test_non_target_context_is_shared_without_regeneration_in_teacher (test_revision_training.RevisionTrainingTests.test_non_target_context_is_shared_without_regeneration_in_teacher) ... ok
+test_noop_difference_zero_after_real_cpu_parameter_updates (test_revision_training.RevisionTrainingTests.test_noop_difference_zero_after_real_cpu_parameter_updates) ... ok
+test_invalid_multiple_targets_keeps_accepted_candidate (test_revision_decisions.RevisionDecisionTests.test_invalid_multiple_targets_keeps_accepted_candidate) ... ok
+test_no_gain_keeps_old_model_and_parent (test_revision_decisions.RevisionDecisionTests.test_no_gain_keeps_old_model_and_parent) ... ok
+test_proposer_transport_is_independently_mockable_and_bad_patch_does_not_lose_sibling (test_revision_decisions.RevisionDecisionTests.test_proposer_transport_is_independently_mockable_and_bad_patch_does_not_lose_sibling) ... ok
+test_search_dev_gain_cannot_bypass_independent_acceptance_gate (test_revision_decisions.RevisionDecisionTests.test_search_dev_gain_cannot_bypass_independent_acceptance_gate) ... ok
+test_supervision_rejects_removal_of_non_target_tool_registration (test_revision_decisions.RevisionDecisionTests.test_supervision_rejects_removal_of_non_target_tool_registration) ... ok
+test_valid_tool_without_target_persists_into_next_candidate_search (test_revision_decisions.RevisionDecisionTests.test_valid_tool_without_target_persists_into_next_candidate_search) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 7.675s
+
+OK
