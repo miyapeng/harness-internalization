@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+from copy import deepcopy
 from pathlib import Path
 import re
 
@@ -26,6 +27,7 @@ class AcceptedAgentState:
     manifest_hash: str
     protocol: dict
     next_cycle: int | None = None
+    sampling_state: dict | None = None
 
     def __post_init__(self):
         if not self.checkpoint or not self.manifest_hash or self.protocol.get("manifest_hash") != self.manifest_hash:
@@ -36,7 +38,8 @@ class AcceptedAgentState:
     def to_dict(self):
         return {"agent_state_schema": 1, "checkpoint": self.checkpoint,
             "harness_revision": serialize_harness(self.harness), "manifest_hash": self.manifest_hash,
-            "protocol": self.protocol, "protocol_hash": digest(self.protocol), "next_cycle": self.next_cycle}
+            "protocol": self.protocol, "protocol_hash": digest(self.protocol), "next_cycle": self.next_cycle,
+            **({"sampling_state":deepcopy(self.sampling_state)} if self.sampling_state is not None else {})}
 
     def check_manifest(self, manifest):
         manifest.validate()
@@ -56,7 +59,7 @@ class AcceptedAgentState:
             recorded=self.protocol.get("harness_acceptance")
             # Recognize the old independent gate without changing old artifacts.
             # revision_loop records a protocol transition for remaining cycles.
-            if recorded not in (dev_acceptance_policy(policy),asdict(attribution_policy)):
+            if recorded not in (dev_acceptance_policy(policy),dev_acceptance_policy(policy,budget=True),asdict(attribution_policy)):
                 raise ValueError("Resume protocol mismatch: harness_acceptance")
         for name, value in expected.items():
             if name not in self.protocol or digest(self.protocol[name]) != digest(value):
@@ -128,7 +131,7 @@ def load_accepted_state(path, manifest, *, checkpoint=None, protocol_path=None):
     elif re.fullmatch(r"cycle_\d+", path.parent.name): next_cycle = int(path.parent.name.split("_")[-1]) + 1
     elif path.name == "deployment.json": next_cycle = protocol.get("loop", {}).get("cycles")
     else: next_cycle = None
-    agent = AcceptedAgentState(str(location), harness, manifest_hash, protocol, next_cycle)
+    agent = AcceptedAgentState(str(location), harness, manifest_hash, protocol, next_cycle, value.get("sampling_state"))
     agent.check_manifest(manifest)
     return agent
 

@@ -26,15 +26,16 @@ Use only the supplied search trajectories. Do not assume access to held-out task
 
 
 class APIProposer:
-    def __init__(self, *, model=None, base_url=None, api_key=None, transport=None):
+    def __init__(self, *, model=None, base_url=None, api_key=None, transport=None, max_tokens=8192, temperature=0.7):
         self.model, self.base_url, self.api_key = model, base_url, api_key
         self.transport = transport
+        self.max_tokens,self.temperature=max_tokens,temperature
 
     def request_json(self,contract,public,output):
         """Shared transport for code proposals; endpoint selection remains protected configuration."""
         payload={"model":self.model or os.environ["HI_PROPOSER_MODEL"],
             "messages":[{"role":"system","content":contract},{"role":"user","content":json.dumps(public,ensure_ascii=False)}],
-            "max_tokens":8192,"temperature":0.7,"response_format":{"type":"json_object"}}
+            "max_tokens":self.max_tokens,"temperature":self.temperature,"response_format":{"type":"json_object"}}
         output.mkdir(parents=True,exist_ok=True)
         write_json(output/"proposer_prompt.json",payload)
         start=time.monotonic()

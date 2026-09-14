@@ -1,0 +1,217 @@
+{
+  "date": "2026-09-14",
+  "status": "CPU_REGRESSION_PASSED_REAL_GPU_NOT_RUN",
+  "tests": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "passed": 213,
+    "seconds": 221.53,
+    "new_budget_tests": 11,
+    "existing_tests": 202,
+    "skipped": 0,
+    "log": "budget-v1-tests.txt"
+  },
+  "parity": {
+    "protected_unchanged_sha256": {
+      "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+      "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+      "src/internalization/training/verl_backend.py": "7a6be70f0eb56ba96cc1c2c26728720e828c3548d22de6cd1c74902cfbc91686",
+      "src/internalization/harness/control_runtime.py": "5889074a8bf07ffd46728da93067ddf7af161ab1389bef4b20b57633d9b746dd",
+      "src/internalization/harness/revision.py": "adbb661f1f149f656be490507c2e27d57b2ada479e3fd400c1529025f1ab6a26",
+      "src/internalization/harness/code_runtime.py": "0a395d1ff323735a7ad7867e3051f5acbec9c0436446bfc811e3e904fff7a34a",
+      "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+      "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+      "src/internalization/outer_loop.py": "5f25c221be805e2445d3511eebbc5713284a8b9354abd6c32cea05df3298c929"
+    },
+    "legacy_reference": "runs/dev-acceptance-legacy-regression",
+    "legacy_current": "runs/budget-v1-legacy-regression",
+    "compared_files": 90,
+    "differences": []
+  },
+  "schedule_proof": {
+    "kind": "synthetic_cpu_scheduling_only",
+    "calls": 11,
+    "episodes": 136,
+    "task_counts": [
+      8,
+      8,
+      8,
+      32,
+      32,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8
+    ],
+    "proposer_scores": [
+      8,
+      8,
+      8
+    ],
+    "proposer_traces": [
+      4,
+      4,
+      4
+    ],
+    "raw_trajectories_per_cycle": 8,
+    "search_tasks": [
+      [
+        "search-87",
+        "search-6",
+        "search-25",
+        "search-64",
+        "search-49",
+        "search-59",
+        "search-27",
+        "search-9"
+      ],
+      [
+        "search-2",
+        "search-46",
+        "search-23",
+        "search-58",
+        "search-54",
+        "search-35",
+        "search-83",
+        "search-92"
+      ],
+      [
+        "search-13",
+        "search-81",
+        "search-19",
+        "search-66",
+        "search-34",
+        "search-12",
+        "search-60",
+        "search-30"
+      ]
+    ],
+    "checkpoint": "old",
+    "real_model_or_gpu": false
+  },
+  "effective_config_hashes": {
+    "alfworld": "69c227663b1ec02516ca0107580016074e0e560aa2d6fd2c142b5617d2138975",
+    "webshop": "9d10618bbed67370fe01642e4e75695180e1d675f8620a8f3de89a1fb86d3fe2",
+    "hotpotqa": "b42644a7723093dd1f8f0e007eb71b7eb5b75aad37cf1ff1dfd256204f696ffc"
+  },
+  "preflight": {
+    "alfworld": {
+      "status": "not_run",
+      "errors": [
+        "missing dependency: alfworld",
+        "requires external verl==0.5.0",
+        "no usable CUDA device; no CPU/mock substitution",
+        "manifest: [Errno 2] No such file or directory: 'data/budget_v1/alfworld/manifest.json'"
+      ],
+      "dependencies": {
+        "torch": true,
+        "transformers": true,
+        "verl": true,
+        "alfworld": false
+      },
+      "verl_version": "0.9.0.dev0",
+      "hardware": {
+        "available": false,
+        "visible_count": 0,
+        "devices": []
+      },
+      "checkpoint_fingerprint": "df0c5a5629da74a63a80be09a792afd5886e2d724ad72f8ab07f60d9d071a536",
+      "preflight_only": true
+    },
+    "webshop": {
+      "status": "not_run",
+      "errors": [
+        "requires external verl==0.5.0",
+        "no usable CUDA device; no CPU/mock substitution",
+        "manifest: [Errno 2] No such file or directory: 'data/budget_v1/webshop/manifest.json'",
+        "environment: Unset benchmark configuration environment variable"
+      ],
+      "dependencies": {
+        "torch": true,
+        "transformers": true,
+        "verl": true
+      },
+      "verl_version": "0.9.0.dev0",
+      "hardware": {
+        "available": false,
+        "visible_count": 0,
+        "devices": []
+      },
+      "checkpoint_fingerprint": "df0c5a5629da74a63a80be09a792afd5886e2d724ad72f8ab07f60d9d071a536",
+      "preflight_only": true
+    },
+    "hotpotqa": {
+      "status": "not_run",
+      "errors": [
+        "requires external verl==0.5.0",
+        "no usable CUDA device; no CPU/mock substitution",
+        "manifest: [Errno 2] No such file or directory: 'data/budget_v1/hotpotqa/manifest.json'",
+        "environment: Unset benchmark configuration environment variable"
+      ],
+      "dependencies": {
+        "torch": true,
+        "transformers": true,
+        "verl": true
+      },
+      "verl_version": "0.9.0.dev0",
+      "hardware": {
+        "available": false,
+        "visible_count": 0,
+        "devices": []
+      },
+      "checkpoint_fingerprint": "df0c5a5629da74a63a80be09a792afd5886e2d724ad72f8ab07f60d9d071a536",
+      "preflight_only": true
+    }
+  },
+  "hardware_read_only_probe": {
+    "command": "nvidia-smi --query-gpu=index,name,memory.total,memory.used --format=csv",
+    "outside_sandbox": true,
+    "exit_code": 6,
+    "output": "No devices were found"
+  },
+  "actual_passes": [
+    "11 synthetic budget tests",
+    "202 existing tests",
+    "real JSON subprocess CPU policy updates",
+    "legacy demo 90 files byte-identical",
+    "9 protected files unchanged",
+    "Python AST parse and git diff --check"
+  ],
+  "fixed_during_regression": [
+    "legacy CLI test backend compatibility",
+    "legacy zero-update journal shape preserved",
+    "atomic sampler cursor plus immutable per-draw snapshots",
+    "weak-gain test fixture corrected",
+    "budget_v1 CLI rejects a missing executable Harness instead of entering legacy scheduling"
+  ],
+  "not_run": [
+    "official data imports/distributions",
+    "real API proposer",
+    "official full WebShop environment",
+    "HF/verl 0.5.0 GPU updates and checkpoint reload",
+    "three benchmarks x three seeds"
+  ],
+  "readiness": {
+    "webshop": "not_ready",
+    "real_gpu_smoke": "not_run_preflight_failed",
+    "official_distributions": "not_prepared"
+  },
+  "limitations": [
+    "No GPU visible, including read-only nvidia-smi outside sandbox",
+    "Existing training env has verl 0.9.0.dev0 instead of required 0.5.0",
+    "ALFWorld/WebShop deps and required official datasets not prepared",
+    "WebShop per-episode simulator loading has not been optimized or run on full official assets"
+  ],
+  "no_method_change": [
+    "same batch old-policy H+ minus cached H- formula",
+    "named controls",
+    "A/B gate",
+    "C/D retirement",
+    "model rollback",
+    "existing PPO and step-weighted outcome"
+  ],
+  "acceptance_partitions_added": false,
+  "old_manifests_modified": false,
+  "large_experiments_started": false
+}

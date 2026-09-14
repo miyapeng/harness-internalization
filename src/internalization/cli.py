@@ -22,6 +22,7 @@ def main():
     run.add_argument("--manifest", type=Path, required=True)
     run.add_argument("--backend", type=Path, required=True)
     run.add_argument("--experiment-config", type=Path, help="Strict execution settings; replace backend execution settings")
+    run.add_argument("--run-seed",type=int,help="Override run and model sampling seeds together (17/29/43)")
     run.add_argument("--checkpoint", help="Required for a fresh run; optional check when resuming --state")
     run.add_argument("--output", type=Path, required=True)
     run.add_argument("--planned-update-batches", "--train-steps", dest="train_steps", type=int,
@@ -79,6 +80,8 @@ def main():
         config = json.loads(args.backend.read_text())
         if args.experiment_config:
             config["execution"] = json.loads(args.experiment_config.read_text())
+        if args.run_seed is not None:
+            config.setdefault("execution",{}).setdefault("seeds",{}).update(run_seed=args.run_seed,model_sampling_seed=args.run_seed)
         backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
         if args.output.exists(): raise FileExistsError(args.output)
         manifest=TaskManifest.load(args.manifest)
@@ -96,6 +99,17 @@ def main():
         if args.cycles is not None: options["cycles"]=args.cycles
         if args.train_steps is not None: options["total_train_steps"]=args.train_steps
         if "seeds" in options: options["seeds"]=tuple(options["seeds"])
+        if getattr(backend,"execution_config",None) and backend.execution_config["schedule"]["profile"] == "budget_v1":
+            expected={"cycles":3,"total_train_steps":300,"candidates_per_cycle":2,
+                "seeds":(backend.execution_config["seeds"]["environment_seed"],)}
+            if any(k in options and options[k]!=v for k,v in expected.items()):
+                raise ValueError("CLI/resume schedule conflicts with budget_v1")
+            options.update(expected)
+            from .core.sampling import validate_budget_manifest
+            validate_budget_manifest(manifest)
+            manifest_metadata=json.loads(args.manifest.read_text())
+            if manifest_metadata.get("split_seed") != backend.execution_config["seeds"]["split_seed"]:
+                raise ValueError("Manifest split_seed does not match effective configuration")
         loop=LoopConfig(**options)
         policy=RetirementPolicy(**accepted.protocol["retirement"]) if accepted else RetirementPolicy()
         attribution_policy=(AttributionPolicy.load(args.attribution_policy) if args.attribution_policy else
@@ -104,6 +118,9 @@ def main():
         from .harness.revision import HarnessRevision
         versioned=bool(args.harness_workspace or (raw_revision and not state_path) or
             (accepted and isinstance(accepted.harness,HarnessRevision)))
+        if (getattr(backend,"execution_config",None) and
+                backend.execution_config["schedule"]["profile"]=="budget_v1" and not versioned):
+            raise ValueError("budget_v1 requires an executable Harness revision/workspace")
         manifest.validate_loop(loop.cycles,versioned=versioned,
             cohort_minimum=max(policy.min_tasks,attribution_policy.min_tasks) if versioned else None)
         if accepted:

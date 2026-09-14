@@ -24,6 +24,9 @@ def rollout_revision(runner,model,harness,tasks,*,seeds,output,training=False):
             started=time.perf_counter()
             try:
                 history=initial_observation=env.reset(task,seed)
+                sampling_seed=runner.seed_episode(model,task,replica)
+                if sampling_seed is not None:
+                    audit.append("episode_seed",episode_id=episode,environment_seed=seed,model_sampling_seed=sampling_seed)
                 audit.append("environment_reset",task_id=task,episode_id=episode,
                     model_version=model.snapshot_id,harness_version=harness.version,
                     parameters={"task_id":task,"seed":seed},result={"observation":initial_observation})

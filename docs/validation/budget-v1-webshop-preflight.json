@@ -1,0 +1,22 @@
+{
+  "status": "not_run",
+  "errors": [
+    "requires external verl==0.5.0",
+    "no usable CUDA device; no CPU/mock substitution",
+    "manifest: [Errno 2] No such file or directory: 'data/budget_v1/webshop/manifest.json'",
+    "environment: Unset benchmark configuration environment variable"
+  ],
+  "dependencies": {
+    "torch": true,
+    "transformers": true,
+    "verl": true
+  },
+  "verl_version": "0.9.0.dev0",
+  "hardware": {
+    "available": false,
+    "visible_count": 0,
+    "devices": []
+  },
+  "checkpoint_fingerprint": "df0c5a5629da74a63a80be09a792afd5886e2d724ad72f8ab07f60d9d071a536",
+  "preflight_only": true
+}

@@ -18,12 +18,11 @@ def main():
     parser.add_argument("--backend", type=Path, required=True)
     add_evaluation_agent_arguments(parser)
     parser.add_argument("--partition", default="test")
-    parser.add_argument("--seeds", type=int, nargs="+", default=[0,1,2])
+    parser.add_argument("--seeds", type=int, nargs="+", default=None)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     manifest = TaskManifest.load(args.manifest)
-    if manifest.benchmark not in BENCHMARKS: raise ValueError("Use the existing evaluator for this benchmark")
-    if len(set(args.seeds)) != len(args.seeds): raise ValueError("Duplicate seeds")
+    if manifest.benchmark not in (*BENCHMARKS,"alfworld"): raise ValueError("Use the existing evaluator for this benchmark")
     config = json.loads(args.backend.read_text())
     if config.get("benchmark") != manifest.benchmark: raise ValueError("Backend/manifest benchmark mismatch")
     config["evaluate"] = config["evaluate"] + ["--final-evaluation"]
@@ -31,6 +30,11 @@ def main():
     checkpoint, harness = agent.checkpoint, agent.harness
     if "effective_config" in agent.protocol:
         config["execution"] = agent.protocol["effective_config"]
+    execution=config.get("execution",{})
+    budget=execution.get("schedule",{}).get("profile")=="budget_v1"
+    if args.seeds is None: args.seeds=[execution["seeds"]["environment_seed"]] if budget else [0,1,2]
+    if len(set(args.seeds)) != len(args.seeds): raise ValueError("Duplicate seeds")
+    if budget and args.seeds != [execution["seeds"]["environment_seed"]]: raise ValueError("budget_v1 evaluates once per task")
     args.output.mkdir(parents=True, exist_ok=False)
     write_json(args.output/"protocol.json", {"manifest_hash":manifest.fingerprint, "checkpoint":checkpoint,
         "harness_version":harness.version, "agent":agent.to_dict(),
@@ -42,7 +46,7 @@ def main():
         raise ValueError("Wrong final evaluation task/seed coverage")
     response = json.loads((args.output/"evaluation"/"response.json").read_text())
     result = {"benchmark":manifest.benchmark, "partition":args.partition,
-        "benchmark_metrics":response["benchmark_metrics"], "cost":response["cost"]}
+        "benchmark_metrics":response.get("benchmark_metrics", {"success":sum(r.success for r in rows)/len(rows)}), "cost":response["cost"]}
     write_json(args.output/"aggregate.json", result)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 

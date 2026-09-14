@@ -1,0 +1,63 @@
+{
+  "kind": "synthetic_cpu_scheduling_only",
+  "calls": 11,
+  "episodes": 136,
+  "task_counts": [
+    8,
+    8,
+    8,
+    32,
+    32,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8
+  ],
+  "proposer_scores": [
+    8,
+    8,
+    8
+  ],
+  "proposer_traces": [
+    4,
+    4,
+    4
+  ],
+  "raw_trajectories_per_cycle": 8,
+  "search_tasks": [
+    [
+      "search-87",
+      "search-6",
+      "search-25",
+      "search-64",
+      "search-49",
+      "search-59",
+      "search-27",
+      "search-9"
+    ],
+    [
+      "search-2",
+      "search-46",
+      "search-23",
+      "search-58",
+      "search-54",
+      "search-35",
+      "search-83",
+      "search-92"
+    ],
+    [
+      "search-13",
+      "search-81",
+      "search-19",
+      "search-66",
+      "search-34",
+      "search-12",
+      "search-60",
+      "search-30"
+    ]
+  ],
+  "checkpoint": "old",
+  "real_model_or_gpu": false
+}

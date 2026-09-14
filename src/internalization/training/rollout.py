@@ -33,11 +33,21 @@ class Environment(Protocol):
 
 
 class InteractionTaskRunner:
-    def __init__(self, environment_factory, model_loader=None, *, max_steps=30, code_sandbox=None, supervision="targeted"):
+    def __init__(self, environment_factory, model_loader=None, *, max_steps=30, code_sandbox=None, supervision="targeted", model_sampling_seed=None, environment_seed=0):
         self.environment_factory, self.model_loader = environment_factory, model_loader
         self.max_steps = max_steps
         self.code_sandbox = code_sandbox
         self.supervision = supervision
+        self.model_sampling_seed = model_sampling_seed
+        self.sampling_batch = 0
+        self.environment_seed = environment_seed
+
+    def seed_episode(self, model, task, replica):
+        if self.model_sampling_seed is None: return None
+        from ..core.sampling import model_seed, seed_process
+        seed=model_seed(self.model_sampling_seed,self.sampling_batch,task,replica)
+        seed_process(seed)
+        return seed
 
     def rollout(self, model, harness, tasks, *, seeds, output, training=False):
         from ..harness.revision import HarnessRevision
@@ -58,6 +68,9 @@ class InteractionTaskRunner:
                 started = time.perf_counter()
                 try:
                     observation = environment.reset(task, seed)
+                    sampling_seed=self.seed_episode(model,task,replica)
+                    if sampling_seed is not None:
+                        journal.append("episode_seed",episode_id=episode,environment_seed=seed,model_sampling_seed=sampling_seed)
                     for index in range(self.max_steps):
                         state = State(task, episode, index, observation)
                         advice = runtime.advise(state)

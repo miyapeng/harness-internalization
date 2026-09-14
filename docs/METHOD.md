@@ -2,6 +2,12 @@
 
 目标是在能力保留时，把外部 Harness 控制计算带来的决策能力转移进学生模型，并减少部署调用成本。现在支持版本化代码演化；原 planning/review/recovery 模块模式仍保留兼容入口。
 
+## budget_v1 调度（2026-09-14）
+
+显式选择 schedule.profile=budget_v1 时，内部数据固定 train2048/search96/dev32/retirement_i各128，三周期每轮从固定打乱 search 池取8个互不重复任务。两个候选先使用相同8题，以配对平均收益>0初筛，只让 search 最优的一个候选进入32题dev；8题初筛不使用显著性门槛。dev仍使用原配对区间下界>0作为正式Harness接受，无额外acceptance。proposer读取8题分数和最多4条代表轨迹，全部原始轨迹留档。旧配置保留旧search/dev规则；下文关于双区间search门槛的描述仅适用于legacy调度。
+
+总计划300批按三周期各100批；通过A/B后才训练，不消耗的预算不转移。以seed打乱训练队列，跨周期/失败/模型回滚保存位置，每批4个不同任务、每题4条fresh rollout。split_seed42、run_seed17（另提供29/43）、环境seed与模型采样seed分开；评价及内部控制greedy，每题评价一次。准确训练名称为external veRL vanilla PPO加step-weighted within-task episode-outcome normalization，原同batch自蒸馏公式、具名控制、A/B、退役与模型rollback不变。具体参数、数据来源与独立两批真实smoke入口见 [BUDGET_V1.md](BUDGET_V1.md)。真实数据/GPU验证状态另列，不把CPU回归当作实验结论。
+
 ## 运行接线与计数约束（2026-09-14）
 
 ALFWorld/HotpotQA 的版本化生产后端提供五个入口，明确 internalization/evolution_only；前者缺少入口即启动失败，后者接受改进后不训练。运行参数经严格校验，完整解析为 effective_config 并连同 hash 传给各子进程；同批 H+/H− 评分、具名目标和统计规则不变。λ 对应 advantage.module_weight，0 是有效值；all/targeted 进入实际 scorer。

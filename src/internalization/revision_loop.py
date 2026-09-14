@@ -13,6 +13,19 @@ from .core.execution_config import NoActorUpdates
 
 
 def run_revision_loop(components,manifest,checkpoint,initial_harness,output,config,policy,attribution_policy,*,accepted_state=None):
+    execution = components.execution_config
+    budget_mode = bool(execution and execution["schedule"]["profile"] == "budget_v1")
+    if budget_mode:
+        from .core.sampling import validate_budget_manifest, search_schedule
+        validate_budget_manifest(manifest)
+        if (config.cycles,config.candidates_per_cycle,config.total_train_steps,config.seeds) != (
+                3,2,300,(execution["seeds"]["environment_seed"],)):
+            raise ValueError("Loop configuration does not match budget_v1")
+        if components.sampling_state is None: components.sampling_state = {}
+        if accepted_state is not None:
+            if accepted_state.sampling_state is None: raise ValueError("Resume requires persisted training sampler")
+            components.sampling_state.update(accepted_state.sampling_state)
+    acceptance_policy = dev_acceptance_policy(policy,budget=budget_mode)
     manifest.validate_loop(config.cycles, versioned=True,
         cohort_minimum=max(policy.min_tasks,attribution_policy.min_tasks))
     if accepted_state is not None: accepted_state.check_resume(manifest,config,policy,attribution_policy)
@@ -24,12 +37,12 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
     harness=initial_harness
     evaluator=components.retirement or PairedRetirementEvaluator(components.runner,policy)
     protocol=accepted_state.protocol if accepted_state is not None else {"mode":"versioned_code_selective_internalization","loop":asdict(config),
-        "retirement":asdict(policy),"attribution":asdict(attribution_policy),"harness_acceptance":dev_acceptance_policy(policy),
+        "retirement":asdict(policy),"attribution":asdict(attribution_policy),"harness_acceptance":acceptance_policy,
         "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint,"initial_harness":harness.to_dict()}
-    if protocol["harness_acceptance"] != dev_acceptance_policy(policy):
+    if protocol["harness_acceptance"] != acceptance_policy:
         # The user-authorized acceptance change applies only to future cycles;
         # retain the original snapshot and never rewrite any historical artifact.
-        protocol={**protocol,"harness_acceptance":dev_acceptance_policy(policy),
+        protocol={**protocol,"harness_acceptance":acceptance_policy,
             "acceptance_transition":{"from_protocol_hash":digest(protocol),
                 "decision_source":"dev","effective_from_cycle":start_cycle}}
     execution = components.execution_config
@@ -46,7 +59,7 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
     archive=[]
 
     def save(folder,reason,*,candidate=None,target=None,model_decision="unchanged",module_decision="retain",**extra):
-        entry={**AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,cycle+1).to_dict(),
+        entry={**AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,cycle+1,components.sampling_state).to_dict(),
             "cycle":cycle,"reason":reason,
             "model_decision":model_decision,"module_decision":module_decision,
             "candidate_id":candidate.candidate_id if candidate else None,
@@ -59,9 +72,21 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
         folder=output/f"cycle_{cycle:02d}"
         folder.mkdir()
         parent=harness
+        if budget_mode:
+            search = search_schedule(manifest.partition("search"),execution["seeds"]["run_seed"])[cycle]
+            write_json(folder/"search_tasks.json",{"task_ids":list(search),"pool_size":96,
+                "run_seed":execution["seeds"]["run_seed"],"cycle":cycle,"rule":"disjoint_seeded_queue"})
         base_search=evaluate_tasks(components.runner,checkpoint,parent,search,config.seeds,folder/"baseline_search")
-        base_dev=evaluate_tasks(components.runner,checkpoint,parent,dev,config.seeds,folder/"baseline_dev")
-        request=ProposalRequest(checkpoint,parent,search,base_search.trajectories,base_search.evaluations,
+        base_dev=None if budget_mode else evaluate_tasks(components.runner,checkpoint,parent,dev,config.seeds,folder/"baseline_dev")
+        traces = base_search.trajectories
+        if budget_mode:
+            # Alternate poorest/best scores; all eight scores and every raw trace remain archived.
+            ordered=sorted(traces,key=lambda t:(t.success,t.task_id,t.episode_id))
+            representative=[]
+            while ordered and len(representative)<4:
+                representative.append(ordered.pop(0 if len(representative)%2==0 else -1))
+            traces=tuple(representative)
+        request=ProposalRequest(checkpoint,parent,search,traces,base_search.evaluations,
             public_history(journal),cycle,config.candidates_per_cycle,folder/"proposals")
         selection=search_revisions(components,request,baseline_search=base_search,baseline_dev=base_dev,
             dev_tasks=dev,seeds=config.seeds,policy=policy,journal=journal)
@@ -134,6 +159,6 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
         save(folder,"internalization_audited",candidate=candidate,target=target,
             model_decision=verdict["model_decision"],module_decision=verdict["module_decision"],
             before_checkpoint=before_checkpoint,proposed_checkpoint=proposed)
-    result={**AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,config.cycles).to_dict(),"archive":archive}
+    result={**AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,config.cycles,components.sampling_state).to_dict(),"archive":archive}
     write_json(output/"deployment.json",result)
     return result

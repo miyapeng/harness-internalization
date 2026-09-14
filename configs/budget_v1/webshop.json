@@ -1,0 +1,74 @@
+{
+  "mode": "internalization",
+  "algorithm": {
+    "actor": "verl_0.5.0_vanilla_PPO",
+    "outcome": "step_weighted_within_task_episode_outcome",
+    "ppo": {
+      "ppo_mini_batch_size": 8,
+      "ppo_micro_batch_size_per_gpu": 1,
+      "ppo_epochs": 1,
+      "clip_ratio": 0.2,
+      "clip_ratio_low": 0.2,
+      "clip_ratio_high": 0.2,
+      "clip_ratio_c": 3.0,
+      "loss_agg_mode": "token-mean",
+      "use_kl_loss": true,
+      "kl_loss_coef": 0.01,
+      "kl_loss_type": "low_var_kl",
+      "entropy_coeff": 0.001,
+      "grad_clip": 1.0,
+      "policy_loss": {
+        "loss_mode": "vanilla"
+      },
+      "use_remove_padding": false,
+      "use_dynamic_bsz": false,
+      "use_fused_kernels": false,
+      "use_torch_compile": false,
+      "ulysses_sequence_parallel_size": 1,
+      "entropy_from_logits_with_chunking": false,
+      "entropy_checkpointing": false
+    }
+  },
+  "schedule": {
+    "profile": "budget_v1",
+    "cycles": 3,
+    "planned_update_batches": 300,
+    "search_per_cycle": 8,
+    "candidate_count": 2,
+    "representative_traces": 4
+  },
+  "seeds": {
+    "split_seed": 42,
+    "run_seed": 17,
+    "environment_seed": 0,
+    "model_sampling_seed": 17
+  },
+  "max_steps": 15,
+  "supervision": "targeted",
+  "tasks_per_batch": 4,
+  "rollouts_per_task": 4,
+  "device": "cuda:0",
+  "reference_device": "cpu",
+  "model": {
+    "max_context": 8192,
+    "max_prompt_tokens": 4096,
+    "max_action_tokens": 512,
+    "max_new_tokens": 256
+  },
+  "advantage": {
+    "module_weight": 0.001,
+    "mode": "mean_std_norm",
+    "normalize_module": false,
+    "clip_module": null,
+    "invalid_action_penalty": 0.1,
+    "epsilon": 1e-06
+  },
+  "optimizer": {
+    "learning_rate": 1e-06,
+    "weight_decay": 0.01
+  },
+  "proposer": {
+    "max_tokens": 8192,
+    "temperature": 0.0
+  }
+}

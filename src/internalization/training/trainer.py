@@ -58,14 +58,17 @@ def build_update_batch(trajectories, signals, policy, config):
         "old_log_probs": old, "advantages": advantage, "token_level_rewards": rewards,
         "module_log_probs": teacher, "module_mask": selected}
     return UpdateBatch(tensors, {"temperature": 1.0, "multi_turn": False,
-                                 "behavior_snapshot": policy.snapshot_id,
+                                 "behavior_snapshot": policy.snapshot_id, "task_groups":groups,
                                  "student_prompts": [step.student_prompt for step in steps]})
 
 
 class ModuleTrainer:
     """Batch-aligned self-distillation; legacy teacher argument is the KL reference."""
     def __init__(self, runner, policy_loader=None, teacher_loader=None, *, config=AdvantageConfig(),
-                 tasks_per_batch=4, rollouts_per_task=2, supervision="targeted", checkpoint_manager=None):
+                 tasks_per_batch=4, rollouts_per_task=2, supervision="targeted", checkpoint_manager=None,
+                 sampling_state=None, sampling_seed=None, environment_seed=0):
+        self.sampling_state, self.sampling_seed = sampling_state, sampling_seed
+        self.environment_seed = environment_seed
         self.runner, self.policy_loader, self.teacher_loader = runner, policy_loader, teacher_loader
         self.config, self.tasks_per_batch, self.rollouts_per_task = config, tasks_per_batch, rollouts_per_task
         if supervision not in ("all", "targeted"): raise ValueError("Unknown supervision mode")
@@ -76,6 +79,22 @@ class ModuleTrainer:
         if h_plus.without(target).version != h_minus.version:
             raise ValueError("H- must remove exactly the target module")
         if budget < 1 or not tasks: raise ValueError("Positive training budget and task allowlist required")
+        queue = None
+        if self.sampling_seed is not None:
+            from ..core.sampling import TaskQueue
+            queue = TaskQueue(tasks,self.sampling_seed,self.sampling_state)
+            if len(tasks)<self.tasks_per_batch: raise ValueError("Batch requires distinct training tasks")
+        def persist_sampler():
+            if queue is not None:
+                if self.sampling_state is not None:
+                    self.sampling_state.clear(); self.sampling_state.update(queue.state())
+                # Immutable per-draw record plus atomic cursor; prior batches remain auditable.
+                import json, os
+                snapshot=output/"sampling"/f"{queue.draws:012d}.json"
+                write_json(snapshot,queue.state())
+                temporary=output/"sampling_state.pending.json"
+                with temporary.open("x") as stream: json.dump(queue.state(),stream,sort_keys=True)
+                os.replace(temporary,output/"sampling_state.json")
         if isinstance(student, str): student = self.policy_loader(student)
         if isinstance(teacher, str): teacher = self.teacher_loader(teacher)
         if student is teacher: raise ValueError("KL reference must not alias the updating student")
@@ -94,7 +113,10 @@ class ModuleTrainer:
                 "actor_update_calls":updates_completed, "optimizer_steps":actual_steps,
                 "batches_skipped_no_student_decisions":skipped, "supervision":self.supervision,
                 "cost": asdict(total), "teacher_snapshot": behavior_id, "kl_reference_snapshot": frozen_id,
-                "module_scorer_refresh": "each_batch_behavior_policy", "advantage_config": asdict(self.config)}
+                "module_scorer_refresh": "each_batch_behavior_policy", "advantage_config": asdict(self.config),
+                "optimizer_algorithm":"veRL vanilla PPO (injected backend owns optimizer)",
+                "outcome_estimator":"step-weighted within-task episode-outcome normalization",
+                **({"sampling_state":queue.state()} if queue is not None else {})}
         try:
             for update in range(budget):
                 attempted+=1
@@ -103,9 +125,17 @@ class ModuleTrainer:
                 with BehaviorPolicySnapshot(student) as behavior:
                     behavior_id = behavior.snapshot_id
                     if trajectories is None:
-                        chosen = tuple(tasks[(update*self.tasks_per_batch+i) % len(tasks)]
-                                       for i in range(min(self.tasks_per_batch, len(tasks))))
-                        samples = self.runner.rollout(behavior, h_minus, chosen, seeds=(0,) * self.rollouts_per_task,
+                        if queue is not None:
+                            self.runner.sampling_batch = queue.draws//self.tasks_per_batch
+                            chosen=queue.take(self.tasks_per_batch)
+                            persist_sampler()  # Consumed tasks remain consumed even after rollback/failure.
+                        else:
+                            chosen = tuple(tasks[(update*self.tasks_per_batch+i) % len(tasks)]
+                                           for i in range(min(self.tasks_per_batch, len(tasks))))
+                        if queue is not None: journal.append("batch_tasks",update=update,task_ids=list(chosen),
+                            rollouts_per_task=self.rollouts_per_task,environment_seed=self.environment_seed,
+                            sampling_state=queue.state() if queue is not None else None)
+                        samples = self.runner.rollout(behavior, h_minus, chosen, seeds=(self.environment_seed,) * self.rollouts_per_task,
                             output=output / f"rollout_{update:05d}", training=True).trajectories
                     else:
                         if not callable(trajectories): raise TypeError("Provide a fresh on-policy trajectory supplier")

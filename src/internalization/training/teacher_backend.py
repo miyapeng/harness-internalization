@@ -32,6 +32,7 @@ class FrozenHFBackend:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
+        self.call_stats = []
         self.path = Path(checkpoint).resolve(strict=True)
         self.snapshot_id = checkpoint_fingerprint(self.path)
         self.torch = torch
@@ -79,6 +80,8 @@ class FrozenHFBackend:
                       pad_token_id=self.tokenizer.eos_token_id, **sampling)
         self._sync()
         generated = outputs[0, len(ids):].tolist()
+        self.call_stats.append({"kind":"generation","purpose":purpose,"model_version":self.snapshot_id,"input_tokens":len(ids),
+            "output_tokens":len(generated),"latency_s":time.perf_counter()-start})
         return Completion(self.tokenizer.decode(generated, skip_special_tokens=True),
                           Cost(len(ids), len(generated), 1, int(purpose not in ("action", "rollout_action")),
                                latency_s=time.perf_counter() - start), tuple(generated))
@@ -97,6 +100,9 @@ class FrozenHFBackend:
             targets = self.torch.tensor(response_ids, device=logits.device)
             lp = logits.log_softmax(-1).gather(-1, targets[:, None]).squeeze(-1).cpu().tolist()
         self._sync()
+        if not all(__import__("math").isfinite(x) for x in lp): raise ValueError("Non-finite action log probabilities")
+        self.call_stats.append({"kind":"scoring","model_version":self.snapshot_id,"input_tokens":len(ids),"response_tokens":len(response_ids),
+            "output_tokens":0,"latency_s":time.perf_counter()-start})
         # Scoring consumes observed response tokens; it generates no response.
         return lp, Cost(len(ids) + len(response_ids), 0, 1, 1,
                         latency_s=time.perf_counter() - start)

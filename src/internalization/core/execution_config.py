@@ -10,9 +10,14 @@ import math
 from pathlib import Path
 
 from .types import write_json
+from ..training.verl_backend import ACTOR_CONFIG
 
 DEFAULTS = {
     "mode": "internalization",
+    "algorithm": {"actor":"verl_0.5.0_vanilla_PPO", "outcome":"step_weighted_within_task_episode_outcome", "ppo":deepcopy(ACTOR_CONFIG)},
+    "schedule": {"profile": "legacy", "cycles": 3, "planned_update_batches": 300,
+                 "search_per_cycle": 8, "candidate_count": 2, "representative_traces": 4},
+    "seeds": {"split_seed": 42, "run_seed": 17, "environment_seed": 0, "model_sampling_seed": 17},
     "max_steps": 30,
     "supervision": "targeted",
     "tasks_per_batch": 4,
@@ -24,6 +29,7 @@ DEFAULTS = {
     "advantage": {"module_weight": .001, "mode": "mean_std_norm", "normalize_module": False,
                   "clip_module": None, "invalid_action_penalty": .1, "epsilon": 1e-6},
     "optimizer": {"learning_rate": 1e-6, "weight_decay": .01},
+    "proposer": {"max_tokens":8192, "temperature":0.0},
 }
 
 
@@ -43,6 +49,17 @@ def resolve_execution(raw=None, *, benchmark_limits=None):
     if value["supervision"] not in ("targeted", "all"): raise ValueError("Unknown supervision mode")
     for key in ("max_steps", "tasks_per_batch", "rollouts_per_task"):
         if type(value[key]) is not int or value[key] < 1: raise ValueError(f"Positive integer required: {key}")
+    if value["algorithm"] != DEFAULTS["algorithm"]: raise ValueError("This task cannot change the training algorithm")
+    schedule = value["schedule"]
+    if schedule["profile"] not in ("legacy", "budget_v1"): raise ValueError("Unknown scheduling profile")
+    for key, n in schedule.items():
+        if key != "profile" and (type(n) is not int or n < 1): raise ValueError(f"Invalid schedule.{key}")
+    for key, n in value["seeds"].items():
+        if type(n) is not int or not 0 <= n < 2**32: raise ValueError(f"Invalid seeds.{key}")
+    if schedule["profile"] == "budget_v1" and schedule != {
+            "profile":"budget_v1", "cycles":3, "planned_update_batches":300,
+            "search_per_cycle":8, "candidate_count":2, "representative_traces":4}:
+        raise ValueError("budget_v1 requires the registered search/update schedule")
     model = value["model"]
     for key, n in model.items():
         if type(n) is not int or n < 1: raise ValueError(f"Positive integer required: model.{key}")
@@ -59,6 +76,10 @@ def resolve_execution(raw=None, *, benchmark_limits=None):
     if adv["epsilon"] <= 0 or value["optimizer"]["learning_rate"] <= 0: raise ValueError("epsilon/lr must be positive")
     if adv["clip_module"] is not None and (type(adv["clip_module"]) not in (int,float) or
             not math.isfinite(adv["clip_module"]) or adv["clip_module"] <= 0): raise ValueError("Invalid module clip")
+    proposer=value["proposer"]
+    if type(proposer["max_tokens"]) is not int or proposer["max_tokens"]<1: raise ValueError("Invalid proposer.max_tokens")
+    if type(proposer["temperature"]) not in (int,float) or not 0<=proposer["temperature"]<=2:
+        raise ValueError("Invalid proposer.temperature")
     return value
 
 

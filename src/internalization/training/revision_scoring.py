@@ -58,7 +58,7 @@ def check_internalization(runner,model,target,tasks,*,output):
         if isinstance(model,str): model=runner.model_loader(model)
         # Real student states, using only search tasks. Never retirement/test trajectories.
         with BehaviorPolicySnapshot(model) as behavior:
-            result=runner.rollout(behavior,target.reduced_revision,tasks[:1],seeds=(0,),output=output/"rollout",training=True)
+            result=runner.rollout(behavior,target.reduced_revision,tasks[:1],seeds=(runner.environment_seed,),output=output/"rollout",training=True)
             cost=sum((t.cost for t in result.trajectories),Cost())
             if not any(t.transitions for t in result.trajectories): raise ValueError("unsupported: no student action states")
             scorer=ModuleTeacherScorer(behavior,target.full_revision,target,tasks,mode=runner.supervision,journal=Journal(output/"scoring.jsonl"))

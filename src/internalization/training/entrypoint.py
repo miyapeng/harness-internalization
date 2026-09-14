@@ -23,7 +23,7 @@ def main(default_stage=None):
     parser.add_argument("--request", type=Path, required=True)
     parser.add_argument("--response", type=Path, required=True)
     parser.add_argument("--device", help="Legacy requests only; must match resolved config if supplied")
-    parser.add_argument("--benchmark", choices=("alfworld", "appworld", "terminalbench2", "swebench_pro", "hotpotqa", "lawbench"), default="alfworld")
+    parser.add_argument("--benchmark", choices=("alfworld", "appworld", "terminalbench2", "swebench_pro", "hotpotqa", "webshop", "lawbench"), default="alfworld")
     parser.add_argument("--env-config", type=Path)
     parser.add_argument("--final-evaluation", action="store_true", help="Held-out evaluation only, never training or search")
     args = parser.parse_args()
@@ -39,7 +39,7 @@ def main(default_stage=None):
         "target": {"checkpoint","harness","task_ids","cycle","candidate_count","trajectories","scores","history"},
         "evaluate": {"checkpoint","harness","task_ids","seeds"},
         "check_internalization": {"checkpoint","target","task_ids"},
-        "train": {"teacher_checkpoint","student_checkpoint","full_harness","reduced_harness","target","task_ids","planned_update_batches","optimizer_steps"},
+        "train": {"teacher_checkpoint","student_checkpoint","full_harness","reduced_harness","target","task_ids","planned_update_batches","optimizer_steps","sampling_state"},
     }
     if set(request)-common-fields[stage]: raise ValueError("Unknown stage request fields")
     if execution is not None and args.device is not None and args.device != execution["device"]:
@@ -50,7 +50,11 @@ def main(default_stage=None):
     out.mkdir(parents=True, exist_ok=True)
     if args.response.exists(): raise FileExistsError(args.response)
     started = time.monotonic()
-    if execution is not None: save_effective(out,execution)
+    if execution is not None:
+        save_effective(out,execution)
+        from ..core.sampling import seed_process
+        seed_process(execution["seeds"]["model_sampling_seed"])
+        write_json(out/"seed_config.json",execution["seeds"])
     if stage in ("propose","target"):
         proposer = APIProposer()
         proposal = ProposalRequest(request["checkpoint"], harness_from_dict(request["harness"]),
@@ -60,7 +64,8 @@ def main(default_stage=None):
         from ..harness.revision import HarnessRevision, RevisionStore
         if isinstance(proposal.harness,HarnessRevision):
             from ..evolution.code_proposer import CodeProposer
-            proposer=CodeProposer(RevisionStore(Path(proposal.harness.path).parent,proposal.harness.policy))
+            proposer=CodeProposer(RevisionStore(Path(proposal.harness.path).parent,proposal.harness.policy),
+                **(execution["proposer"] if execution else {}))
             if stage=="target":
                 target=proposer.propose_target(proposal)
                 result={"target":target.to_dict() if target else None,"cost":asdict(proposer.last_cost)}
@@ -84,7 +89,7 @@ def main(default_stage=None):
             write_json(out / "benchmark_protocol.json", {"benchmark":"appworld", "config":asdict(config),
                 "model_options":model_options, "policy_options":policy_options,
                 "supervision":"same_behavior_policy_H_plus_minus_H_minus", "reward":"terminal_official_task_success"})
-        elif args.benchmark in ("terminalbench2", "swebench_pro", "hotpotqa", "lawbench"):
+        elif args.benchmark in ("terminalbench2", "swebench_pro", "hotpotqa", "webshop", "lawbench"):
             from ..benchmarks.common import BenchmarkConfig, Catalog
             from ..benchmarks.isolated import environment_factory
             config = BenchmarkConfig.load(args.env_config or Path(f"configs/{args.benchmark}.json"))
@@ -111,7 +116,8 @@ def main(default_stage=None):
         model_options = execution["model"]
         policy_options = {**model_options, **execution["optimizer"]}
         runner = InteractionTaskRunner(factory, lambda p: FrozenHFBackend(p, device=execution["device"], **model_options),
-                                       max_steps=execution["max_steps"], supervision=execution["supervision"])
+                                       max_steps=execution["max_steps"], supervision=execution["supervision"],
+                                       model_sampling_seed=execution["seeds"]["model_sampling_seed"],environment_seed=execution["seeds"]["environment_seed"])
         if stage == "check_internalization":
             from ..harness.revision import InternalizationTarget
             result=runner.check_internalization(request["checkpoint"],InternalizationTarget.from_dict(request["target"]),
@@ -124,7 +130,7 @@ def main(default_stage=None):
             if args.benchmark == "appworld":
                 from ..benchmarks.appworld_manifest import aggregate_results
                 result["benchmark_metrics"] = aggregate_results(trajectories.evaluations)
-            elif args.benchmark in ("terminalbench2", "swebench_pro", "hotpotqa", "lawbench"):
+            elif args.benchmark in ("terminalbench2", "swebench_pro", "hotpotqa", "webshop", "lawbench"):
                 from ..benchmarks.aggregate import aggregate
                 result["benchmark_metrics"] = aggregate(config, out, trajectories.evaluations)
                 result["cost"]["latency_s"] = time.monotonic()-started
@@ -135,7 +141,10 @@ def main(default_stage=None):
             trainer = ModuleTrainer(runner, lambda p: VerlPolicy(p, device=execution["device"], **policy_options),
                 lambda p: FrozenHFBackend(p, device=execution["reference_device"], **model_options),
                 config=AdvantageConfig(**execution["advantage"]), supervision=execution["supervision"],
-                tasks_per_batch=execution["tasks_per_batch"], rollouts_per_task=execution["rollouts_per_task"])
+                tasks_per_batch=execution["tasks_per_batch"], rollouts_per_task=execution["rollouts_per_task"],
+                sampling_state=request.get("sampling_state",{}),
+                sampling_seed=execution["seeds"]["run_seed"] if execution["schedule"]["profile"]=="budget_v1" else None,
+                environment_seed=execution["seeds"]["environment_seed"])
             target=request["target"]
             if isinstance(target,dict):
                 from ..harness.revision import InternalizationTarget

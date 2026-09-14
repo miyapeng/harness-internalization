@@ -9,9 +9,9 @@ from ..core.types import write_json
 
 
 
-def dev_acceptance_policy(policy):
+def dev_acceptance_policy(policy, *, budget=False):
     """Record exactly the existing search/dev gate, not the attribution gate."""
-    return {"decision_source":"dev", "rule":"search_gain.low > 0 and dev_gain.low > 0",
+    return {"decision_source":"dev", "rule":("search paired_mean > 0; top one only; dev_gain.low > 0" if budget else "search_gain.low > 0 and dev_gain.low > 0"),
         "confidence":policy.confidence,"bootstrap_samples":policy.bootstrap_samples,
         "seed":policy.seed,"bootstrap_cluster":"task_id","minimum_lower_gain":0}
 
@@ -52,6 +52,9 @@ class RevisionSelection:
 
 
 def search_revisions(components,request,*,baseline_search,baseline_dev,dev_tasks,seeds,policy,journal):
+    if components.execution_config and components.execution_config["schedule"]["profile"] == "budget_v1":
+        return budget_search_revisions(components,request,baseline_search=baseline_search,baseline_dev=baseline_dev,
+            dev_tasks=dev_tasks,seeds=seeds,policy=policy,journal=journal)
     candidates=components.proposer.propose(request)
     if len(candidates)!=request.count: raise ValueError("Proposer returned wrong code candidate count")
     evaluated=[]
@@ -96,3 +99,58 @@ def public_history(journal):
         if row["kind"]=="code_candidate" else {"candidate":row["candidate"],"status":"failed",
             "reason":"candidate_execution_or_evaluation_failed"})
         for row in rows if row["kind"] in ("code_candidate","candidate_failed"))
+
+
+def budget_search_revisions(components, request, *, baseline_search, baseline_dev, dev_tasks, seeds, policy, journal):
+    """Two common-task evaluations; positive paired mean only; a single dev finalist."""
+    candidates = components.proposer.propose(request)
+    if len(candidates) != request.count: raise ValueError("Wrong candidate count")
+    eligible = []
+    for index, candidate in enumerate(candidates):
+        folder = request.output.parent/f"candidate_{index}"
+        try:
+            if not isinstance(candidate, HarnessCandidate): raise ValueError(str(candidate))
+            candidate.validate(request.harness)
+            write_json(folder/"candidate.json", candidate.to_dict())
+            result = evaluate_tasks(components.runner, request.checkpoint, candidate.full_revision,
+                                    request.tasks, seeds, folder/"search")
+            parent_rows = {(r.task_id,r.seed):r for r in baseline_search.evaluations}
+            rows = {(r.task_id,r.seed):r for r in result.evaluations}
+            if len(rows) != len(result.evaluations) or rows.keys() != parent_rows.keys():
+                raise ValueError("Unpaired search results")
+            versions = {t.model_version for r in (baseline_search,result) for t in r.trajectories}
+            if len(versions)>1: raise ValueError("Search used different model snapshots")
+            gains = [rows[key].success-parent_rows[key].success for key in sorted(rows)]
+            gain = {"mean":sum(gains)/len(gains), "paired_gains":gains,
+                    "rule":"paired_mean > 0", "significance_test":False,
+                    "task_ids":list(request.tasks)}
+            journal.append("code_candidate", candidate=candidate.to_dict(), search_gain=gain,
+                           status="search_positive" if gain["mean"]>0 else "no_gain")
+            write_json(folder/"search_screen.json",gain)
+            if gain["mean"]>0: eligible.append((gain["mean"], -sum(r.cost.total_tokens for r in result.evaluations),
+                                               -index, candidate, gain, versions))
+        except Exception as exc:
+            write_json(folder/"rejection.json", {"reason":str(exc),"index":index})
+            journal.append("candidate_failed",index=index,reason=str(exc),
+                           candidate=candidate.to_dict() if isinstance(candidate,HarnessCandidate) else candidate)
+        request.harness.files()
+    if not eligible: return None
+    _, _, neg_index, candidate, gain, versions = max(eligible, key=lambda row:row[:3])
+    index = -neg_index
+    folder = request.output.parent/f"candidate_{index}"
+    try:
+        if baseline_dev is None:
+            baseline_dev = evaluate_tasks(components.runner,request.checkpoint,request.harness,dev_tasks,seeds,
+                                          request.output.parent/"baseline_dev")
+        dev = evaluate_tasks(components.runner,request.checkpoint,candidate.full_revision,dev_tasks,seeds,folder/"dev")
+        versions |= {t.model_version for result in (baseline_dev,dev) for t in result.trajectories}
+        if len(versions)>1: raise ValueError("Search/dev used different model snapshots")
+        dg = paired_interval(dev.evaluations,baseline_dev.evaluations,lambda r:r.success,policy)
+        selected = RevisionSelection(candidate,request.harness,request.checkpoint,
+            tuple(baseline_dev.evaluations),tuple(dev.evaluations),gain,dg,dg["low"]>0,True,index,
+            dev_acceptance_policy(policy, budget=True),next(iter(versions),None))
+        write_json(folder/"dev_acceptance.json",selected.acceptance_record())
+        return selected
+    except Exception as exc:
+        write_json(folder/"dev_rejection.json",{"reason":str(exc),"no_second_finalist":True})
+        return None

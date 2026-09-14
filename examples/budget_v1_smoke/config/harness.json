@@ -1,0 +1,1 @@
+{"schema":2,"entrypoint":"agent/main.py:run","composition":"independent_suffix","controls":[{"id":"public_review_v1","entrypoint":"controls/review.py:run","enabled":true}]}

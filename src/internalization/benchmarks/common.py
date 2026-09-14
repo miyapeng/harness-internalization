@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 import subprocess
 
-BENCHMARKS = ("terminalbench2", "swebench_pro", "hotpotqa", "lawbench")
+BENCHMARKS = ("terminalbench2", "swebench_pro", "hotpotqa", "webshop", "lawbench")
 
 
 def sha256(path):

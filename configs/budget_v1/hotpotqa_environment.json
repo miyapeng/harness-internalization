@@ -1,0 +1,14 @@
+{
+  "benchmark": "hotpotqa",
+  "catalog": "${HI_BENCHMARK_CATALOG}",
+  "max_steps": 8,
+  "max_context": 16384,
+  "max_prompt_tokens": 12288,
+  "max_action_tokens": 512,
+  "max_new_tokens": 256,
+  "options": {
+    "python": "${HI_BENCHMARK_PYTHON}",
+    "setting": "distractor",
+    "top_k": 3
+  }
+}

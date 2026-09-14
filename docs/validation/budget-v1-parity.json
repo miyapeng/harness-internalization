@@ -1,0 +1,17 @@
+{
+  "protected_unchanged_sha256": {
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/training/verl_backend.py": "7a6be70f0eb56ba96cc1c2c26728720e828c3548d22de6cd1c74902cfbc91686",
+    "src/internalization/harness/control_runtime.py": "5889074a8bf07ffd46728da93067ddf7af161ab1389bef4b20b57633d9b746dd",
+    "src/internalization/harness/revision.py": "adbb661f1f149f656be490507c2e27d57b2ada479e3fd400c1529025f1ab6a26",
+    "src/internalization/harness/code_runtime.py": "0a395d1ff323735a7ad7867e3051f5acbec9c0436446bfc811e3e904fff7a34a",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+    "src/internalization/outer_loop.py": "5f25c221be805e2445d3511eebbc5713284a8b9354abd6c32cea05df3298c929"
+  },
+  "legacy_reference": "runs/dev-acceptance-legacy-regression",
+  "legacy_current": "runs/budget-v1-legacy-regression",
+  "compared_files": 90,
+  "differences": []
+}

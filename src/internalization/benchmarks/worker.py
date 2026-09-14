@@ -25,6 +25,9 @@ def native_environment(config, output):
     if config.benchmark == "hotpotqa":
         from .hotpotqa import HotpotQAEnvironment
         return HotpotQAEnvironment(config, output)
+    if config.benchmark == "webshop":
+        from .webshop import WebShopEnvironment
+        return WebShopEnvironment(config,output)
     raise ValueError("Unknown native environment")
 
 
@@ -47,6 +50,8 @@ async def run(config, output):
                     operation = request.pop("op")
                     if operation == "reset":
                         env.training = request.pop("training")
+                        from ..core.sampling import seed_process
+                        seed_process(request["seed"])
                         result = await invoke(env.reset, **request)
                     elif operation == "step": result = await invoke(env.step, **request)
                     else: raise ValueError("Unknown worker operation")

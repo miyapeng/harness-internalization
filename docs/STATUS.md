@@ -1,5 +1,15 @@
 # 实现状态
 
+## 2026-09-14：budget_v1 配置、调度与真实 smoke 入口
+
+新增 ALFWorld/WebShop/HotpotQA 三份完整 budget_v1 配置。96题search池每周期8题、三周期不重复；两个候选以配对平均正收益初筛，只让一个进入32题dev，dev沿用原统计接受门槛，无独立acceptance。训练以持久化seed队列每批4题×4次fresh rollout，配置/seed进入实际JSON子进程及训练器；固定PPO参数和完整effective_config/hash留档。
+
+新导入入口按用途独立数量、官方来源、任务类型和同源group精确分配2048/96/32/128×3，不足则失败，不改旧manifest。WebShop补齐官方模拟器接线、隔离worker、整数task ID重置和官方reward，旧partition helper保留；**真实完整环境仍not ready**。独立smoke只取train八题、固定H+/H−、两批真实更新，检查概率/优势/参数/KL reference/重载/事件回报/上下文/资源，不能代替正式效果实验。
+
+最终 **213项测试通过**（221.530秒，新增11项，无skip），其中原202项全部保留。CPU/mock、真实子进程和沙箱证据与GPU分开；旧CPU三周期demo90文件逐字节一致，9个算法/协议关键文件哈希不变。三份GPU smoke预检均为not_run：本机沙箱外nvidia-smi也无GPU，已有veRL环境版本为0.9.0.dev0而要求0.5.0，官方数据和部分环境依赖未准备。没有启动真实模型训练或九组大实验。
+
+配置/准确命令/接口清单见 [BUDGET_V1.md](BUDGET_V1.md)，[数据分布状态](BUDGET_V1_DATA.md)，[验证报告](validation/budget-v1-report.json)。以下条目为历史验证记录；旧search双显著性规则仅保留在legacy调度。
+
 ## 2026-09-14：dev 直接正式接受 Harness
 
 已取消独立 acceptance_i 数据集要求和 acceptance_plus/acceptance_parent 额外评价。原 search/dev 配对区间下界均>0的规则与排序保持；RevisionSelection 返回父/候选 dev 逐题结果、配对收益和接受判定，外层复用并记录 decision_source=dev。无目标、不兼容、A/B未通过仍保留已接受H+；训练、C/D及模型rollback未改。

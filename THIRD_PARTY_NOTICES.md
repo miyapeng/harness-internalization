@@ -85,3 +85,15 @@ Harbor 0.23.0's published wheel SHA256 is
 downloaded or locally hash-verified. Pro and LawBench evaluator commits, task hashes
 and image digests are recorded in runtime configuration/artifacts once real external
 dependencies are prepared. No placeholder hash is asserted to be an upstream commit.
+
+
+## WebShop budget_v1 adapter (2026-09-14)
+
+`src/internalization/benchmarks/webshop.py` is original integration code calling
+[WebShop's official environment](https://github.com/princeton-nlp/WebShop/blob/master/web_agent_site/envs/web_agent_text_env.py)
+and its official reward through the external simulator; no engine/evaluator source
+or dataset was copied. Runtime requires a clean external checkout and exact commit,
+plus product/attribute/index hashes recorded in configuration. Reference API review
+used the public source; no resolved runtime commit or official execution is claimed.
+The module-level data locations are configured only inside the isolated worker.
+Existing WebShop task identity helpers are preserved.

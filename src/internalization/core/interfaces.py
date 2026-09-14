@@ -64,3 +64,4 @@ class Components:
     targets: InternalizationTargetBackend | None = None
 
     execution_config: dict | None = None
+    sampling_state: dict | None = None

@@ -4,7 +4,7 @@
 
 工程是独立实现，不需要 OPID 或 Meta-Harness 的嵌套运行仓库。训练优化器通过可选外部依赖 `verl==0.5.0` 使用。原 planning/review/recovery 模块模式仍兼容。
 
-**验证状态：182 项测试通过，包含完整环境事件回报、无学生决策 batch、具名控制及既有数据接线、训练与生命周期回归。真实 API proposer、HF 模型、外部 veRL、GPU 和官方 benchmark 实验均未运行。** CPU/mock 结果用于验证工程流程，不能作为模型内化效果或论文性能证据。
+**验证状态：213 项测试通过（CPU/mock、子进程与代码隔离）。budget_v1 配置、调度、数据导入和真实 smoke 入口已落地；官方数据分布、真实 API/HF/veRL/GPU 实验尚未运行，WebShop 官方完整环境仍 not ready。** 见 [budget_v1 运行说明](docs/BUDGET_V1.md) 和 [验收报告](docs/validation/budget-v1-report.json)。
 
 ## 方法
 
@@ -35,7 +35,7 @@ src/internalization/
   evolution/     proposer、候选lineage、archive、配对搜索选择
   training/      on-policy rollout、同批次策略H+评分、优势、更新、checkpoint
   evaluation/    训练前归因、模型接受/回滚、四格退役、bootstrap与成本
-  benchmarks/    ALFWorld、AppWorld、TB2、SWE-bench Pro、HotpotQA、LawBench适配
+  benchmarks/    ALFWorld、WebShop、AppWorld、TB2、SWE-bench Pro、HotpotQA、LawBench适配
   outer_loop.py  只通过本项目接口编排三个周期
 configs/         保留的实验协议与进程配置
 scripts/         提案、训练、评价、manifest与迁移验证入口

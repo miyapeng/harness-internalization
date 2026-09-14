@@ -22,6 +22,7 @@ class CommandBackend:
         from .core.trajectory import RolloutResult, read_trace_file
         from .evolution.candidate import Candidate
         owner = self
+        self.sampling_state = getattr(self,"sampling_state",{})
 
         class Proposer:
             def propose(self, request):
@@ -61,13 +62,14 @@ class CommandBackend:
                 if student != teacher: raise ValueError("Teacher must be the phase-initial student snapshot")
                 return owner.train(student, h_plus, h_minus, target, tasks, budget, output)
 
-        return Components(Proposer(), Runner(), Trainer(), execution_config=self.execution_config)
+        return Components(Proposer(), Runner(), Trainer(), execution_config=self.execution_config, sampling_state=self.sampling_state)
 
     def __init__(self, config: dict, ledger: Path):
         from .core.execution_config import resolve_execution
         allowed = {"propose", "target", "check_internalization", "evaluate", "train", "cwd", "timeout_s", "benchmark", "execution"}
         if set(config)-allowed: raise ValueError(f"Unknown backend fields: {sorted(set(config)-allowed)}")
         self.config = config
+        self.sampling_state = {}
         limits = None
         # Resolve the benchmark's published limits once, then apply explicit experiment values.
         argv = config.get("evaluate", [])
@@ -78,7 +80,7 @@ class CommandBackend:
             if benchmark == "appworld":
                 from .benchmarks.appworld import AppWorldConfig
                 env = AppWorldConfig.load(path)
-            elif benchmark in ("hotpotqa", "terminalbench2", "swebench_pro", "lawbench"):
+            elif benchmark in ("hotpotqa", "webshop", "terminalbench2", "swebench_pro", "lawbench"):
                 from .benchmarks.common import BenchmarkConfig
                 env = BenchmarkConfig.load(path)
             else: env = None
@@ -108,8 +110,23 @@ class CommandBackend:
                 for s in self.config[stage]]
         start = time.monotonic()
         with (output / "stdout.log").open("x") as stdout, (output / "stderr.log").open("x") as stderr:
-            completed = subprocess.run(argv, cwd=self.config.get("cwd"), shell=False,
-                         timeout=self.config.get("timeout_s", 86400), stdout=stdout, stderr=stderr)
+            import os
+            env=dict(os.environ, PYTHONHASHSEED=str(self.execution_config["seeds"]["model_sampling_seed"]))
+            try:
+                completed = subprocess.run(argv, cwd=self.config.get("cwd"), env=env, shell=False,
+                             timeout=self.config.get("timeout_s", 86400), stdout=stdout, stderr=stderr)
+            except subprocess.TimeoutExpired:
+                self.ledger.append("process_timeout",stage=stage,request=str(request),wall_time_s=time.monotonic()-start)
+                raise
+            finally:
+                # The child is reaped on timeout. Preserve consumption even if no response was produced.
+                if stage == "train" and self.execution_config["schedule"]["profile"]=="budget_v1":
+                    cursor=output/"sampling_state.json"
+                    if cursor.exists():
+                        from .core.sampling import TaskQueue
+                        state=json.loads(cursor.read_text())
+                        TaskQueue(payload["task_ids"],self.execution_config["seeds"]["run_seed"],state)
+                        self.sampling_state.clear(); self.sampling_state.update(state)
         elapsed = time.monotonic() - start
         self.ledger.append("process", stage=stage, request=str(request), returncode=completed.returncode,
                            wall_time_s=elapsed)
@@ -154,7 +171,15 @@ class CommandBackend:
         result = self._call("train", {"teacher_checkpoint": checkpoint, "student_checkpoint": checkpoint,
             "full_harness": serialize_harness(full), "reduced_harness": serialize_harness(reduced),
             "target": target.to_dict() if isinstance(target,InternalizationTarget) else target,
-            "task_ids": tasks, "planned_update_batches": budget}, output)
+            "task_ids": tasks, "planned_update_batches": budget,
+            **({"sampling_state":self.sampling_state} if self.execution_config["schedule"]["profile"]=="budget_v1" else {})}, output)
+        if self.execution_config["schedule"]["profile"] == "budget_v1":
+            from .core.sampling import TaskQueue
+            state = result.get("sampling_state")
+            if not state: raise ValueError("Trainer did not return its sampling cursor")
+            TaskQueue(tasks,self.execution_config["seeds"]["run_seed"],state)
+            self.sampling_state.clear()
+            self.sampling_state.update(state)
         if any(type(result.get(k)) is not int or result[k] != budget for k in ("planned_update_batches", "attempted_update_batches")):
             raise ValueError("Training did not consume the prescribed update-batch budget")
         calls = result.get("actor_update_calls")

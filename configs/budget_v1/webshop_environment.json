@@ -1,0 +1,22 @@
+{
+  "benchmark": "webshop",
+  "catalog": "${HI_BENCHMARK_CATALOG}",
+  "max_steps": 15,
+  "max_context": 8192,
+  "max_prompt_tokens": 4096,
+  "max_action_tokens": 512,
+  "max_new_tokens": 256,
+  "options": {
+    "python": "${HI_BENCHMARK_PYTHON}",
+    "repo": "${HI_WEBSHOP_REPO}",
+    "commit": "${HI_WEBSHOP_COMMIT}",
+    "products": "${HI_WEBSHOP_PRODUCTS}",
+    "products_sha256": "${HI_WEBSHOP_PRODUCTS_SHA256}",
+    "attributes": "${HI_WEBSHOP_ATTRIBUTES}",
+    "attributes_sha256": "${HI_WEBSHOP_ATTRIBUTES_SHA256}",
+    "human_attributes": "${HI_WEBSHOP_HUMAN_ATTRIBUTES}",
+    "human_attributes_sha256": "${HI_WEBSHOP_HUMAN_ATTRIBUTES_SHA256}",
+    "index_hash": "${HI_WEBSHOP_INDEX_HASH}",
+    "initialization_seed": 42
+  }
+}
