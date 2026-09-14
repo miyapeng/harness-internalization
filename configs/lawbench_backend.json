@@ -35,5 +35,8 @@
     "--response",
     "{response}"
   ],
-  "benchmark": "lawbench"
+  "benchmark": "lawbench",
+  "execution": {
+    "mode": "evolution_only"
+  }
 }

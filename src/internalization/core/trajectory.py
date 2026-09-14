@@ -80,6 +80,7 @@ class EnvironmentEvent:
     action_valid: bool
     tool_calls: int
     control_id: str | None = None
+    observation_kind: str = "delta"
 
 
 @dataclass(frozen=True)

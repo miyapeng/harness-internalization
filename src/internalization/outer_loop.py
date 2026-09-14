@@ -51,9 +51,16 @@ def run_outer_loop(backend, manifest: TaskManifest, checkpoint: str,
     journal = Journal(output / "events.jsonl")
     candidate_archive = CandidateArchive(output / "candidate_archive.jsonl")
     evaluator = components.retirement or PairedRetirementEvaluator(components.runner, policy)
-    write_json(output / "protocol.json", accepted_state.protocol if accepted_state else
-               {"loop": asdict(config), "retirement": asdict(policy),
-               "manifest_hash": manifest.fingerprint, "initial_checkpoint": checkpoint})
+    protocol = accepted_state.protocol if accepted_state else {"loop":asdict(config), "retirement":asdict(policy),
+        "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint}
+    if components.execution_config is not None:
+        from .core.execution_config import config_hash, save_effective
+        execution=components.execution_config
+        if accepted_state and protocol.get("effective_config_hash") != config_hash(execution):
+            raise ValueError("Resumed execution configuration differs or is unverified")
+        protocol={**protocol,"effective_config":execution,"effective_config_hash":config_hash(execution)}
+        save_effective(output,execution)
+    write_json(output / "protocol.json",protocol)
     # Immutable artifact written before any rollout/candidate evaluation.
     write_json(output / "attribution_policy.json", asdict(attribution_policy))
     harness, archive = accepted_state.harness if accepted_state else Harness(), []
@@ -100,8 +107,25 @@ def run_outer_loop(backend, manifest: TaskManifest, checkpoint: str,
                 candidate_id=candidate.candidate_id, checkpoint=checkpoint,
                 attribution=evidence, training_batches_spent=0)
             continue
-        new_checkpoint = components.trainer.train(checkpoint, checkpoint, full, reduced, None,
-            target=module.name, tasks=train, budget=config.total_train_steps // config.cycles, output=folder / "training")
+        from .core.execution_config import NoActorUpdates
+        no_training_reason=None
+        if components.execution_config is not None and components.execution_config["mode"]=="evolution_only":
+            no_training_reason="evolution_only"
+        else:
+            try:
+                new_checkpoint = components.trainer.train(checkpoint, checkpoint, full, reduced, None,
+                    target=module.name, tasks=train, budget=config.total_train_steps // config.cycles, output=folder / "training")
+            except NoActorUpdates:
+                no_training_reason="no_actor_updates"
+        if no_training_reason:
+            harness=full
+            archive.append({"cycle":cycle,"module":module.name,"version":module.version,"source":module.source,
+                "reason":no_training_reason,"model_decision":"unchanged","module_decision":"retain"})
+            write_json(folder/"state.json",{"checkpoint":checkpoint,"harness_version":harness.version,
+                "active_modules":[{"name":m.name,"version":m.version,"source":m.source} for m in harness.modules],
+                "archive":archive})
+            journal.append("cycle_complete",cycle=cycle,reason=no_training_reason,checkpoint=checkpoint)
+            continue
         if new_checkpoint == checkpoint:
             raise ValueError("Training must produce a new checkpoint, preserving the teacher snapshot")
         verdict = evaluator.evaluate(checkpoint, new_checkpoint, full, reduced, tasks=tasks,

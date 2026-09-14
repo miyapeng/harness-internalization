@@ -103,6 +103,6 @@ class HotpotQAEnvironment:
             write_json(self.output/"grade.json", {"task_id":self.task_id, "seed":self.seed,
                 "prediction":{"answer":answer, "sp":facts}, "metrics":values, "reward_metric":"joint_f1"})
         self.history.extend(["Action: "+action, "Observation: "+obs])
-        return asdict(EnvironmentStep("\n".join(self.history), reward, self.done, reward, valid, calls))
+        return asdict(EnvironmentStep("\n".join(self.history), reward, self.done, reward, valid, calls, observation_kind="context"))
 
     def close(self): pass

@@ -130,3 +130,25 @@ prepare 直接完成环境时不再执行无用控制/学生生成。trainer 对
 新增 test_environment_events.py 11项全部通过，具名控制17项回归通过；完整182项通过（254.208秒，无skip），未修改旧测试断言。案例覆盖首个 prepare 终局、下一 prepare 终局、多次环境返回不重算、无事件回退禁止、公开日志/失败后奖励审计、proposer 可见性和隔离、全空/混合/跳过后训练 batch。旧CPU demo90文件逐字节一致，原20项测试源文件哈希不变；7个优势/同步/veRL/评分/统计/外层循环文件与修改前哈希一致。
 
 持久化示例 runs/environment-events-proof 使用测试fixture与实际沙箱：首例return=3、零学生决策和模型调用；次例return=3.5、仅两个既有response token；另保存两批纯工具episode、零actor update的checkpoint/summary。实际模型/环境为mock，CPU训练回归执行了真实小模型SGD；真实API proposer、HF/veRL/GPU/官方任务未运行。完整日志与parity见 validation/environment-events-*。ENVIRONMENT_EVENTS、METHOD、STATUS、NAMED_CONTROLS和README已更新；既有未提交修改保留。旧事件缺失的历史轨迹只能兼容读取，无法追补已丢失奖励，需要重采受影响数据。
+
+## 2026-09-14 任务一：运行接线、观察契约与真实计数
+
+先检查工作区（起始干净）、现有五入口配置、ModuleTrainer/VerlPolicy 和事件账本，保留已修好的具名控制、同批 old-policy、归因、退役及沙箱边界。确认 HotpotQA 缺 target/check、训练参数未贯通、完整观察被反复追加、零更新仍保存 checkpoint 等缺口后增量修复。
+
+新增严格 execution_config 解析与 hash，通过主 CLI、真实 JSON subprocess、runner/scorer/policy 传递；补全 ALFWorld/HotpotQA 配置并显式区分模式。环境返回标注 context/delta，按事件呈现而非字符串去重；保留独立环境奖励与公开审计账本。计数区分 planned/attempted/actor/optimizer，支持 failed summary 与 no_actor_updates 保留 H+ 分支。
+
+回归先验证环境事件11项、AppWorld13项，再新增运行接线/观察测试。测试替换模型和官方数据，部分实际执行 sandbox/HotpotQA worker/CPU 张量优化；不能称为 HF/veRL/GPU 验证。初次误用 shell 默认 Python 3.14 无法导入项目后，统一使用既有 python3.12 + PYTHONPATH=src。子进程配置重复落盘问题在回归中发现并修正为同内容幂等校验；外部模块替身测试预加载 torch._dynamo 以避免模块缓存扰动。最终测试结果与源码清单记录于 validation/execution-wiring-report.json。
+
+旧测试只改两项必要断言：零 actor 更新不应生成 checkpoint；旧 training_batches_completed 字段改为 attempted_update_batches。未修改自蒸馏数学、具名控制组合规则、统计阈值，不新增 benchmark。准确运行配置及命令见 EXECUTION_WIRING.md。
+
+最终验证：195/195通过（257.889秒，无skip），新增13项；与本轮前 environment-events-legacy-regression 对照，CPU demo90文件逐字节一致。最初校验默认指向更早迁移基线产生8个P0-3 schema差异，改用本轮前基线后全部一致；未为迁就对照修改代码。原20项测试文件哈希保持，8个受保护数学/同步/具名控制/统计/隔离文件哈希保持。详细stdout、配置证明与零更新奖励证明已记录在 execution-wiring-report.json。未运行真实HF/veRL/GPU或官方数据实验。
+
+## 2026-09-14：取消独立 Harness acceptance 评价
+
+先核查未提交的任务一改动并保留；本轮前另存 training 全目录及目标/归因/退役文件哈希。确认原 search/dev 已要求两个配对区间下界均>0，额外 acceptance_plus/parent 在其后重复执行。
+
+增加 RevisionSelection 返回父/候选 dev 逐题结果、配对收益、门槛判定及模型版本依据；外层复用这些结果，保存 decision_source=dev 的接受记录，去掉额外两次评价。目标、A/B、训练、C/D及rollback分支不变。生成器/启动检查不再要求 acceptance，旧manifest多余分区保持闲置；不编辑已有实验产物。新协议明确接受来源，旧协议续跑的变化仅记录于新输出协议和原协议hash。
+
+新增7项定向验收通过，含6次评价/180个合成episode/1980 tokens的真实调用计数证明、正均值但下界=0拒绝、旧分区不挪用、目标不兼容/A-B失败保留H+。既有断言只改本轮必要语义：search返回对象、dev拒绝来源、新manifest不生成acceptance及最低样本量。最终全套结果见 validation/dev-acceptance-report.json；未运行真实模型/GPU/官方数据。
+
+本轮最终：202/202通过（225.071秒，无skip），旧CPU demo90文件逐字节一致；17个训练/目标/统计文件工作区哈希未变。实际证据位于 runs/dev-acceptance-proof，完整测试日志和结果保存于 validation/dev-acceptance-tests.txt、validation/dev-acceptance-report.json。未修改已有实验产物，任务一未提交修改保留。

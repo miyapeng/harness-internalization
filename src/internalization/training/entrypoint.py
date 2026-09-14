@@ -22,7 +22,7 @@ def main(default_stage=None):
     if default_stage is None: parser.add_argument("stage", choices=("propose", "target", "check_internalization", "evaluate", "train"))
     parser.add_argument("--request", type=Path, required=True)
     parser.add_argument("--response", type=Path, required=True)
-    parser.add_argument("--device", default=os.environ.get("HI_DEVICE", "cuda:0"))
+    parser.add_argument("--device", help="Legacy requests only; must match resolved config if supplied")
     parser.add_argument("--benchmark", choices=("alfworld", "appworld", "terminalbench2", "swebench_pro", "hotpotqa", "lawbench"), default="alfworld")
     parser.add_argument("--env-config", type=Path)
     parser.add_argument("--final-evaluation", action="store_true", help="Held-out evaluation only, never training or search")
@@ -31,10 +31,26 @@ def main(default_stage=None):
     if args.final_evaluation and stage != "evaluate": raise ValueError("Final evaluation cannot train/propose")
     request = json.loads(args.request.read_text())
     if request["stage"] != stage: raise ValueError("Request stage mismatch")
+    from ..core.execution_config import request_execution, resolve_execution, save_effective
+    execution = request_execution(request)
+    common = {"schema_version", "stage", "effective_config", "effective_config_hash"}
+    fields = {
+        "propose": {"checkpoint","harness","task_ids","cycle","candidate_count","trajectories","scores","history"},
+        "target": {"checkpoint","harness","task_ids","cycle","candidate_count","trajectories","scores","history"},
+        "evaluate": {"checkpoint","harness","task_ids","seeds"},
+        "check_internalization": {"checkpoint","target","task_ids"},
+        "train": {"teacher_checkpoint","student_checkpoint","full_harness","reduced_harness","target","task_ids","planned_update_batches","optimizer_steps"},
+    }
+    if set(request)-common-fields[stage]: raise ValueError("Unknown stage request fields")
+    if execution is not None and args.device is not None and args.device != execution["device"]:
+        raise ValueError("--device conflicts with effective configuration")
+    if execution is not None and execution["mode"] == "evolution_only" and stage in ("target","check_internalization","train"):
+        raise ValueError("evolution_only mode cannot enter internalization stages")
     out = args.response.resolve().parent
     out.mkdir(parents=True, exist_ok=True)
     if args.response.exists(): raise FileExistsError(args.response)
     started = time.monotonic()
+    if execution is not None: save_effective(out,execution)
     if stage in ("propose","target"):
         proposer = APIProposer()
         proposal = ProposalRequest(request["checkpoint"], harness_from_dict(request["harness"]),
@@ -60,6 +76,8 @@ def main(default_stage=None):
         if args.benchmark == "appworld":
             from ..benchmarks.appworld import AppWorldConfig, environment_factory
             config = AppWorldConfig.load(args.env_config or Path("configs/appworld.json"))
+            if execution is not None:
+                config = replace(config, max_steps=execution["max_steps"], **execution["model"])
             factory = environment_factory(config, out, training=stage == "train")
             model_options, max_steps = config.model_options, config.max_steps
             policy_options = {**model_options, "max_prompt_tokens":config.max_prompt_tokens}
@@ -74,6 +92,8 @@ def main(default_stage=None):
             catalog = Catalog(config.catalog, args.benchmark)
             catalog.check_selection(request["task_ids"], final=args.final_evaluation)
             config = replace(config, catalog=str(catalog.path), options={**config.options, "catalog_hash":catalog.fingerprint})
+            if execution is not None:
+                config = replace(config, max_steps=execution["max_steps"], **execution["model"])
             factory = environment_factory(config, out, training=stage == "train")
             model_options, max_steps = config.model_options, config.max_steps
             policy_options = {**model_options, "max_prompt_tokens":config.max_prompt_tokens}
@@ -83,8 +103,15 @@ def main(default_stage=None):
                 "supervision":"same_behavior_policy_H_plus_minus_H_minus"})
         else:
             factory = lambda: AlfworldEnvironment(args.env_config or Path("configs/alfworld.yaml"))
-        runner = InteractionTaskRunner(factory, lambda p: FrozenHFBackend(p, device=args.device, **model_options),
-                                       max_steps=max_steps)
+        if execution is None:
+            # Historical direct requests get one explicit, recorded compatibility resolution.
+            execution = resolve_execution({"device":args.device or "cuda:0"}, benchmark_limits={
+                "max_steps":max_steps,"model":policy_options or model_options})
+            save_effective(out,execution)
+        model_options = execution["model"]
+        policy_options = {**model_options, **execution["optimizer"]}
+        runner = InteractionTaskRunner(factory, lambda p: FrozenHFBackend(p, device=execution["device"], **model_options),
+                                       max_steps=execution["max_steps"], supervision=execution["supervision"])
         if stage == "check_internalization":
             from ..harness.revision import InternalizationTarget
             result=runner.check_internalization(request["checkpoint"],InternalizationTarget.from_dict(request["target"]),
@@ -104,20 +131,31 @@ def main(default_stage=None):
         else:
             from .trainer import ModuleTrainer
             from .verl_backend import VerlPolicy
-            trainer = ModuleTrainer(runner, lambda p: VerlPolicy(p, device=args.device, **policy_options),
-                lambda p: FrozenHFBackend(p, device=os.environ.get("HI_TEACHER_DEVICE", "cpu"), **model_options))
+            from .module_advantage import AdvantageConfig
+            trainer = ModuleTrainer(runner, lambda p: VerlPolicy(p, device=execution["device"], **policy_options),
+                lambda p: FrozenHFBackend(p, device=execution["reference_device"], **model_options),
+                config=AdvantageConfig(**execution["advantage"]), supervision=execution["supervision"],
+                tasks_per_batch=execution["tasks_per_batch"], rollouts_per_task=execution["rollouts_per_task"])
             target=request["target"]
             if isinstance(target,dict):
                 from ..harness.revision import InternalizationTarget
                 target=InternalizationTarget.from_dict(target)
-            checkpoint = trainer.train(request["student_checkpoint"], request["teacher_checkpoint"],
-                harness_from_dict(request["full_harness"]), harness_from_dict(request["reduced_harness"]),
-                target=target, tasks=tuple(request["task_ids"]),
-                budget=request["optimizer_steps"], output=out)
+            from ..core.execution_config import NoActorUpdates
+            budget=request.get("planned_update_batches", request.get("optimizer_steps"))
+            if "planned_update_batches" in request and "optimizer_steps" in request:
+                raise ValueError("Ambiguous batch budget; optimizer_steps is a legacy alias only")
+            if type(budget) is not int or budget < 1: raise ValueError("Positive planned_update_batches required")
+            if execution["mode"] != "internalization": raise ValueError("Training requires internalization mode")
+            try:
+                checkpoint = trainer.train(request["student_checkpoint"], request["teacher_checkpoint"],
+                    harness_from_dict(request["full_harness"]), harness_from_dict(request["reduced_harness"]),
+                    target=target, tasks=tuple(request["task_ids"]), budget=budget, output=out)
+            except NoActorUpdates:
+                checkpoint=request["student_checkpoint"]
             cost = asdict(trainer.last_cost)
             cost["latency_s"] = time.monotonic()-started
-            result = {"checkpoint": checkpoint, "optimizer_steps_completed": request["optimizer_steps"],
-                      "training_batches_completed": request["optimizer_steps"], "cost": cost}
+            result = {**trainer.last_summary, "checkpoint": checkpoint, "cost": cost}
+
     write_json(args.response, {"schema_version": 1, **result})
 
 

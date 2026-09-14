@@ -141,7 +141,7 @@ class AppWorldEnvironment:
         self.history += "\n\n[Submitted Python]\n" + action + "\n[Execution output]\n" + result["observation"]
         self.journal.append("step", **result)
         return EnvironmentStep(self.history, result["reward"], self.finished, result["success"],
-                               result["action_valid"], result["tool_calls"])
+                               result["action_valid"], result["tool_calls"], observation_kind="context")
 
     def close(self):
         if self.process is not None:

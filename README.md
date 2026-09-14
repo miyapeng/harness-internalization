@@ -10,7 +10,7 @@
 
 ```text
 当前 checkpoint + Harness revision
-    → 两个代码候选 → 实际 search/dev 运行 → 独立 Harness 接受门槛
+    → 两个代码候选 → 实际 search/dev 运行 → 复用 dev 配对收益正式接受 Harness
     → 可选 InternalizationTarget → 训练前 contribution gate
     → H− on-policy rollout + 同一 old policy 的 H+ 评分
     → 模型更新 → 四格评价 → accept/retire、accept/retain 或 rollback/retain
@@ -70,7 +70,7 @@ python3.12 -m internalization.cli validate-module harness_modules/recovery.py
 python3.12 -m internalization.cli demo --output runs/my-legacy-demo
 ```
 
-真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。新版导入器按 `--cycles` 生成独立 acceptance/retirement；三周期通用导入默认需至少270个非测试任务。演化恢复使用 `--state`，最终评价必须显式选择 `--state` 或 `--baseline`，不能复用 retirement/test。
+真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。新版导入器按 `--cycles` 生成独立 retirement，不再分配 acceptance；三周期通用导入默认需至少180个非测试任务。既有 manifest 的 acceptance 分区保留闲置，不重划 retirement/test。演化恢复使用 `--state`，最终评价必须显式选择 `--state` 或 `--baseline`，不能复用 retirement/test。
 
 ## 文档与实验边界
 

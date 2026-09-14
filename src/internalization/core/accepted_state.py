@@ -52,7 +52,12 @@ class AcceptedAgentState:
             raise ValueError("Resume requires the recorded attribution policy; evaluation can still load this historical state")
         expected["attribution"] = asdict(attribution_policy)
         if isinstance(self.harness, HarnessRevision):
-            expected.update(attribution=asdict(attribution_policy), harness_acceptance=asdict(attribution_policy))
+            from ..evolution.revision_search import dev_acceptance_policy
+            recorded=self.protocol.get("harness_acceptance")
+            # Recognize the old independent gate without changing old artifacts.
+            # revision_loop records a protocol transition for remaining cycles.
+            if recorded not in (dev_acceptance_policy(policy),asdict(attribution_policy)):
+                raise ValueError("Resume protocol mismatch: harness_acceptance")
         for name, value in expected.items():
             if name not in self.protocol or digest(self.protocol[name]) != digest(value):
                 raise ValueError(f"Resume protocol mismatch: {name}")

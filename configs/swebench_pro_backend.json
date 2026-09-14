@@ -35,5 +35,8 @@
     "--response",
     "{response}"
   ],
-  "benchmark": "swebench_pro"
+  "benchmark": "swebench_pro",
+  "execution": {
+    "mode": "evolution_only"
+  }
 }

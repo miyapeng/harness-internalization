@@ -2,13 +2,14 @@
 from dataclasses import asdict, replace
 
 from .core.interfaces import ProposalRequest
-from .core.types import Journal, write_json
+from .core.types import Journal, write_json, digest
 from .evolution.search import evaluate_tasks
-from .evolution.revision_search import search_revisions, public_history
+from .evolution.revision_search import search_revisions, public_history, dev_acceptance_policy
 from .evaluation.attribution import evaluate_attribution
 from .evaluation.retirement import PairedRetirementEvaluator
 from .harness.revision import InternalizationTarget
 from .core.accepted_state import AcceptedAgentState
+from .core.execution_config import NoActorUpdates
 
 
 def run_revision_loop(components,manifest,checkpoint,initial_harness,output,config,policy,attribution_policy,*,accepted_state=None):
@@ -18,14 +19,27 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
     start_cycle=accepted_state.next_cycle if accepted_state is not None else 0
     train,search,dev=(manifest.partition(p) for p in ("train","search","dev"))
     cohorts=[manifest.partition(f"retirement_{i}") for i in range(config.cycles)]
-    acceptance=[manifest.partition(f"acceptance_{i}") for i in range(config.cycles)]
     output.mkdir(parents=True,exist_ok=False)
     journal=Journal(output/"events.jsonl")
     harness=initial_harness
     evaluator=components.retirement or PairedRetirementEvaluator(components.runner,policy)
     protocol=accepted_state.protocol if accepted_state is not None else {"mode":"versioned_code_selective_internalization","loop":asdict(config),
-        "retirement":asdict(policy),"attribution":asdict(attribution_policy),"harness_acceptance":asdict(attribution_policy),
+        "retirement":asdict(policy),"attribution":asdict(attribution_policy),"harness_acceptance":dev_acceptance_policy(policy),
         "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint,"initial_harness":harness.to_dict()}
+    if protocol["harness_acceptance"] != dev_acceptance_policy(policy):
+        # The user-authorized acceptance change applies only to future cycles;
+        # retain the original snapshot and never rewrite any historical artifact.
+        protocol={**protocol,"harness_acceptance":dev_acceptance_policy(policy),
+            "acceptance_transition":{"from_protocol_hash":digest(protocol),
+                "decision_source":"dev","effective_from_cycle":start_cycle}}
+    execution = components.execution_config
+    if execution is not None:
+        from .core.execution_config import config_hash, save_effective
+        identity = config_hash(execution)
+        if accepted_state is not None and protocol.get("effective_config_hash") != identity:
+            raise ValueError("Resumed execution configuration differs or historical configuration is unverified")
+        protocol = {**protocol, "effective_config":execution, "effective_config_hash":identity}
+        save_effective(output, execution)
     write_json(output/"protocol.json",protocol)
     initial=accepted_state or AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,0)
     write_json(output/"initial_agent.json",initial.to_dict())
@@ -49,23 +63,26 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
         base_dev=evaluate_tasks(components.runner,checkpoint,parent,dev,config.seeds,folder/"baseline_dev")
         request=ProposalRequest(checkpoint,parent,search,base_search.trajectories,base_search.evaluations,
             public_history(journal),cycle,config.candidates_per_cycle,folder/"proposals")
-        candidate=search_revisions(components,request,baseline_search=base_search,baseline_dev=base_dev,
+        selection=search_revisions(components,request,baseline_search=base_search,baseline_dev=base_dev,
             dev_tasks=dev,seeds=config.seeds,policy=policy,journal=journal)
-        if candidate is None:
+        if selection is None:
+            write_json(folder/"harness_acceptance.json",{"decision_source":"dev","passed":False,
+                "reason":"no_evaluable_candidate","checkpoint":checkpoint,"parent_revision":parent.version,
+                "additional_evaluation_calls":0})
             save(folder,"no_useful_candidate",module_decision="unchanged")
             continue
+        candidate=selection.candidate
+        if selection.checkpoint != checkpoint or selection.parent.version != parent.version:
+            raise ValueError("Dev selection does not belong to the current model/parent pair")
+        write_json(folder/"harness_acceptance.json",selection.acceptance_record())
+        if not selection.accepted:
+            save(folder,"no_useful_candidate",candidate=candidate,module_decision="unchanged")
+            continue
         full=candidate.full_revision
-        try:
-            plus=evaluate_tasks(components.runner,checkpoint,full,acceptance[cycle],config.seeds,folder/"acceptance_plus")
-            before=evaluate_tasks(components.runner,checkpoint,parent,acceptance[cycle],config.seeds,folder/"acceptance_parent")
-            gate=evaluate_attribution(plus.evaluations,before.evaluations,attribution_policy)
-            write_json(folder/"harness_acceptance.json",{**gate,"parent_revision":parent.version,"full_revision":full.version})
-        except Exception as exc:
-            save(folder,"harness_acceptance_failed",candidate=candidate,error=str(exc));continue
-        if not gate["passed"]:
-            save(folder,"harness_acceptance_failed",candidate=candidate);continue
         harness=full  # Durable acceptance precedes any attempt to construct H-minus.
         write_json(folder/"accepted_harness.json",AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol).to_dict())
+        if execution is not None and execution["mode"] == "evolution_only":
+            save(folder,"accepted_without_internalization",candidate=candidate,detail="evolution_only");continue
         target=None
         try:
             provider=components.targets or (components.proposer if hasattr(components.proposer,"propose_target") else None)
@@ -105,6 +122,9 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
             decisions=(verdict.get("model_decision"),verdict.get("module_decision"))
             if decisions not in (("accept","retire"),("accept","retain"),("rollback","retain")):
                 raise ValueError("Invalid independent model/module decisions")
+        except NoActorUpdates as exc:
+            save(folder,"no_actor_updates",candidate=candidate,target=target,
+                training_summary=exc.summary, before_checkpoint=before_checkpoint);continue
         except Exception as exc:
             save(folder,"training_or_audit_failed",candidate=candidate,target=target,
                 model_decision="rollback",detail=str(exc),before_checkpoint=before_checkpoint);continue

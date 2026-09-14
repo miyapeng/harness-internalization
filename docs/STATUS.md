@@ -1,5 +1,25 @@
 # 实现状态
 
+## 2026-09-14：dev 直接正式接受 Harness
+
+已取消独立 acceptance_i 数据集要求和 acceptance_plus/acceptance_parent 额外评价。原 search/dev 配对区间下界均>0的规则与排序保持；RevisionSelection 返回父/候选 dev 逐题结果、配对收益和接受判定，外层复用并记录 decision_source=dev。无目标、不兼容、A/B未通过仍保留已接受H+；训练、C/D及模型rollback未改。
+
+新生成manifest不再含acceptance；旧分区可闲置保留，不挪用、不重划既有retirement/test。旧协议续跑的接受来源变化只记录于新输出，保留原协议hash及next_cycle。
+
+全套 **202项测试通过**（新增7项，225.071秒，无skip），旧CPU demo **90文件逐字节一致**；本轮开始时的17个training/内化目标/统计文件哈希保持。两个候选的合成证明共6次实际评价调用，接受本身0次额外调用，成本证据复用不重复计费。真实HF/veRL/GPU/官方数据未运行。
+
+说明见 [DEV_ACCEPTANCE.md](DEV_ACCEPTANCE.md)，验收见 [验证报告](validation/dev-acceptance-report.json)。以下为历史记录；其中关于独立 acceptance 的描述已经被本节替代。
+
+## 2026-09-14 任务一：运行接线与记账修复
+
+ALFWorld/HotpotQA 的版本化后端已配齐五入口，internalization 缺入口启动即失败，evolution_only 明确不训练。严格 execution 配置经主 CLI 和实际 JSON subprocess 进入 runner/ModuleTrainer/scorer/HF/VerlPolicy；保存 effective_config + SHA256，续跑绑定配置身份。λ=0、all/targeted、任务/rollout 数、学习率和 max_steps 均有回归验证。
+
+完整环境上下文采用替换语义，增量观察按事件追加；同次环境返回不再被重复呈现为工具结果，真实重复事件及原始奖励/成本账本保留。planned/attempted/actor/optimizer 独立计数，实际 optimizer.step 由 post-step hook 观测；未知时为 null。整阶段无 actor 更新不保存新模型，外层保留旧模型和已接受的 H+。
+
+最终全套 **195 项测试通过**（新增13项，257.889秒，无 skip）；旧CPU三周期demo **90文件逐字节一致**，8个算法/协议/隔离关键文件未改。模型/官方数据为测试替身，部分实际执行代码沙箱、HotpotQA worker、CPU SGD/AdamW和子进程；真实API proposer、HF、外部veRL执行和GPU/官方任务均**未运行**。证明产物：`runs/task1-config-proof`、`runs/task1-zero-update-proof`。
+
+配置、修改清单及准确命令见 [EXECUTION_WIRING.md](EXECUTION_WIRING.md)，完整验收见 [验证报告](validation/execution-wiring-report.json)。本轮不新增benchmark，WebShop完整适配留待任务二。以下条目是历史记录，以本节为最新运行状态。
+
 ## 2026-09-14：环境事件回报与学生 loss 分离
 
 版本化 rollout 改用 EventTrajectory：环境事件是 total_reward 的唯一来源，覆盖 prepare/control/execute；旧 Transition 保留但不会把奖励重复加到事件回报上。无学生决策时不补造 response；全空 batch 跳过教师评分/actor update，保存 return、成功、成本和跳过次数，checkpoint step 为实际 update 次数。混合 batch 只保留真实决策行。

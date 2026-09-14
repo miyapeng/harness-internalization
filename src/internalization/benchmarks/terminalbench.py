@@ -98,7 +98,7 @@ class TerminalBench2Environment:
             write_json(self.output/"grade.json", {"task_id":self.task_id, "seed":self.seed,
                 "metrics":{"reward":reward}, "reward_metric":"harbor_verifier_reward"})
         return asdict(EnvironmentStep("\n".join(self.history), reward, self.done, reward,
-            result.get("valid", True), result.get("tool_calls", 0)))
+            result.get("valid", True), result.get("tool_calls", 0), observation_kind="context"))
 
     async def close(self):
         if self.session is not None: await self.session.close()

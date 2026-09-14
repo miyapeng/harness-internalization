@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -60,22 +61,50 @@ class CommandBackend:
                 if student != teacher: raise ValueError("Teacher must be the phase-initial student snapshot")
                 return owner.train(student, h_plus, h_minus, target, tasks, budget, output)
 
-        return Components(Proposer(), Runner(), Trainer())
+        return Components(Proposer(), Runner(), Trainer(), execution_config=self.execution_config)
 
     def __init__(self, config: dict, ledger: Path):
+        from .core.execution_config import resolve_execution
+        allowed = {"propose", "target", "check_internalization", "evaluate", "train", "cwd", "timeout_s", "benchmark", "execution"}
+        if set(config)-allowed: raise ValueError(f"Unknown backend fields: {sorted(set(config)-allowed)}")
         self.config = config
+        limits = None
+        # Resolve the benchmark's published limits once, then apply explicit experiment values.
+        argv = config.get("evaluate", [])
+        if isinstance(argv,list) and "--env-config" in argv:
+            path = Path(argv[argv.index("--env-config")+1])
+            if not path.is_absolute(): path = Path(config.get("cwd") or ".") / path
+            benchmark = config.get("benchmark")
+            if benchmark == "appworld":
+                from .benchmarks.appworld import AppWorldConfig
+                env = AppWorldConfig.load(path)
+            elif benchmark in ("hotpotqa", "terminalbench2", "swebench_pro", "lawbench"):
+                from .benchmarks.common import BenchmarkConfig
+                env = BenchmarkConfig.load(path)
+            else: env = None
+            if env is not None:
+                limits = {"max_steps":env.max_steps, "model":{**env.model_options,"max_prompt_tokens":env.max_prompt_tokens}}
+        self.execution_config = resolve_execution(config.get("execution"), benchmark_limits=limits)
         self.ledger = Journal(ledger)
-        for key in ("propose", "evaluate", "train"):
+        required = ("propose", "target", "check_internalization", "evaluate", "train") if self.execution_config["mode"] == "internalization" else ("propose", "evaluate")
+        for key in required:
+            if key not in config: raise ValueError(f"{self.execution_config['mode']} mode requires {key} entrypoint")
+        for key in set(config) & {"propose", "target", "check_internalization", "evaluate", "train"}:
             command = config[key]
             if not isinstance(command, list) or not command or any(not isinstance(s, str) for s in command):
                 raise ValueError("Commands must be nonempty argv arrays; shell strings are not allowed")
+        if type(config.get("timeout_s",86400)) not in (int,float) or config.get("timeout_s",86400) <= 0:
+            raise ValueError("Positive process timeout required")
 
     def _call(self, stage, payload, output):
         output.mkdir(parents=True, exist_ok=True)
         request, response = output / "request.json", output / "response.json"
-        write_json(request, {"schema_version": 1, "stage": stage, **payload})
+        from .core.execution_config import config_hash, save_effective
+        save_effective(output, self.execution_config)
+        write_json(request, {"schema_version": 1, "stage": stage, **payload,
+            "effective_config": self.execution_config, "effective_config_hash": config_hash(self.execution_config)})
         if response.exists(): raise FileExistsError(response)
-        argv = [s.replace("{request}", str(request.resolve())).replace("{response}", str(response.resolve()))
+        argv = [s.replace("{request}", str(request.resolve())).replace("{response}", str(response.resolve())).replace("{python}",sys.executable)
                 for s in self.config[stage]]
         start = time.monotonic()
         with (output / "stdout.log").open("x") as stdout, (output / "stderr.log").open("x") as stderr:
@@ -125,9 +154,19 @@ class CommandBackend:
         result = self._call("train", {"teacher_checkpoint": checkpoint, "student_checkpoint": checkpoint,
             "full_harness": serialize_harness(full), "reduced_harness": serialize_harness(reduced),
             "target": target.to_dict() if isinstance(target,InternalizationTarget) else target,
-            "task_ids": tasks, "optimizer_steps": budget}, output)
-        if result.get("optimizer_steps_completed") != budget:
+            "task_ids": tasks, "planned_update_batches": budget}, output)
+        if any(type(result.get(k)) is not int or result[k] != budget for k in ("planned_update_batches", "attempted_update_batches")):
             raise ValueError("Training did not consume the prescribed update-batch budget")
+        calls = result.get("actor_update_calls")
+        if type(calls) is not int or not 0 <= calls <= budget: raise ValueError("Invalid actor update count")
+        if calls == 0:
+            from .core.execution_config import NoActorUpdates
+            if result.get("status") != "no_actor_updates" or result.get("checkpoint") != checkpoint:
+                raise ValueError("Zero updates must preserve the input checkpoint")
+            raise NoActorUpdates(result)
+        if result.get("status") != "trained": raise ValueError("Actor calls do not imply a successfully trained model")
+        steps=result.get("optimizer_steps")
+        if steps is not None and (type(steps) is not int or steps < 0): raise ValueError("Invalid actual optimizer step count")
         path = Path(result["checkpoint"])
         if not path.is_absolute() or not path.is_dir():
             raise ValueError("Trainer must return an existing absolute checkpoint directory")

@@ -45,7 +45,7 @@ class CapabilityBroker:
             result={"observation":outcome.observation,"done":outcome.done,"action_valid":outcome.action_valid}
             event=EnvironmentEvent(len(self.environment_events),self.context["step"],self.context["phase"],
                 payload["action"],outcome.observation,outcome.reward,outcome.done,outcome.success,
-                outcome.action_valid,outcome.tool_calls,self.context.get("control_id"))
+                outcome.action_valid,outcome.tool_calls,self.context.get("control_id"),outcome.observation_kind)
             self.environment_events.append(event)
             if self.audit: self.audit.append("environment_event",revision=self.revision.version,
                 task_id=self.context.get("task_id"),episode_id=self.context.get("episode_id"),
@@ -80,8 +80,12 @@ class CodeRuntime:
         self.environment_events=[]
         self.public_calls=[]
         self.task_id,self.episode_id=task_id,episode_id
+        self.environment_history=None
+        self.local_history=[]
+        self.rendered_events=0
 
     def prepare(self,history,step):
+        if self.environment_history is None: self.environment_history=history
         named=self.revision.config["schema"]==2
         self.broker=CapabilityBroker(self.model,self.revision,environment=self.environment,audit=self.audit,
             events=self.environment_events,calls=self.public_calls,
@@ -121,14 +125,27 @@ class CodeRuntime:
             not isinstance(result["observation"],str) or not isinstance(result["memory"],dict) or type(result["stop"]) is not bool):
             raise ValueError("Harness execute must return observation, memory and stop; reward stays protected")
         self.memory=result["memory"]
-        # Preserve actual tool observations even if the candidate omits them from its return value.
-        public=history
-        if self.broker.public is not None:
-            public+="\n[Environment observation]\n"+self.broker.public
-        public+="\n[Student action]\n"+action+"\n[Harness tool result]\n"+result["observation"]
+        # Render event occurrences, not distinct strings. A full environment context
+        # replaces its previous view. Local tool history has its own retained view.
+        fresh=self.environment_events[self.rendered_events:]
+        for event in fresh:
+            if event.index == previous_events:
+                self.environment_history+="\n[Student action]\n"+action
+            if event.observation_kind=="context":
+                self.environment_history=event.observation
+            else:
+                self.environment_history+="\n[Environment observation]\n"+event.observation
+        self.rendered_events=len(self.environment_events)
+        # A dispatcher commonly echoes the exact environment result. Suppress that
+        # mirror only against events in THIS dispatch, never against previous text.
+        mirrors_event=any(result["observation"]==event.observation for event in fresh)
+        if not mirrors_event:
+            self.local_history.append(("\n[Student action]\n"+action if len(self.environment_events)==previous_events else "")
+                +"\n[Harness tool result]\n"+result["observation"])
+        public=self.environment_history+"".join(self.local_history)
         if len(self.environment_events)==previous_events:
             used=Cost(tool_calls=1)  # One local dispatch, even if prepare previously called the environment.
             self.broker.cost+=used
             self.broker.record_call("local_tool",{"action":action},
                 {"observation":result["observation"],"stop":result["stop"]},used)
-        return EnvironmentStep(public,self.broker.reward,self.broker.done or result["stop"],self.broker.success,self.broker.valid)
+        return EnvironmentStep(public,self.broker.reward,self.broker.done or result["stop"],self.broker.success,self.broker.valid,observation_kind="context")

@@ -29,6 +29,8 @@ def main():
     config["evaluate"] = config["evaluate"] + ["--final-evaluation"]
     agent = evaluation_agent(args, manifest)
     checkpoint, harness = agent.checkpoint, agent.harness
+    if "effective_config" in agent.protocol:
+        config["execution"] = agent.protocol["effective_config"]
     args.output.mkdir(parents=True, exist_ok=False)
     write_json(args.output/"protocol.json", {"manifest_hash":manifest.fingerprint, "checkpoint":checkpoint,
         "harness_version":harness.version, "agent":agent.to_dict(),

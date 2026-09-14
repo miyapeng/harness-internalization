@@ -1,0 +1,201 @@
+{
+  "date": "2026-09-14",
+  "status": "PASS",
+  "scope": "Task one: execution wiring, resolved configuration, observation occurrence rendering, actual training counters",
+  "base_commit": "c7c595252a369f70367ac588fa4b5c5e8ef46a8e",
+  "tests": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "passed": 195,
+    "new": 13,
+    "skipped": 0,
+    "seconds": 257.889,
+    "log": "execution-wiring-tests.txt"
+  },
+  "targeted": {
+    "execution_wiring": {
+      "passed": 13,
+      "seconds": 13.892
+    },
+    "environment_events": {
+      "passed": 11,
+      "seconds": 3.485
+    },
+    "appworld": {
+      "passed": 13,
+      "seconds": 3.512
+    }
+  },
+  "legacy_parity": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 90,
+    "original_demo_differences": [],
+    "original_demo_files_byte_equal": 90,
+    "acceptance_schema_only_changes": [],
+    "additional_demo_files": [],
+    "python_files_parsed": 97,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "parity_command": "PYTHONPATH=src python3.12 scripts/verify_migration.py --before runs/environment-events-legacy-regression --after runs/task1-legacy-demo",
+  "protected_files_unchanged_sha256": {
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/harness/control_runtime.py": "5889074a8bf07ffd46728da93067ddf7af161ab1389bef4b20b57633d9b746dd",
+    "src/internalization/harness/revision.py": "adbb661f1f149f656be490507c2e27d57b2ada479e3fd400c1529025f1ab6a26",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+    "src/internalization/core/manifest.py": "4a030eb27a3578cd39a6412219a73b75134b7237b6dae1d12c2638a6add95a06",
+    "src/internalization/harness/sandbox.py": "35332e0cd1e479801afb3c7bba7fa043d819d6508434dc1a0afc392319891dde"
+  },
+  "acceptance": {
+    "internalization_mode_missing_entries_fail_at_start": "PASS (CLI and CommandBackend)",
+    "evolution_only_skips_target_check_train": "PASS (orchestration mock)",
+    "hotpotqa_versioned_check_evaluate_train": "PASS (real isolated worker on synthetic data, mock policy/optimizer adapter)",
+    "configuration_crosses_real_json_subprocess": "PASS (CPU model and environment fixtures)",
+    "lambda_zero_preserves_outcome_with_nonzero_module_signal": "PASS (CPU tensors)",
+    "all_and_targeted_masks": "PASS (CPU tensors/scorer)",
+    "tasks_rollouts_learning_rate_max_steps": "PASS (subprocess, real ModuleTrainer)",
+    "verl_learning_rate_and_optimizer_step_hook": "PASS (real CPU AdamW, mocked external veRL actor constructor)",
+    "full_observation_not_recursively_appended": "PASS (actual code sandbox)",
+    "identical_real_events_preserved": "PASS (actual code sandbox and raw event/call ledger)",
+    "zero_updates_preserve_old_model_and_accepted_plus": "PASS (actual zero-update trainer plus separate outer-loop mock)",
+    "failed_batch_attempt_count": "PASS (failure fixture, planned=5/attempted=1/actor=0)",
+    "old_policy_noop_mask_new_tool_single_control_rollback": "PASS (existing regression suite)"
+  },
+  "proofs": {
+    "configuration": {
+      "path": "runs/task1-config-proof/proof.json",
+      "validation": "actual JSON subprocess and tiny CPU SGD; mock policy/environment, no HF/veRL/GPU",
+      "counts": {
+        "planned_update_batches": 2,
+        "attempted_update_batches": 2,
+        "actor_update_calls": 2,
+        "optimizer_steps": 2
+      },
+      "supervision": "all",
+      "advantage": {
+        "module_weight": 0,
+        "mode": "mean_std_norm",
+        "normalize_module": false,
+        "clip_module": null,
+        "invalid_action_penalty": 0.1,
+        "epsilon": 1e-06
+      },
+      "model_constructor_options": {
+        "policy": {
+          "device": "cpu",
+          "max_context": 8192,
+          "max_prompt_tokens": 4096,
+          "max_action_tokens": 512,
+          "max_new_tokens": 192,
+          "learning_rate": 0.023,
+          "weight_decay": 0.01
+        },
+        "reference": {
+          "device": "cpu",
+          "max_context": 8192,
+          "max_prompt_tokens": 4096,
+          "max_action_tokens": 512,
+          "max_new_tokens": 192
+        }
+      },
+      "effective_config": "runs/task1-config-proof/training/effective_config.json",
+      "effective_config_sha256": "bc73e538f6a13ca57b8d9626cbe9fa879c902397d9aeb8c2c309dcba58e98b1f"
+    },
+    "zero_updates": {
+      "path": "runs/task1-zero-update-proof/proof.json",
+      "validation": "actual sandbox, mock environment/policy; zero actor updates",
+      "summary": {
+        "planned_update_batches": 2,
+        "attempted_update_batches": 2,
+        "actor_update_calls": 0,
+        "optimizer_steps": null,
+        "batches_skipped_no_student_decisions": 2,
+        "supervision": "targeted",
+        "cost": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "model_calls": 0,
+          "auxiliary_calls": 0,
+          "tool_calls": 2,
+          "latency_s": 0.0657222755253315
+        },
+        "teacher_snapshot": "policy-0",
+        "kl_reference_snapshot": "phase-reference",
+        "module_scorer_refresh": "each_batch_behavior_policy",
+        "advantage_config": {
+          "module_weight": 0.001,
+          "mode": "mean_std_norm",
+          "normalize_module": false,
+          "clip_module": null,
+          "invalid_action_penalty": 0.1,
+          "epsilon": 1e-06
+        },
+        "status": "no_actor_updates"
+      },
+      "checkpoint_created": false,
+      "episode_returns": [
+        3.0,
+        3.0
+      ],
+      "unchanged_policy_snapshot": "policy-0"
+    }
+  },
+  "existing_assertion_changes": {
+    "tests/test_environment_events.py": "Zero actor updates must not create a step=0 checkpoint; now asserts no artifact and no_actor_updates status.",
+    "tests/test_appworld.py": "Replace ambiguous training_batches_completed assertion with attempted_update_batches."
+  },
+  "not_run": [
+    "real API proposer",
+    "real HF model inference",
+    "external veRL actor execution / GPU training",
+    "official benchmark datasets/evaluation"
+  ],
+  "known_boundaries": [
+    "Generic rendering removes exact event echoes only; does not infer provenance of arbitrary candidate paraphrases.",
+    "An unverified historical runtime configuration cannot silently resume as a newly resolved configuration.",
+    "Partial costs of interrupted calls require the raw audit trail; failed training is never reported as a completed budget."
+  ],
+  "modified_and_added_files": [
+    "configs/alfworld_backend.json",
+    "configs/alfworld_execution.json",
+    "configs/appworld_backend.json",
+    "configs/hotpotqa_backend.json",
+    "configs/hotpotqa_execution.json",
+    "configs/lawbench_backend.json",
+    "configs/swebench_pro_backend.json",
+    "configs/terminalbench2_backend.json",
+    "configs/versioned_alfworld_backend.json",
+    "docs/EXECUTION_WIRING.md",
+    "docs/METHOD.md",
+    "docs/STATUS.md",
+    "docs/WORKLOG.md",
+    "docs/validation/execution-wiring-report.json",
+    "docs/validation/execution-wiring-tests.txt",
+    "scripts/evaluate_benchmark.py",
+    "src/internalization/benchmarks/alfworld.py",
+    "src/internalization/benchmarks/appworld.py",
+    "src/internalization/benchmarks/hotpotqa.py",
+    "src/internalization/benchmarks/lawbench.py",
+    "src/internalization/benchmarks/swebench.py",
+    "src/internalization/benchmarks/terminalbench.py",
+    "src/internalization/cli.py",
+    "src/internalization/command_backend.py",
+    "src/internalization/core/execution_config.py",
+    "src/internalization/core/interfaces.py",
+    "src/internalization/core/trajectory.py",
+    "src/internalization/harness/code_runtime.py",
+    "src/internalization/outer_loop.py",
+    "src/internalization/revision_loop.py",
+    "src/internalization/training/entrypoint.py",
+    "src/internalization/training/revision_scoring.py",
+    "src/internalization/training/rollout.py",
+    "src/internalization/training/teacher_backend.py",
+    "src/internalization/training/trainer.py",
+    "src/internalization/training/verl_backend.py",
+    "tests/fixtures/execution_worker.py",
+    "tests/test_appworld.py",
+    "tests/test_environment_events.py",
+    "tests/test_execution_wiring.py"
+  ]
+}

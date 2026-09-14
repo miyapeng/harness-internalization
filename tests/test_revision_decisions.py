@@ -29,7 +29,7 @@ class RevisionDecisionTests(unittest.TestCase):
             def rollout(_,model,harness,tasks,*,seeds,output,training=False):
                 seen.append((model,harness.version,tasks))
                 success=float('tools/log_query.py' in harness.files())
-                if mode=='no_gain' or (mode=='reject_acceptance' and tasks[0].startswith('acceptance')):success=0.
+                if mode=='no_gain' or (mode=='reject_dev' and tasks[0].startswith('dev')):success=0.
                 return RolloutResult((),tuple(EpisodeResult(t,s,success,Cost(10,1,1)) for t in tasks for s in seeds))
         class Trainer:
             def train(*a,**kw):raise AssertionError('Trainer must not run')
@@ -44,9 +44,9 @@ class RevisionDecisionTests(unittest.TestCase):
         self.assertEqual(result['harness_revision']['version'],self.parent.version)
         self.assertEqual(result['archive'][0]['reason'],'no_useful_candidate')
 
-    def test_search_dev_gain_cannot_bypass_independent_acceptance_gate(self):
-        result,_,_=self.run_loop('reject_acceptance')
-        self.assertEqual(result['archive'][0]['reason'],'harness_acceptance_failed')
+    def test_search_gain_cannot_bypass_dev_acceptance_gate(self):
+        result,_,_=self.run_loop('reject_dev')
+        self.assertEqual(result['archive'][0]['reason'],'no_useful_candidate')
         self.assertEqual(result['harness_revision']['version'],self.parent.version)
 
     def test_valid_tool_without_target_persists_into_next_candidate_search(self):

@@ -59,17 +59,17 @@ class AcceptedStatePipelineTests(unittest.TestCase):
 
     def test_import_allocates_actual_cycle_count_without_borrowing_test(self):
         for cycles in (1,2,4):
-            _,manifest=make_catalog_manifest('hotpotqa','v1',records(2,'test'),records((3+2*cycles)*30),cycles=cycles)
+            _,manifest=make_catalog_manifest('hotpotqa','v1',records(2,'test'),records((3+cycles)*30),cycles=cycles)
             manifest.validate_loop(cycles,versioned=True,cohort_minimum=30)
             self.assertEqual(len(manifest.partitions['train']),30)
-            self.assertEqual(sum(k.startswith('acceptance_') for k in manifest.partitions),cycles)
+            self.assertEqual(sum(k.startswith('acceptance_') for k in manifest.partitions),0)
             self.assertEqual(manifest.partitions['test'],('test-0000','test-0001'))
-        with self.assertRaisesRegex(ValueError,'at least 270'):
-            make_catalog_manifest('hotpotqa','v1',records(1,'test'),records(269))
+        with self.assertRaisesRegex(ValueError,'at least 180'):
+            make_catalog_manifest('hotpotqa','v1',records(1,'test'),records(179))
         _,legacy=make_catalog_manifest('hotpotqa','v1',records(1,'test'),records(180),versioned=False)
         self.assertFalse(any(k.startswith('acceptance_') for k in legacy.partitions))
 
-    def test_appworld_allocates_disjoint_scenario_families_to_acceptance(self):
+    def test_appworld_allocates_disjoint_scenario_families_without_acceptance(self):
         splits={};offset=0
         for name,count in (('train',80),('dev',30),('test_normal',2),('test_challenge',2)):
             splits[name]=[f'{i:07x}_{j}' for i in range(offset,offset+count) for j in (1,2,3)];offset+=count
@@ -84,7 +84,7 @@ class AcceptedStatePipelineTests(unittest.TestCase):
         class Never:
             def propose(*a,**kw):raise AssertionError('proposer ran')
             def rollout(*a,**kw):raise AssertionError('runner ran')
-        with self.assertRaisesRegex(ValueError,'retirement_0, acceptance_0'):
+        with self.assertRaisesRegex(ValueError,'retirement_0'):
             run_outer_loop(Components(Never(),Never(),None),manifest,str(self.checkpoint),self.root/'run',self.config,initial_harness=self.parent)
         self.assertFalse((self.root/'run').exists())
 
@@ -174,7 +174,7 @@ class AcceptedStatePipelineTests(unittest.TestCase):
         self.assertEqual(result['next_cycle'],2)
         self.assertEqual(result['protocol_hash'],agent.to_dict()['protocol_hash'])
         self.assertFalse((self.root/'resumed/cycle_00').exists())
-        consumed=set(manifest.partitions['retirement_0']+manifest.partitions['acceptance_0']+manifest.partitions['test'])
+        consumed=set(manifest.partitions['retirement_0']+manifest.partitions['test'])
         self.assertFalse(any(consumed.intersection(tasks) for _,_,tasks in seen))
 
     def test_import_evolve_state_final_evaluation_executes_the_accepted_tool(self):

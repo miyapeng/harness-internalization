@@ -81,7 +81,7 @@ PYTHONPATH=src python -m internalization.cli run \
   --output runs/alfworld-code-experiment --train-steps 300
 ```
 
-此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2、**acceptance_0..2**；不能借用 retirement/test 填充 acceptance，也不会自动重新划分既有数据。该要求只针对新模式，原模式 manifest 不变。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。最终评价必须显式选择 `--state` 或 `--baseline`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
+此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2；不再要求 acceptance_0..2。旧文件中多出的 acceptance 分区保留不用，不自动重新划分既有数据或借用 retirement/test。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。最终评价必须显式选择 `--state` 或 `--baseline`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
 
 ## 产物与验收证据
 
@@ -92,7 +92,7 @@ PYTHONPATH=src python -m internalization.cli run \
 | `revisions/` | 父版本、完整候选和精简版本的可执行全文件快照 |
 | `experiment/cycle_00/candidate_0/candidate.json` | candidate_id、parent_revision、完整 patch、full_revision、rationale |
 | `experiment/cycle_00/internalization_target.json` | full/reduced 路径和 hash、待撤除行为、可执行 hook |
-| `experiment/cycle_00/harness_acceptance.json` | 独立 Harness 接受门槛 |
+| `experiment/cycle_00/harness_acceptance.json` | 复用 dev 逐题结果与配对区间的 Harness 接受记录（decision_source=dev，无额外评价） |
 | `experiment/cycle_00/compatibility/` | 实际 H_minus action IDs、同状态 hook 执行检查 |
 | `experiment/cycle_00/A/` 至 `D/` | 各版本实际代码执行轨迹、任务、模型、hash、分数和成本 |
 | `experiment/cycle_00/retirement.json` | 四格能力、成本与模型接受的独立判定 |
@@ -101,6 +101,6 @@ PYTHONPATH=src python -m internalization.cli run \
 
 混合例首轮 A=1/B=0/C=1/D=1，accept/retire 后日志工具仍在；第二、三轮从该 checkpoint + reduced revision 搜索，没有进一步收益则不训练。这些数值是合成生命周期证据。源代码演化、实际工具调用、内核隔离是真实执行；学习结论、真实 API proposer、HF/veRL/GPU、官方任务均未验证。
 
-`tests/test_versioned_harness.py` 验证实际工具、混合四格版本、unsupported 保留、失败隔离、回滚及门槛；`test_revision_decisions.py` 验证独立接受、无收益、无目标跨周期、非法目标和独立 proposer mock；`test_revision_training.py` 用 CPU 小模型真实 SGD 更新验证两批同步、零效应、inactive mask、非目标上下文只生成一次。原 100 项测试保留，旧三周期 90 文件逐字节一致。最终机器记录见 `docs/validation/versioned-harness-report.json`。
+`tests/test_versioned_harness.py` 验证实际工具、混合四格版本、unsupported 保留、失败隔离、回滚及门槛；`test_revision_decisions.py` 验证 dev 接受、无收益、无目标跨周期、非法目标和独立 proposer mock；`test_revision_training.py` 用 CPU 小模型真实 SGD 更新验证两批同步、零效应、inactive mask、非目标上下文只生成一次。原 100 项测试保留，旧三周期 90 文件逐字节一致。最终机器记录见 `docs/validation/versioned-harness-report.json`。
 
 保留的范围限制：没有自动模块分解、DAG 搜索、可内化性分类器、任意代码差异编译器或旧 retained 目标的自动再审计调度；当前版本只支持上述可执行 hook 桥。没有降低统计阈值来让演示退役。

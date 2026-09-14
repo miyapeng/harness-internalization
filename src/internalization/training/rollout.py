@@ -18,6 +18,12 @@ class EnvironmentStep:
     success: float
     action_valid: bool = True
     tool_calls: int = 1
+    # context replaces the environment view; delta appends one new event.
+    observation_kind: str = "delta"
+
+    def __post_init__(self):
+        if self.observation_kind not in ("context", "delta"):
+            raise ValueError("Unknown observation_kind")
 
 
 class Environment(Protocol):
@@ -27,10 +33,11 @@ class Environment(Protocol):
 
 
 class InteractionTaskRunner:
-    def __init__(self, environment_factory, model_loader=None, *, max_steps=30, code_sandbox=None):
+    def __init__(self, environment_factory, model_loader=None, *, max_steps=30, code_sandbox=None, supervision="targeted"):
         self.environment_factory, self.model_loader = environment_factory, model_loader
         self.max_steps = max_steps
         self.code_sandbox = code_sandbox
+        self.supervision = supervision
 
     def rollout(self, model, harness, tasks, *, seeds, output, training=False):
         from ..harness.revision import HarnessRevision
@@ -67,7 +74,9 @@ class InteractionTaskRunner:
                                                 outcome.done, outcome.action_valid, tuple(old_lp), step_cost,
                                                 tuple(model.prompt_ids(advice.teacher_prompt)) if training else ())
                         steps.append(transition)
-                        success, observation = outcome.success, outcome.observation
+                        success = outcome.success
+                        observation = (outcome.observation if outcome.observation_kind == "context" else
+                            observation+"\n[Student action]\n"+action.text+"\n[Environment observation]\n"+outcome.observation)
                         journal.append("transition", state=asdict(state), action=action.text,
                             student_prompt=advice.teacher_prompt, response_ids=ids, reward=outcome.reward,
                             success=success, done=outcome.done, action_valid=outcome.action_valid,

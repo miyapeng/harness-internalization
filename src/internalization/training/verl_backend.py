@@ -27,7 +27,7 @@ ACTOR_CONFIG = {
 
 class VerlPolicy(FrozenHFBackend):
     def __init__(self, checkpoint, *, device="cuda:0", max_context=8192, max_action_tokens=512,
-                 max_new_tokens=192, max_prompt_tokens=4096):
+                 max_new_tokens=192, max_prompt_tokens=4096, learning_rate=1e-6, weight_decay=.01):
         # Imports occur only when this real optimizer backend is requested.
         from importlib.metadata import version
         if version("verl") != "0.5.0":
@@ -35,13 +35,15 @@ class VerlPolicy(FrozenHFBackend):
         from omegaconf import OmegaConf
         from verl.workers.actor.dp_actor import DataParallelPPOActor
         super().__init__(checkpoint, device=device, max_context=max_context,
-                         max_action_tokens=max_action_tokens, max_new_tokens=max_new_tokens)
+                         max_action_tokens=max_action_tokens, max_new_tokens=max_new_tokens, max_prompt_tokens=max_prompt_tokens)
         self.max_prompt_tokens = max_prompt_tokens
         self.pad_token_id = self.tokenizer.pad_token_id
         if self.pad_token_id is None: self.pad_token_id = self.tokenizer.eos_token_id
         self.model.requires_grad_(True)
         self.model.gradient_checkpointing_enable()
-        self.optimizer = self.torch.optim.AdamW(self.model.parameters(), lr=1e-6, weight_decay=0.01)
+        self.optimizer = self.torch.optim.AdamW(self.model.parameters(), lr=learning_rate, weight_decay=weight_decay)
+        self.optimizer_steps = 0
+        self._step_hook = self.optimizer.register_step_post_hook(self._count_optimizer_step)
         if not self.torch.distributed.is_initialized():
             self.rendezvous = tempfile.TemporaryDirectory(prefix="hi-verl-")
             self.torch.distributed.init_process_group("gloo", rank=0, world_size=1,
@@ -52,6 +54,9 @@ class VerlPolicy(FrozenHFBackend):
         self.updates = 0
         self.initial_snapshot = self.snapshot_id
         self.reference = None
+
+    def _count_optimizer_step(self, optimizer, args, kwargs):
+        self.optimizer_steps += 1
 
     def prompt_ids(self, prompt):
         ids = super().prompt_ids(prompt)

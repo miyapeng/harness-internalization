@@ -168,7 +168,7 @@ def run(api,payload):
         journal=Journal(self.root/'events.jsonl')
         selected=search_revisions(Components(Proposer(),runner,None),request,baseline_search=base,baseline_dev=base_dev,
             dev_tasks=dev,seeds=(0,),policy=RetirementPolicy(),journal=journal)
-        self.assertEqual(selected.candidate_id,good.candidate_id)
+        self.assertEqual(selected.candidate.candidate_id,good.candidate_id)
         self.parent.files()
         history=public_history(journal)
         self.assertEqual(history[0]['status'],'failed')

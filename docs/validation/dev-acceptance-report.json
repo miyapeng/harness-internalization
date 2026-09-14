@@ -1,0 +1,122 @@
+{
+  "date": "2026-09-14",
+  "status": "PASS",
+  "scope": "Reuse existing dev acceptance evidence; remove independent acceptance evaluation/cohorts",
+  "tests": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "passed": 202,
+    "seconds": 225.071,
+    "new": 7,
+    "skipped": 0,
+    "log": "dev-acceptance-tests.txt"
+  },
+  "targeted": {
+    "dev_acceptance": 7,
+    "revision_decisions": 6,
+    "agent_state_pipeline": 17
+  },
+  "legacy_parity": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 90,
+    "original_demo_differences": [],
+    "original_demo_files_byte_equal": 90,
+    "acceptance_schema_only_changes": [],
+    "additional_demo_files": [],
+    "python_files_parsed": 97,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "protected_training_target_statistics_sha256": {
+    "src/internalization/training/rollout.py": "d3e79466e9e4f0ae6c063e2ae6f09b69fd6f7e10aa0bac794e958ec6072bca6f",
+    "src/internalization/training/revision_rollout.py": "a3f5dc45b75d5708bc40f99a78b6d32756f473bbd76db6ae6bd4e44075c359ba",
+    "src/internalization/training/verl_backend.py": "7a6be70f0eb56ba96cc1c2c26728720e828c3548d22de6cd1c74902cfbc91686",
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/trainer.py": "b71741e5bbc2d35fc40937fc1169e1133dfe19177a3f90a6ea5c5ef8e49951f7",
+    "src/internalization/training/__init__.py": "049174ba2ac33f1e48281be0195eb6e89e55cfbd84dd18b4f8411d396587505d",
+    "src/internalization/training/checkpoint.py": "dff35df9ce065a1f451279b08a2a8604727ecec600268bd8f411e137a5ff88b5",
+    "src/internalization/training/student_context.py": "19d4f9a906c5c70b064b53949084c94095bcbdf1c989f15693ebc5425b84c00f",
+    "src/internalization/training/revision_scoring.py": "8f445cb0ddc9056084146f0f9539d3a44fc6bd76b9e4045c769aa530eddbe3f1",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/training/teacher_scoring.py": "cec132f7cbbfdd9c653811f59d5377249be8fdfc148f8d98a14cb084a243ccb4",
+    "src/internalization/training/entrypoint.py": "cf9642a3a3355cb84fe1dbe941c196c2341acc13a568be19c9204119d2c4a112",
+    "src/internalization/training/teacher_backend.py": "ff98089886f901164e3647fe3d6e64a531330b0462b11e39c74de7d506f64023",
+    "src/internalization/harness/revision.py": "adbb661f1f149f656be490507c2e27d57b2ada479e3fd400c1529025f1ab6a26",
+    "src/internalization/harness/control_runtime.py": "5889074a8bf07ffd46728da93067ddf7af161ab1389bef4b20b57633d9b746dd",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971"
+  },
+  "proof": {
+    "path": "runs/dev-acceptance-proof/proof.json",
+    "validation": "synthetic scores, actual search/dev orchestration and unchanged paired bootstrap",
+    "evaluation_calls": 6,
+    "episodes": 180,
+    "cost": {
+      "input_tokens": 1800,
+      "output_tokens": 180,
+      "model_calls": 180,
+      "auxiliary_calls": 0,
+      "tool_calls": 180,
+      "latency_s": 17.999999999999986
+    },
+    "additional_acceptance_calls": 0,
+    "decision_source": "dev",
+    "state_reason": "accepted_without_internalization",
+    "model_checkpoint": "old",
+    "full_revision": "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8",
+    "parent_revision": "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3",
+    "cost_measurement": "Episode costs are explicit synthetic fixture values; evaluation invocation counts are actual. Not real-model token/latency measurements."
+  },
+  "acceptance_cases": {
+    "dev_pass_without_acceptance_rerun": "PASS",
+    "zero_dev_gain_rejected": "PASS",
+    "positive_mean_but_nonpositive_lower_bound_rejected": "PASS",
+    "tool_gain_without_target_retained": "PASS",
+    "unsupported_target_retained_without_training": "PASS",
+    "ab_gate_failure_keeps_dev_accepted_plus": "PASS",
+    "training_retirement_and_rollback": "PASS (existing CPU/mock/sandbox regressions)",
+    "old_manifest_acceptance_unused_not_reallocated": "PASS (original bytes and manifest hash unchanged)",
+    "old_protocol_resume_transition_audited_without_overwrite": "PASS",
+    "retirement_test_results_not_given_to_proposer": "PASS",
+    "evaluation_and_cost_reuse": "PASS (6 calls, 180 synthetic episodes, 1980 fixture tokens; no double charge)"
+  },
+  "rule_preserved": "search_gain.low > 0 AND dev_gain.low > 0; original task-cluster bootstrap and candidate ranking",
+  "changed_files_this_turn": [
+    "src/internalization/evolution/revision_search.py",
+    "src/internalization/revision_loop.py",
+    "src/internalization/core/accepted_state.py",
+    "src/internalization/core/manifest.py",
+    "src/internalization/benchmarks/appworld_manifest.py",
+    "src/internalization/revision_demo.py",
+    "scripts/build_appworld_manifest.py",
+    "scripts/build_benchmark_manifest.py",
+    "tests/test_dev_acceptance.py",
+    "tests/test_versioned_harness.py",
+    "tests/test_revision_decisions.py",
+    "tests/test_agent_state_pipeline.py",
+    "tests/test_benchmark_adapters.py",
+    "README.md",
+    "docs/METHOD.md",
+    "docs/STATUS.md",
+    "docs/WORKLOG.md",
+    "docs/ACCEPTED_AGENT_PIPELINE.md",
+    "docs/DEV_ACCEPTANCE.md",
+    "docs/VERSIONED_HARNESS.md",
+    "docs/NAMED_CONTROLS.md",
+    "docs/EXECUTION_WIRING.md",
+    "docs/validation/dev-acceptance-report.json",
+    "docs/validation/dev-acceptance-tests.txt"
+  ],
+  "existing_assertion_adjustments": [
+    "search result now carries candidate and evidence",
+    "independent acceptance rejection test now verifies dev gate",
+    "new manifest has no acceptance partitions; three-cycle minimum source 180 instead of 270",
+    "resume checks consumed retirement/test without requiring removed partition"
+  ],
+  "not_run": [
+    "real API proposer",
+    "real HF model / veRL GPU training",
+    "official benchmark datasets"
+  ],
+  "previous_uncommitted_work": "Preserved; protected hashes captured from working tree at start of this turn, not from HEAD.",
+  "old_experiment_files": "Not modified; new proof and demo directories only."
+}

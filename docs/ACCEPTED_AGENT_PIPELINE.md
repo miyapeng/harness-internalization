@@ -24,9 +24,9 @@ next_cycle: 下一未完成周期；中间接受状态为 null
 
 ## 数据分区和启动检查
 
-通用导入器默认版本化模式，通过 `--cycles N` 生成互斥的 train/search/dev、retirement_0..N-1、acceptance_0..N-1 和 test。acceptance 从独立非测试训练源预先划分，不借 retirement/test。
+通用导入器通过 `--cycles N` 生成互斥的 train/search/dev、retirement_0..N-1 和 test。dev 的既有配对评价同时用于正式接受 Harness，不再生成或要求 acceptance 分区；旧 manifest 中的 acceptance 分区可保留，始终闲置，不挪入 train/dev/retirement/test。
 
-通用导入器每 cohort 默认 30 个任务，需要至少 `(3 + 2*N) * cohort_size` 个训练源任务；三周期为 **270**，旧模式为 180。只有 test 源的导入仍可供最终评价，但不能进入演化循环。`--legacy-modules` 显式生成旧模式分区。ALFWorld/AppWorld 导入入口也提供 cycles/模式参数；AppWorld 保留 scenario 三变体整组，样本不足直接报错。它的 search/dev 大小不同，不能直接套用通用导入器总量公式。
+通用导入器每 cohort 默认 30 个任务，需要至少 `(3 + N) * cohort_size` 个训练源任务；三周期为 **180**，两种模式的数据分区要求一致。只有 test 源的导入仍可供最终评价，但不能进入演化循环。`--legacy-modules` 仍显式标记旧模块模式。ALFWorld/AppWorld 导入入口也提供 cycles/模式参数；AppWorld 保留 scenario 三变体整组，样本不足直接报错。它的 search/dev 大小不同，不能直接套用通用导入器总量公式。
 
 `TaskManifest.validate_loop` 在任何 rollout/proposer 调用前一次性检查整个计划；CLI 在创建代码工作区前也会校验。已存在的 manifest 不自动重切。若文件声明 manifest_hash，还要与实际内容一致。
 
@@ -54,7 +54,7 @@ python scripts/evaluate_benchmark.py --manifest data/hotpot-versioned/manifest.j
   --partition test --output runs/hotpot-final
 ```
 
-部分现有 benchmark backend 未配置可选 `target` / `check_internalization` 进程：它们可以演化和评价版本化代码，但有效改进会走“接受 H+、不内化”分支。本次未新增训练后端。需要内化时应使用已配置这些接口的后端，例如已有 `versioned_alfworld_backend.json`，并准备对应环境。
+ALFWorld/HotpotQA 的 internalization 后端已配齐五入口，缺入口会启动失败；其他未配齐的后端采用显式 evolution_only。配置与命令细节见 [运行接线](EXECUTION_WIRING.md)。
 
 初始基线必须显式选择：
 
@@ -86,3 +86,5 @@ checkpoint、Harness、总周期数、总预算、seeds、统计策略从状态�
 AppWorld 最终评价也使用统一加载器。LawBench 专用整类原生评价器尚无代码 revision 执行路径，本次明确报 unsupported，并在模型加载前停止；不回退为空 Harness，不用逐样本入口冒充官方完整整类评价。ALFWorld 请求式 evaluate 进程本身已显式接收 Harness，沿用原协议。
 
 两个旧划分测试按新语义调整：通用训练池从 180 增至 270，并检查 acceptance；AppWorld 原规模 fixture 显式选 legacy，另加较大合成 fixture 验证新版分区。原 20 项测试文件未修改。验证记录见 `docs/validation/agent-pipeline-report.json`。
+
+旧独立接受协议若从未完成周期继续，保留原 manifest 与 next_cycle，并在新输出协议中记录 acceptance_transition/from_protocol_hash；不修改旧 state/protocol，不再次使用已消费的 retirement cohort。新 dev 协议续跑保持原协议身份。

@@ -1,0 +1,27 @@
+{
+  "mode": "internalization",
+  "max_steps": 30,
+  "supervision": "targeted",
+  "tasks_per_batch": 4,
+  "rollouts_per_task": 2,
+  "device": "cuda:0",
+  "reference_device": "cpu",
+  "model": {
+    "max_context": 8192,
+    "max_prompt_tokens": 4096,
+    "max_action_tokens": 512,
+    "max_new_tokens": 192
+  },
+  "advantage": {
+    "module_weight": 0.001,
+    "mode": "mean_std_norm",
+    "normalize_module": false,
+    "clip_module": null,
+    "invalid_action_penalty": 0.1,
+    "epsilon": 1e-06
+  },
+  "optimizer": {
+    "learning_rate": 1e-06,
+    "weight_decay": 0.01
+  }
+}

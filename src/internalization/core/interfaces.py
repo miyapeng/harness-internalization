@@ -62,3 +62,5 @@ class Components:
     trainer: TrainingBackend
     retirement: RetirementEvaluator | None = None
     targets: InternalizationTargetBackend | None = None
+
+    execution_config: dict | None = None

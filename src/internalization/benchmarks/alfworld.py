@@ -81,7 +81,7 @@ class AlfworldEnvironment:
         self.admissible = infos["admissible_commands"][0]
         success = float(infos["won"][0])
         public = self.prompt.advance(actions[0], observations[0], self.admissible)
-        return EnvironmentStep(public, 10.0*success, bool(dones[0]), success, bool(valid[0]))
+        return EnvironmentStep(public, 10.0*success, bool(dones[0]), success, bool(valid[0]), observation_kind="context")
 
     def close(self):
         if self.env is not None: self.env.close()

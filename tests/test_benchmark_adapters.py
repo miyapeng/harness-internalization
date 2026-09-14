@@ -145,8 +145,8 @@ class AdapterTests(unittest.TestCase):
         test=[{"id":"heldout","split":"test","record":{"question":"heldout"}}]
         _,manifest=make_catalog_manifest("hotpotqa","v1",test,train)
         self.assertEqual([len(manifest.partitions[f"retirement_{i}"]) for i in range(3)],[30]*3)
-        self.assertEqual([len(manifest.partitions[f"acceptance_{i}"]) for i in range(3)],[30]*3)
-        self.assertEqual(len(manifest.partitions["train"]),30)
+        self.assertFalse(any(k.startswith("acceptance_") for k in manifest.partitions))
+        self.assertEqual(len(manifest.partitions["train"]),120)
         with self.assertRaises(ValueError): make_catalog_manifest("hotpotqa","v1",test,train,cohort_size=1)
 
     def test_lawbench_import_preserves_category_row_identity(self):

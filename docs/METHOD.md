@@ -2,13 +2,21 @@
 
 目标是在能力保留时，把外部 Harness 控制计算带来的决策能力转移进学生模型，并减少部署调用成本。现在支持版本化代码演化；原 planning/review/recovery 模块模式仍保留兼容入口。
 
+## 运行接线与计数约束（2026-09-14）
+
+ALFWorld/HotpotQA 的版本化生产后端提供五个入口，明确 internalization/evolution_only；前者缺少入口即启动失败，后者接受改进后不训练。运行参数经严格校验，完整解析为 effective_config 并连同 hash 传给各子进程；同批 H+/H− 评分、具名目标和统计规则不变。λ 对应 advantage.module_weight，0 是有效值；all/targeted 进入实际 scorer。
+
+公开观察区分完整 context 和增量 delta；CodeRuntime 按事件发生顺序更新模型视图，同一次环境返回不再同时原样显示为 Harness tool result。重复事件不去重；完整环境事件账本仍独立累计回报。
+
+计划批次、尝试批次、actor 调用和实际 optimizer.step 分别计数。没有学生决策的 batch 不更新；整阶段零 actor 调用保留旧模型与已接受的 H+，不保存新 checkpoint 或执行退役 C/D。细节、配置字段与命令见 [运行接线说明](EXECUTION_WIRING.md)。
+
 ## 版本化代码演化与选择性内化
 
 `HarnessCandidate` 是完整改进，记录 candidate_id、parent_revision、带文件基准哈希的 patch、可实际执行的 full_revision 和 rationale。`InternalizationTarget` 是可选撤除目标，记录 full_revision、reduced_revision、removed_behavior 和可执行 supervision_adapter。H_parent 是接受修改前版本；H_plus 是完整改进；H_minus 是只旁路目标控制后的版本，**不要求等于 H_parent**。例如新增日志查询工具和诊断控制后，精简版本仍保留工具。
 
 模型只提出 path/content 修改，文件基准 hash 由宿主从已验证的 parent revision 计算；应用时仍严格校验父版本。schema 2 将控制注册为有顺序的具名入口，目标只选择 target_control_id/removed_behavior，宿主只关闭该 ID，保留其他控制和工具。旧 schema 1 单 hook 桥继续兼容。不提供可用目标则跳过目标 API；模型选择仍需通过原可执行监督检查，不能凭声明获得训练资格。
 
-每轮从正式接受的 checkpoint 和代码 revision 出发，固定模型生成两个候选。候选在独立代码目录构造，实际加载其入口、prompt、工具注册、实现和配置；search/dev 使用既有配对收益选择规则。无收益则保留父版本，不训练。候选通过额外独立 `acceptance_i` cohort 的 Harness 接受门槛后，先持久化 H_plus，再最多提出一个精简版本。该门槛复用原 AttributionPolicy 的 30 个 task、95% bootstrap 下界严格大于 0；没有降低阈值。
+每轮从正式接受的 checkpoint 和代码 revision 出发，固定模型生成两个候选。候选在独立代码目录构造，实际加载其入口、prompt、工具注册、实现和配置；search/dev 使用既有配对收益选择规则。无收益则保留父版本，不训练。候选沿用原 search/dev 门槛：两个配对收益区间下界均严格大于 0。外层直接复用已执行的 dev 逐题结果正式接受 H_plus，记录 decision_source=dev，不再分配 acceptance_i 或重跑 acceptance_plus/acceptance_parent。bootstrap 置信度、次数、任务聚类及选择排序规则保持不变；接受后再最多提出一个精简版本。
 
 未提供目标、精简版本不可执行或监督接口不支持时，接受 old_model + H_plus，记录 `accepted_without_internalization`。有合法目标时在原 `retirement_i` cohort 计算 A/B 并复用 contribution gate。未通过则记录 `attribution_failed`，不训练，但保留已独立接受的 H_plus。这与 search/dev 无收益、整个改进被丢弃的分支不同。
 
@@ -35,7 +43,7 @@
 
 撤除要求模块先前有用、D相对B改善、D接近A且接近C，并满足真实token/调用/工具/延迟约束。不能只凭C−D缩小而忽略共同退化。模型接受与模块退役分别判定：C−A配对区间上界低于−ε（默认0.02）则回滚旧模型并保留H+；独立任务不足也拒绝新模型。否则接受新模型，D达到原能力/成本要求则retire，未达到则retain。下一轮使用正式接受的checkpoint和剩余Harness，拒绝checkpoint留档。不显著退化的接受规则不等于非劣证明。
 
-三轮、每轮两个候选、最多退役一个模块，训练总批次平均分配；search/dev/train/每轮retirement/test严格分离。主实验固定ALFWorld＋WebShop＋Search-QA，可扩展AppWorld。正式任务依赖与待运行baseline保持 [configs/experiment_protocol.json](../configs/experiment_protocol.json) 原内容不变。
+三轮、每轮两个候选、最多退役一个模块，训练总批次平均分配；search/dev/train/每轮retirement/test严格分离。早期预注册组合为ALFWorld＋WebShop＋Search-QA，可扩展AppWorld；本轮运行接线对象为ALFWorld和已存在的HotpotQA，WebShop完整接入留待任务二。历史预注册与待运行baseline保持 [configs/experiment_protocol.json](../configs/experiment_protocol.json) 原内容不变。
 
 仍需运行的对照：固定模型＋演化Harness、等预算RL/OPID、固定Harness蒸馏/OPHSD、SLIM生命周期、同策略文本技能、无退役、全步蒸馏、单轮蒸馏。当前CPU合成demo不能证明内化或论文创新。
 

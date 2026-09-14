@@ -266,7 +266,7 @@ class AppWorldTests(unittest.TestCase):
                      patch.object(verl_backend,"VerlPolicy",return_value=policy) as loader:
                     entrypoint.main("train")
                 result = json.loads(response.read_text())
-                self.assertEqual(result["training_batches_completed"],1)
+                self.assertEqual(result["attempted_update_batches"],1)
                 self.assertEqual(loader.call_args.kwargs["max_prompt_tokens"],28672)
                 self.assertTrue((Path(result["checkpoint"]) / "weights.pt").is_file())
 

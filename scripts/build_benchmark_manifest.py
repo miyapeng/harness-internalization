@@ -19,7 +19,7 @@ def main():
     parser.add_argument("--image-lock", type=Path, help="Pro instance ID -> {tag, digest}")
     parser.add_argument("--cohort-size", type=int, default=30)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--legacy-modules", action="store_true", help="Explicit old module protocol without acceptance cohorts")
+    parser.add_argument("--legacy-modules", action="store_true", help="Explicit old module protocol (both modes reuse dev for selection)")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     lock = json.loads(args.image_lock.read_text()) if args.image_lock else None

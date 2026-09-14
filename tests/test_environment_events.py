@@ -176,8 +176,12 @@ class EnvironmentEventTests(unittest.TestCase):
         target=InternalizationTarget.from_supervision(self.store,full,'unused guidance',full.config['supervision'])
         trainer=ModuleTrainer(InteractionTaskRunner(PublicEnvironment,max_steps=1),
             tasks_per_batch=tasks_per_batch,rollouts_per_task=1)
-        checkpoint=trainer.train(policy,reference,full,target.reduced_revision,target=target,
-            tasks=tasks,budget=budget,output=self.root/'training')
+        from internalization.core.execution_config import NoActorUpdates
+        try:
+            checkpoint=trainer.train(policy,reference,full,target.reduced_revision,target=target,
+                tasks=tasks,budget=budget,output=self.root/'training')
+        except NoActorUpdates:
+            checkpoint=None
         return policy,trainer,json.loads((self.root/'training/training_summary.json').read_text()),checkpoint
 
     def test_all_tool_only_batches_skip_actor_update_and_keep_returns_costs(self):
@@ -192,7 +196,9 @@ class EnvironmentEventTests(unittest.TestCase):
         rows=[json.loads(line) for line in (self.root/'training/training.jsonl').read_text().splitlines()]
         self.assertEqual([r['reason'] for r in rows],['no_student_decisions']*2)
         self.assertEqual([r['episodes'][0]['total_reward'] for r in rows],[3.,3.])
-        self.assertEqual(json.loads((Path(checkpoint)/'internalization.json').read_text())['step'],0)
+        self.assertIsNone(checkpoint)
+        self.assertFalse((self.root/'training/checkpoint').exists())
+        self.assertEqual(summary['status'],'no_actor_updates')
 
     def test_mixed_batch_only_real_decision_gets_its_own_episode_return(self):
         policy,_,summary,_=self.training(('auto','normal'),tasks_per_batch=2)

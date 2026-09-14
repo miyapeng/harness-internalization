@@ -36,7 +36,7 @@ def build_manifest(splits, revision, *, seed=42, cycles=3, search_size=15, dev_s
     if len(train) <= search_size//3 or len(dev) < dev_size//3: raise ValueError("Insufficient train/dev tasks")
     search, train = train[:search_size//3], train[search_size//3:]
     chosen_dev, held_out = dev[:dev_size//3], dev[dev_size//3:]
-    cohort_names=tuple(f"retirement_{i}" for i in range(cycles)) + (tuple(f"acceptance_{i}" for i in range(cycles)) if versioned else ())
+    cohort_names=tuple(f"retirement_{i}" for i in range(cycles))
     need = len(cohort_names) * cohort_size//3
     from_train = max(0, need-len(held_out))
     if len(train) <= from_train: raise ValueError("Insufficient non-test data; cannot weaken attribution or reuse cohorts")

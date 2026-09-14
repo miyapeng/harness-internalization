@@ -107,7 +107,7 @@ def run_demo(output,scenario="mixed",config=LoopConfig()):
     checkpoint=output/"initial_model"
     write_json(checkpoint/"mock_model.json",{"trained":False,"broken":False})
     partitions={name:tuple(f"{name}-{i:03d}" for i in range(30)) for name in
-        ("train","search","dev","test",*(f"acceptance_{i}" for i in range(config.cycles)),*(f"retirement_{i}" for i in range(config.cycles)))}
+        ("train","search","dev","test",*(f"retirement_{i}" for i in range(config.cycles)))}
     manifest=TaskManifest("synthetic_revision_lifecycle","fixture-v1",partitions)
     write_json(output/"manifest.json",asdict(manifest))
     proposer,trainer=DemoProposer(store,scenario),DemoTrainer(scenario)

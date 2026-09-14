@@ -25,7 +25,7 @@ def main():
     write_json(args.output, {**asdict(manifest), "manifest_hash":manifest.fingerprint,
         "split_seed":args.seed, "package_version":source["package_version"],
         "official_split_sha256":source["split_sha256"], "official_splits":source["splits"],
-        "allocation":"train/search only official train; dev/acceptance/retirement from train+dev; test held out",
+        "allocation":"train/search only official train; dev/retirement from train+dev; test held out",
         "loop_cycles":args.cycles,"loop_mode":"legacy_modules" if args.legacy_modules else "versioned",
         "scenario_families_disjoint":True})
 

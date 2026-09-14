@@ -76,6 +76,6 @@ class LawBenchEnvironment:
             "category":self.category, "prediction":action, "metrics":values,
             "reward_metric":"official_single_example_score"})
         return asdict(EnvironmentStep(self.prompt+"\nResponse: "+action+"\nResponse submitted.",
-            values["score"], True, values["score"], True, 0))
+            values["score"], True, values["score"], True, 0, observation_kind="context"))
 
     def close(self): pass

@@ -62,7 +62,7 @@ LLM 的目标选择响应为：
 | `core/trajectory.py`、`serialization.py` | 新 `RevisionTransition/ControlContext/ControlOutput`；旧 Transition JSON 不添加字段 |
 | `training/revision_rollout.py`、`revision_scoring.py` | 保存实际组合，按部署顺序增强评分；旧桥保留 |
 
-原 schema 1 的 `supervision` string/null、planning/review/recovery 模块模式继续工作，旧 revision hash 和归档不重写。没有自动把旧总 hook 拆成多个 ID；可以由后续候选显式升级配置，通过原 search/dev/acceptance 后生效。状态加载、实验隔离、归因门槛和 accept/retain/rollback 规则均沿用现有实现。
+原 schema 1 的 `supervision` string/null、planning/review/recovery 模块模式继续工作，旧 revision hash 和归档不重写。没有自动把旧总 hook 拆成多个 ID；可以由后续候选显式升级配置，通过原 search/dev 收益规则并复用 dev 正式接受后生效。状态加载、实验隔离、归因门槛和 accept/retain/rollback 规则均沿用现有实现。
 
 ## 运行与证据
 

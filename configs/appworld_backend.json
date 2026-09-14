@@ -1,7 +1,41 @@
 {
   "cwd": ".",
   "timeout_s": 86400,
-  "propose": ["python", "scripts/propose.py", "--request", "{request}", "--response", "{response}"],
-  "evaluate": ["python", "-m", "internalization.training.entrypoint", "evaluate", "--benchmark", "appworld", "--env-config", "configs/appworld.json", "--request", "{request}", "--response", "{response}"],
-  "train": ["python", "scripts/train.py", "--benchmark", "appworld", "--env-config", "configs/appworld.json", "--request", "{request}", "--response", "{response}"]
+  "propose": [
+    "python",
+    "scripts/propose.py",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "evaluate": [
+    "python",
+    "-m",
+    "internalization.training.entrypoint",
+    "evaluate",
+    "--benchmark",
+    "appworld",
+    "--env-config",
+    "configs/appworld.json",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "train": [
+    "python",
+    "scripts/train.py",
+    "--benchmark",
+    "appworld",
+    "--env-config",
+    "configs/appworld.json",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "execution": {
+    "mode": "evolution_only"
+  }
 }

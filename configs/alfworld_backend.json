@@ -2,29 +2,59 @@
   "cwd": ".",
   "timeout_s": 86400,
   "propose": [
-    "python",
+    "{python}",
     "scripts/propose.py",
     "--request",
     "{request}",
     "--response",
     "{response}"
   ],
-  "evaluate": [
-    "python",
-    "scripts/evaluate_alfworld.py",
-    "--request",
-    "{request}",
-    "--response",
-    "{response}",
-    "--device",
-    "cuda:0"
-  ],
-  "train": [
-    "python",
-    "scripts/train.py",
+  "target": [
+    "{python}",
+    "-m",
+    "internalization.training.entrypoint",
+    "target",
     "--request",
     "{request}",
     "--response",
     "{response}"
-  ]
+  ],
+  "check_internalization": [
+    "{python}",
+    "-m",
+    "internalization.training.entrypoint",
+    "check_internalization",
+    "--benchmark",
+    "alfworld",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "evaluate": [
+    "{python}",
+    "-m",
+    "internalization.training.entrypoint",
+    "evaluate",
+    "--benchmark",
+    "alfworld",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "train": [
+    "{python}",
+    "scripts/train.py",
+    "--benchmark",
+    "alfworld",
+    "--request",
+    "{request}",
+    "--response",
+    "{response}"
+  ],
+  "execution": {
+    "mode": "internalization"
+  },
+  "benchmark": "alfworld"
 }

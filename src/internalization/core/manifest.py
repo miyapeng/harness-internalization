@@ -51,12 +51,12 @@ class TaskManifest:
         missing = [name for name in names if name not in self.partitions]
         if missing: raise ValueError("Incomplete loop manifest; missing partitions: " + ", ".join(missing))
         if cohort_minimum is not None:
-            small = [name for name in names if name.startswith(("acceptance_", "retirement_"))
+            small = [name for name in names if name.startswith("retirement_")
                      and len(self.partitions[name]) < cohort_minimum]
             if small: raise ValueError("Insufficient independent tasks in cohorts: " + ", ".join(small))
 
 
 def loop_cohort_names(cycles, *, versioned=True):
     if type(cycles) is not int or cycles < 1: raise ValueError("cycles must be a positive integer")
-    return ("search", "dev", *(f"retirement_{i}" for i in range(cycles)),
-            *((f"acceptance_{i}" for i in range(cycles)) if versioned else ()))
+    # Keep versioned as a compatibility argument; neither mode allocates acceptance cohorts.
+    return ("search", "dev", *(f"retirement_{i}" for i in range(cycles)))

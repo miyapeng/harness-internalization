@@ -61,7 +61,7 @@ def check_internalization(runner,model,target,tasks,*,output):
             result=runner.rollout(behavior,target.reduced_revision,tasks[:1],seeds=(0,),output=output/"rollout",training=True)
             cost=sum((t.cost for t in result.trajectories),Cost())
             if not any(t.transitions for t in result.trajectories): raise ValueError("unsupported: no student action states")
-            scorer=ModuleTeacherScorer(behavior,target.full_revision,target,tasks,journal=Journal(output/"scoring.jsonl"))
+            scorer=ModuleTeacherScorer(behavior,target.full_revision,target,tasks,mode=runner.supervision,journal=Journal(output/"scoring.jsonl"))
             _,used=scorer.score(result.trajectories);cost+=used
         verdict={"supported":True,"reason":None,"cost":asdict(cost)}
     except Exception as exc:

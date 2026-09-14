@@ -21,9 +21,11 @@ def main():
     run = commands.add_parser("run")
     run.add_argument("--manifest", type=Path, required=True)
     run.add_argument("--backend", type=Path, required=True)
+    run.add_argument("--experiment-config", type=Path, help="Strict execution settings; replace backend execution settings")
     run.add_argument("--checkpoint", help="Required for a fresh run; optional check when resuming --state")
     run.add_argument("--output", type=Path, required=True)
-    run.add_argument("--train-steps", type=int, help="Total planned budget; default 300, or preserved from resumed protocol")
+    run.add_argument("--planned-update-batches", "--train-steps", dest="train_steps", type=int,
+                     help="Total planned update batches (not optimizer steps); default 300, or resumed protocol")
     run.add_argument("--cycles", type=int, help="Total planned cycles; default 3, or preserved from resumed protocol")
     code_source=run.add_mutually_exclusive_group()
     code_source.add_argument("--harness-workspace",type=Path,help="Import a configured executable Harness source tree")
@@ -74,6 +76,10 @@ def main():
         from .evaluation.attribution import AttributionPolicy
         from .evaluation.retirement import RetirementPolicy
         from .core.accepted_state import load_accepted_state
+        config = json.loads(args.backend.read_text())
+        if args.experiment_config:
+            config["execution"] = json.loads(args.experiment_config.read_text())
+        backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
         if args.output.exists(): raise FileExistsError(args.output)
         manifest=TaskManifest.load(args.manifest)
         accepted=None
@@ -110,8 +116,6 @@ def main():
             from .harness.revision import RevisionStore
             initial_harness=RevisionStore(args.revision_store).import_directory(args.harness_workspace)
         elif raw_revision and not state_path: initial_harness=HarnessRevision.from_dict(raw_revision)
-        config = json.loads(args.backend.read_text())
-        backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
         result = run_outer_loop(backend,manifest,checkpoint,args.output,loop,policy,
                   attribution_policy=attribution_policy,initial_harness=initial_harness,accepted_state=accepted)
     print(json.dumps(result, ensure_ascii=False, indent=2))

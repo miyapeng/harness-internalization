@@ -150,7 +150,7 @@ class SWEBenchProEnvironment:
             write_json(self.output/"grade.json", {"task_id":self.task_id, "seed":self.seed,
                 "prediction":diff["stdout"], "metrics":{"resolved":reward}, "reward_metric":"resolved"})
         self.history.extend(["Action: "+action, "Observation: "+obs])
-        return asdict(EnvironmentStep("\n".join(self.history), reward, self.done, reward, valid, calls))
+        return asdict(EnvironmentStep("\n".join(self.history), reward, self.done, reward, valid, calls, observation_kind="context"))
 
     def close(self):
         if self.workspace is not None: self.workspace.close()

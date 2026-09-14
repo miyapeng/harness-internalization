@@ -28,7 +28,7 @@ class FrozenHFBackend:
     Dependencies load only when a real teacher is requested.
     """
     def __init__(self, checkpoint: str, *, device="cpu", max_new_tokens=192, max_action_tokens=512,
-                 max_context=8192, chat_template_kwargs=None, student_tokenizer=None):
+                 max_context=8192, chat_template_kwargs=None, student_tokenizer=None, max_prompt_tokens=None):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -43,6 +43,7 @@ class FrozenHFBackend:
         self.model.requires_grad_(False)
         self.max_new_tokens, self.max_context = max_new_tokens, max_context
         self.max_action_tokens = max_action_tokens
+        self.max_prompt_tokens = max_prompt_tokens
         self.chat_template_kwargs = chat_template_kwargs or {}
 
     def assert_frozen(self):
@@ -55,7 +56,10 @@ class FrozenHFBackend:
         rendered = self.tokenizer.apply_chat_template(
             [{"role": "user", "content": prompt}], tokenize=False,
             add_generation_prompt=True, **self.chat_template_kwargs)
-        return self.tokenizer.encode(rendered, add_special_tokens=False)
+        ids = self.tokenizer.encode(rendered, add_special_tokens=False)
+        limit = getattr(self,"max_prompt_tokens",None)
+        if limit is not None and len(ids) > limit: raise ValueError("Prompt overflow; truncation is forbidden")
+        return ids
 
     def _sync(self):
         if self.model.device.type == "cuda": self.torch.cuda.synchronize(self.model.device)

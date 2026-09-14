@@ -35,5 +35,8 @@
     "--response",
     "{response}"
   ],
-  "benchmark": "terminalbench2"
+  "benchmark": "terminalbench2",
+  "execution": {
+    "mode": "evolution_only"
+  }
 }
