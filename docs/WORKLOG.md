@@ -83,3 +83,50 @@ worker只公开task允许字段与REPL输出，terminal reward取官方TestTrack
 按用户指定的 miyapeng/harness-internalization 公共仓库准备首次 main 提交。更新 README 为当前版本化 Harness/可选内化流程、可从 clone 后运行的命令及真实验证边界；补充项目自有代码 MIT LICENSE，保留原第三方版权和许可证。pyproject 添加 README、仓库 URL 和打包许可证配置。扩展忽略规则，运行产物、checkpoint、凭据、构建与解释器缓存均不提交；既有源码、测试、配置、示例与历史记录保留，没有修改算法或新增 benchmark。
 
 发布前全套 127 项测试再次通过（226.705 秒，无 skip）；wheel 构建通过且包含 LICENSE、第三方说明和 Apache 许可证。暂存内容常见凭据格式扫描无命中，未包含嵌套 Git 仓库或运行/模型产物。首次构建因默认 /root pip cache 只读而失败，改用 /tmp 专用缓存后构建成功；未修改系统权限。网络代理拒绝 GitHub，直连后成功核对目标 PUBLIC 空仓库与已有 miyapeng 登录。提交使用仓库范围的 GitHub noreply 身份，不改变全局 Git 配置。验证详见 validation/publication-report.json；真实 GPU/模型/官方任务仍未运行。
+
+
+## 2026-09-14：贯通数据准备、版本化状态与最终评价
+
+确认两个实际断点：make_catalog_manifest 只生成三个 retirement，不生成 acceptance；evaluate_benchmark.py 仅解析旧 harness_version/active_modules，未传 state 时默认空 Harness。相同旧状态逻辑还存在于 AppWorld/LawBench 的最终脚本。未修改训练器、优势、冻结策略同步、统计门槛或官方 evaluator。
+
+新增 core/accepted_state.py，统一保存/加载 checkpoint、代码/模块 Harness、manifest_hash、protocol/hash 和 next_cycle。新版循环写入完整配对，最终评价直接使用其中的 revision；旧状态只能在身份可验证且源码齐全时兼容。旧模块名字列表无法恢复代码则拒绝，不猜测、不回退。历史模块恢复读取原 attribution_policy 侧录，防止改变门槛。最终脚本必须选择 --state 或 --baseline，checkpoint 对 state 仅作可选一致性检查。
+
+数据导入按 --cycles 生成独立 acceptance/retirement，默认三周期通用训练池从180增至270；保留 --legacy-modules。ALFWorld/AppWorld 同步添加模式/周期选项，AppWorld 保留完整 scenario family，数据不足不借 test。TaskManifest 增加声明哈希检查和全计划预检查。CLI --state 从原协议恢复总预算、周期、seeds、统计设置，仅运行后续周期；中间 acceptance、已完成 deployment 或不同 manifest/配置拒绝恢复。
+
+新增17项接线回归。通用划分旧fixture增至270并检查acceptance；AppWorld旧规模fixture显式legacy，新增较大fixture检查新版独立分区；原20测试文件不变。全套144项通过（248.049秒，无skip）；旧90文件逐字节一致。持久化合成证明见 runs/accepted-agent-pipeline-proof，验证导入→mock演化评分→新版deployment→最终实际隔离工具执行；已复核之前真实落盘的旧版本化deployment可由原protocol加载。没有将mock评分或模型视为官方benchmark成绩。
+
+LawBench专用整类原生评价尚无代码revision运行路径，本次改为明确拒绝并在模型加载前停止，不替换官方评价语义。部分既有backend未配置可选target/check_internalization时仍保留只演化不内化分支。本次未增加训练后端、GPU/模型/官方任务运行。接口、命令、周期恢复边界与未运行项记录于 ACCEPTED_AGENT_PIPELINE.md 及 validation/agent-pipeline-report.json。
+
+## 2026-09-14：Proposer 不再计算 hash 或改写精简代码
+
+确认 API CodeProposer 原来要求 before_hash，但输入只有文件内容；target 又让模型生成实际只允许关闭 supervision 的 patch。本轮保留所有未提交接线修改，仅在 code_proposer.py/revision.py 增加宿主确定性操作。RevisionStore.bind_patch 从已验证 parent_revision 计算 before_hash；原 apply/候选谱系校验不放宽。API 编辑格式只允许 path/content，原 FileEdit 与候选归档继续带 hash，已有 Python 提案器不受影响。
+
+目标模型只选 removed_behavior/supervision_adapter 或返回 null；InternalizationTarget.from_supervision 验证注册入口，程序构造只将 config.supervision 置空的新快照。其他源码、工具注册、prompt 和配置语义保留。模型不再输出精简 patch；无 hook 时跳过 API，last_cost 归零并保存零调用记录。存在 hook 时仍一次行为选择调用，未宣称所有第二次调用均消除。可执行监督检查、只读评分限制、P0门槛、回滚和不支持时保留 H_plus 的分支不变。
+
+新增 test_code_proposer_binding.py 10 项；原 test_revision_decisions.py 的 mock payload 去掉 before_hash，所有原断言保持。首轮新测试9通过、1失败，原因是测试把 JSON list 与 dataclass tuple 直接比较；改为经正式 from_dict 反序列化后比较，未放宽运行条件。修正后新增10项通过；全套154项通过（243.064秒，无skip）。测试实际在沙箱运行减法后保留的日志工具，并拒绝需要新环境观察的监督；独立 target 子进程在无 API 配置、无 hook 时返回零调用。9个训练/同步/统计/循环关键文件与本轮修改前哈希一致。git diff --check 通过。
+
+完整日志与检查记录为 validation/proposer-binding-tests.txt、validation/proposer-binding-report.json。模型提案使用 mock transport，工具运行使用真实隔离；未运行真实 API proposer、真实模型、HF/veRL/GPU 或官方任务。未新增 benchmark、训练算法或搜索调度，既有未提交修改未覆盖。
+
+## 2026-09-14：具名控制注册与部署一致的选择性评分
+
+按用户批准的范围增量实现 schema 2：controls 为有序 id/entrypoint/enabled 列表，composition 指明 independent_suffix 或 sequential_suffix；无 Planning/Review/Recovery 类别限制。InternalizationTarget 增加可选 target_control_id，宿主从 ID 解析入口并只关闭该项。完整源码、工具注册和其他控制配置不变；旧 schema 1、旧目标字段和归档 hash 不重写。CodeProposer 继续只提出 path/content，目标新响应只选 ID/行为；无开启控制不调用目标 API，顺序依赖明确 unsupported。前两轮未提交接线与 hash 修复均保留。
+
+新增 control_runtime，独立模式中每个控制读取相同基础上下文，通过独立沙箱与无环境 broker 执行；顺序模式读取累积上下文但禁止进入训练桥。新 RevisionTransition/ControlContext 保存实际基础输入和每个控制的输出、顺序及入口；序列化往返兼容旧格式。评分先复核 H-minus 组合逐字等于学生 prompt，再仅执行目标并插入 H-plus 部署位置，非目标内容不重算。具名候选的配置开关文件由 Landlock 屏蔽，prepare/execute 也不能通过读取开关重新组织基础上下文；其他工具文件仍可读。没有弱化沙箱、修改优势公式或新增程序依赖分类器。
+
+新增17项回归：13项注册/运行/选择/结构/多周期/回滚检查，4项复用旧训练断言的 CPU SGD 测试。全部既有测试断言保留，本轮没有调整旧测试。两周期 mock 的第1轮 accept/retain recovery，第2轮 accept/retire review，实际原30-task/95%/2000-bootstrap门槛生效；另测第2轮训练退化回滚到旧模型并保留两个控制，以及顺序依赖改进保留但不训练。首位/中间/末位目标的增强 prompt 与 full 部署组合一致；随机非目标输出不重新生成；缺失/损坏组合记录拒绝。CPU 更新继续检验同批old policy、同response IDs、no-op、inactive mask、梯度隔离。
+
+全套171项通过（244.863秒，无skip），针对性17项通过。旧三周期 demo90文件与上轮逐字节一致，原20项测试源文件哈希不变，独立源码边界检查无私有上游引用。7个训练编排/优势/策略同步/统计/外层循环文件与本轮修改前哈希一致。完整日志、parity及报告位于 validation/named-controls-*。
+
+新增 examples/named_controls 可运行工作区及 scripts/demo_named_controls.py。实际运行产物为 runs/named-controls-proof：full 开启 recovery/review，reduced 只开启 recovery；实际执行日志工具并在同一学生状态只增强 review。演示模型/环境是脚本fixture，optimizer updates为0，不将其成功率作为学习证据。真实 API proposer、HF/外部veRL/GPU与官方任务未运行。任意 Python 程序等价性、环境元数据旁路或未访问状态不由这些有限测试证明；使用明确接口与组合边界，不能对齐则不内化。METHOD、STATUS、README、VERSIONED_HARNESS 与新 NAMED_CONTROLS 文档均更新。
+
+## 2026-09-14：修复 prepare 终局奖励漏记并分离环境事件
+
+确认旧 rollout_revision 在 prepare done 分支仅记录 cost/success，无 transition，因此 total_reward 丢失该次奖励。新增 EnvironmentEvent、RuntimeCall、EventTrajectory，版本化 total_reward 独立从完整环境事件求和；保留旧 Trajectory/Transition 序列化和读取。事件包含 prepare/control/execute 阶段、决策位置和控制 ID；没有学生 response 的事件照常保存奖励。reset 的公开观察单独保存，不假设 reset 提供 reward。
+
+broker 每次环境返回立即写事件与公开 capability 参数/结果；隐藏环境对象、evaluator state 与额外参考解不进入序列化。独立具名控制使用共享日志容器，但继续不共享环境能力或其他控制输入。纯本地 dispatch 另记公开 action/observation/stop；修正 prepare 已调用环境导致后续本地调用漏计成本的问题。CodeProposer 可读取允许 search 任务的事件与实际内部调用，即使没有学生动作；原任务 allowlist 不变。事件日志不参与 teacher 输入构造。
+
+prepare 直接完成环境时不再执行无用控制/学生生成。trainer 对全无决策 batch 记录 batch_skipped、episode return/cost，不调用 scorer 或 actor、不补采预算；下一批权重保持原快照。混合 batch 仅真实 response 构造 loss 行；原任务优势公式、episode return 重复到真实决策末 token 和 invalid-action penalty 规则均不改变。summary 区分 actor_update_calls 与 skipped batch，checkpoint step 使用实际调用更新次数。
+
+新增 test_environment_events.py 11项全部通过，具名控制17项回归通过；完整182项通过（254.208秒，无skip），未修改旧测试断言。案例覆盖首个 prepare 终局、下一 prepare 终局、多次环境返回不重算、无事件回退禁止、公开日志/失败后奖励审计、proposer 可见性和隔离、全空/混合/跳过后训练 batch。旧CPU demo90文件逐字节一致，原20项测试源文件哈希不变；7个优势/同步/veRL/评分/统计/外层循环文件与修改前哈希一致。
+
+持久化示例 runs/environment-events-proof 使用测试fixture与实际沙箱：首例return=3、零学生决策和模型调用；次例return=3.5、仅两个既有response token；另保存两批纯工具episode、零actor update的checkpoint/summary。实际模型/环境为mock，CPU训练回归执行了真实小模型SGD；真实API proposer、HF/veRL/GPU/官方任务未运行。完整日志与parity见 validation/environment-events-*。ENVIRONMENT_EVENTS、METHOD、STATUS、NAMED_CONTROLS和README已更新；既有未提交修改保留。旧事件缺失的历史轨迹只能兼容读取，无法追补已丢失奖励，需要重采受影响数据。

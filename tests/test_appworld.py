@@ -145,11 +145,11 @@ class AppWorldTests(unittest.TestCase):
 
     def test_three_cycle_manifest_preserves_official_train_and_scenario_separation(self):
         splits = self.official_splits()
-        manifest = build_manifest(splits, "test-revision")
+        manifest = build_manifest(splits, "test-revision", versioned=False)
         self.assertEqual({k:len(v) for k,v in manifest.partitions.items()},
             {"train":27,"search":15,"dev":15,"retirement_0":30,"retirement_1":30,"retirement_2":30,
              "test_normal":6,"test_challenge":6})
-        self.assertEqual(manifest.fingerprint, build_manifest(splits, "test-revision").fingerprint)
+        self.assertEqual(manifest.fingerprint, build_manifest(splits, "test-revision", versioned=False).fingerprint)
         self.assertTrue(set(manifest.partitions["train"]) <= set(splits["train"]))
         self.assertTrue(set(manifest.partitions["search"]) <= set(splits["train"]))
         families = {}

@@ -82,6 +82,7 @@ class ModuleTrainer:
         output.mkdir(parents=True, exist_ok=True)
         journal = Journal(output / "training.jsonl")
         total = Cost()
+        updates_completed,skipped=0,0
         for update in range(budget):
             # H- rollout and H+ scoring share the very same pre-update policy.
             # No optimizer call occurs until this read-only context has closed.
@@ -99,10 +100,21 @@ class ModuleTrainer:
                 if any(t.model_version != behavior_id or t.harness_version != h_minus.version for t in samples):
                     raise ValueError("Stale/off-policy trajectories or wrong student harness")
                 if any(t.task_id not in tasks for t in samples): raise ValueError("Training task outside allowlist")
+                if not any(t.transitions for t in samples):
+                    # A tool-only episode still has an outcome and real costs, but no
+                    # response tokens on which to attach an actor/distillation loss.
+                    for trajectory in samples: total += trajectory.cost
+                    skipped+=1
+                    journal.append("batch_skipped",update=update,reason="no_student_decisions",
+                        behavior_snapshot=behavior_id,
+                        episodes=[{"task_id":t.task_id,"episode_id":t.episode_id,
+                            "total_reward":t.total_reward,"success":t.success,"cost":asdict(t.cost)} for t in samples])
+                    continue
                 scorer = ModuleTeacherScorer(behavior, h_plus, target, set(tasks), journal=journal)
                 signals, teacher_cost = scorer.score(samples)
                 batch = build_update_batch(samples, signals, behavior, self.config)
             metrics = student.update(batch)
+            updates_completed+=1
             if student.snapshot_id == behavior_id:
                 raise RuntimeError("Student update must advance its behavior-policy snapshot ID")
             if teacher.snapshot_id != frozen_id: raise RuntimeError("KL reference changed during phase")
@@ -112,10 +124,11 @@ class ModuleTrainer:
             total += getattr(student, "last_update_cost", Cost())
             journal.append("update", update=update, metrics=metrics, teacher_snapshot=behavior_id,
                 behavior_snapshot=behavior_id, student_snapshot=student.snapshot_id, kl_reference_snapshot=frozen_id)
-        result = self.checkpoints.save(student, output / "checkpoint", step=budget,
+        result = self.checkpoints.save(student, output / "checkpoint", step=updates_completed,
             teacher_snapshot=frozen_id, behavior_snapshot=behavior_id)
         self.last_cost = total
         write_json(output / "training_summary.json", {"training_batches_completed": budget,
+            "actor_update_calls":updates_completed,"batches_skipped_no_student_decisions":skipped,
             "cost": asdict(total), "teacher_snapshot": behavior_id, "kl_reference_snapshot": frozen_id,
             "module_scorer_refresh": "each_batch_behavior_policy", "checkpoint": result,
             "advantage_config": asdict(self.config)})

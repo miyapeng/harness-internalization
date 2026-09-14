@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .common import sha256, tree_hash
 from .lawbench import CATEGORIES
-from ..core.manifest import TaskManifest
+from ..core.manifest import TaskManifest, loop_cohort_names
 from ..core.types import digest
 
 
@@ -57,7 +57,8 @@ def import_tasks(benchmark, source, *, split="test", image_lock=None):
     return rows
 
 
-def make_catalog_manifest(benchmark, revision, test, train=(), *, cohort_size=30):
+def make_catalog_manifest(benchmark, revision, test, train=(), *, cohort_size=30, cycles=3, versioned=True):
+    cohorts = loop_cohort_names(cycles, versioned=versioned)
     if not revision or revision in ("main", "master", "latest"):
         raise ValueError("A pinned dataset revision is required")
     if any(r["split"] != "test" for r in test) or any(r["split"] != "train" for r in train):
@@ -74,11 +75,14 @@ def make_catalog_manifest(benchmark, revision, test, train=(), *, cohort_size=30
     if train:
         if cohort_size < 30: raise ValueError("Do not lower the 30-task attribution/retirement threshold")
         pool = sorted(r["id"] for r in train)
-        if len(pool) < 6*cohort_size: raise ValueError("Separate training source needs at least six task cohorts")
-        for name in ("search", "dev", "retirement_0", "retirement_1", "retirement_2"):
+        required = (len(cohorts)+1)*cohort_size
+        if len(pool) < required:
+            raise ValueError(f"Separate training source needs at least {required} tasks for {cycles} cycles; cannot borrow retirement/test tasks")
+        for name in cohorts:
             partitions[name], pool = tuple(pool[:cohort_size]), pool[cohort_size:]
         partitions["train"] = tuple(pool)
     catalog = {"schema_version":1, "benchmark":benchmark, "revision":revision, "tasks":rows}
     manifest = TaskManifest(benchmark, revision, partitions)
     manifest.validate()
+    if train: manifest.validate_loop(cycles, versioned=versioned, cohort_minimum=30)
     return catalog, manifest

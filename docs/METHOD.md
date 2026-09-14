@@ -6,15 +6,21 @@
 
 `HarnessCandidate` 是完整改进，记录 candidate_id、parent_revision、带文件基准哈希的 patch、可实际执行的 full_revision 和 rationale。`InternalizationTarget` 是可选撤除目标，记录 full_revision、reduced_revision、removed_behavior 和可执行 supervision_adapter。H_parent 是接受修改前版本；H_plus 是完整改进；H_minus 是只旁路目标控制后的版本，**不要求等于 H_parent**。例如新增日志查询工具和诊断控制后，精简版本仍保留工具。
 
+模型只提出 path/content 修改，文件基准 hash 由宿主从已验证的 parent revision 计算；应用时仍严格校验父版本。schema 2 将控制注册为有顺序的具名入口，目标只选择 target_control_id/removed_behavior，宿主只关闭该 ID，保留其他控制和工具。旧 schema 1 单 hook 桥继续兼容。不提供可用目标则跳过目标 API；模型选择仍需通过原可执行监督检查，不能凭声明获得训练资格。
+
 每轮从正式接受的 checkpoint 和代码 revision 出发，固定模型生成两个候选。候选在独立代码目录构造，实际加载其入口、prompt、工具注册、实现和配置；search/dev 使用既有配对收益选择规则。无收益则保留父版本，不训练。候选通过额外独立 `acceptance_i` cohort 的 Harness 接受门槛后，先持久化 H_plus，再最多提出一个精简版本。该门槛复用原 AttributionPolicy 的 30 个 task、95% bootstrap 下界严格大于 0；没有降低阈值。
 
 未提供目标、精简版本不可执行或监督接口不支持时，接受 old_model + H_plus，记录 `accepted_without_internalization`。有合法目标时在原 `retirement_i` cohort 计算 A/B 并复用 contribution gate。未通过则记录 `attribution_failed`，不训练，但保留已独立接受的 H_plus。这与 search/dev 无收益、整个改进被丢弃的分支不同。
 
 通过 contribution gate 后沿用原训练器、优势公式、optimizer 和四格审计。accept/retire 部署 new_model + H_minus；accept/retain 部署 new_model + H_plus；rollback/retain 部署 old_model + H_plus。后续周期不会重置为 H0。退役 hook 的源码仍留档，但 reduced 配置不再调用它。未消耗预算不重分配。
 
-当前监督桥支持显式内部计算 hook：`augment(api, {context, step}) -> {suffix, selected}`。H_minus 只将该 hook 配置置空，其余代码、prompt、工具、配置必须完全共享；更广泛的代码修改仍可作为有效候选接受，但不能强行转换成这种监督。检查器在 search 任务的真实学生状态上执行精简程序及 hook，训练每一步继续强制检查接口。hook 在评分时没有环境能力，只能读当前公开上下文并调用本 batch 的固定策略；需要新 observation、环境动作或不共享工具接口的目标标记 unsupported。有限状态预检查不保证后续所有状态都兼容，后续运行失败会停止训练并保留 old_model + 已接受的 H_plus。
+当前监督桥支持显式内部计算入口：`hook(api, {context, step}) -> {suffix, selected}`。schema 2 的独立控制读取同一个公开基础上下文，按固定顺序组合；H_minus 仅关闭目标 ID。rollout 保存非目标控制的实际输出和位置，评分复用它们，只运行目标并插入原位置，不能任意追加到末尾。顺序依赖组合仍可运行但不支持内化。旧 schema 1 则仅将总 hook 配置置空。其他代码、prompt、工具、配置必须共享；更广泛的代码修改不能强行转换成这种监督。检查器在 search 任务的真实学生状态上执行精简程序与目标，训练每一步继续检查。评分不能访问新环境观察、隐藏答案或学生不可见的历史；有限状态预检查不保证所有未来状态，运行失败仍保留 old_model + 已接受的 H_plus。组合协议与边界见 [具名控制说明](NAMED_CONTROLS.md)。
 
 代码执行使用独立 Python 子进程和 Linux Landlock + seccomp；缺少必需隔离直接报错，没有宿主执行回退。候选只能通过受保护 broker 使用实验已有 model/environment 能力，不能更换端点、权重、reward、成本计数或官方评分器。正常任务运行允许环境动作；评分阶段禁止环境动作。路径白名单仅负责补丁边界，不能替代执行隔离。具体限制、配置和产物见 [VERSIONED_HARNESS.md](VERSIONED_HARNESS.md)。
+
+当前配对通过 `AcceptedAgentState` 一起保存 checkpoint、实际 Harness revision、manifest/protocol 身份和下一周期编号。导入器按计划周期数预先分配独立 acceptance/retirement，启动前检查完整分区。最终评价从同一 state 加载代码；初始空 Harness 必须显式指定 baseline。周期恢复保留原配置与未使用 cohort，不重切任务或重分配预算。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
+
+版本化轨迹将环境事件与学生决策分开保存。任务 return 来自全部环境返回，覆盖 prepare/control/execute 中的 reward；只有实际生成 response 的决策进入 actor batch。prepare 直接完成任务也保留终局奖励，不补造 response；整批没有学生决策则记录结果与成本并跳过 update，不追加预算。broker 的公开参数/结果提供给允许的 search 提案轨迹，不拼入教师评分输入。详见 [环境事件与回报](ENVIRONMENT_EVENTS.md)。
 
 ## 兼容模块模式与共享训练协议
 

@@ -1,5 +1,35 @@
 # 实现状态
 
+## 2026-09-14：环境事件回报与学生 loss 分离
+
+版本化 rollout 改用 EventTrajectory：环境事件是 total_reward 的唯一来源，覆盖 prepare/control/execute；旧 Transition 保留但不会把奖励重复加到事件回报上。无学生决策时不补造 response；全空 batch 跳过教师评分/actor update，保存 return、成功、成本和跳过次数，checkpoint step 为实际 update 次数。混合 batch 只保留真实决策行。
+
+broker 立即保存公开调用参数、结果、奖励及 phase/step；初始公开观察、本地工具 dispatch 和完整事件进入 search proposer 可见轨迹，不序列化隐藏 evaluator/环境对象，也不进入教师 prompt。prepare 完成任务后不继续控制或学生生成；prepare 环境调用后 execute 本地工具的成本漏计也已修复。
+
+全套 **182 项测试通过**（254.208秒，无skip），新增11项；具名控制17项针对性回归通过。旧三周期90文件逐字节一致、原20项测试对应源文件哈希不变。7个优势/策略同步/veRL/评分/统计/循环关键文件本轮哈希不变；trainer 只增加零决策跳过及实际更新次数记录。示例位于 runs/environment-events-proof：prepare 终止 return=3、零决策；下一 prepare 终止 return=3.5、仅原两个 response token。真实隔离与 CPU mock/SGD 验证通过，真实模型/API/GPU/官方任务未运行。详见 [说明](ENVIRONMENT_EVENTS.md) 与 [验收记录](validation/environment-events-report.json)。
+
+## 2026-09-14：具名控制与单 ID 撤除
+
+新增 schema 2 ordered controls registry 与 target_control_id；宿主只关闭所选 enabled ID，保留其他控制、工具、源码与顺序。独立控制共享公开基础输入；rollout 记录实际 ControlContext，评分复用非目标输出并在原位置插入目标。组合记录缺失或不一致明确拒绝。sequential_suffix 可以运行但不能内化，有效候选保留 H+。旧 schema 1、旧目标和旧 Transition JSON 保持兼容。
+
+全套 **171 项测试通过**（244.863秒，无skip），新增17项。验证首/中/末位置组合、随机非目标输出缓存、两周期 retain recovery→retire review、rollback 保留两个控制、不兼容保留、不触发/no-op/同批策略/mask/梯度隔离。具名运行真实使用 Landlock/seccomp；配置开关读权限进一步收紧，没有放宽原隔离。
+
+旧 CPU demo **90文件逐字节一致**，原20项测试对应源文件哈希不变。7个优化器编排/优势/策略同步/统计/外层循环关键文件本轮哈希不变。示例 `scripts/demo_named_controls.py` 已运行至 `runs/named-controls-proof/`，保留 recovery 与日志工具，只增强 review；模型脚本化，实际 optimizer updates=0。另有 CPU 小模型真实 SGD 测试；真实 API/模型/HF/veRL/GPU/官方任务未运行。详见 [协议与命令](NAMED_CONTROLS.md) 和 [验收记录](validation/named-controls-report.json)。
+
+## 2026-09-14：宿主绑定补丁与确定性精简版本
+
+CodeProposer 的编辑响应只接受 path/content。宿主从锁定父版本填入 before_hash，再经原 apply 和候选谱系校验；归档格式仍含完整 hash。目标 API 只返回待撤除行为与已注册 hook，宿主确定性构造 reduced revision，保留其他代码与工具。无 hook 时跳过目标 API 并记零调用成本；有 hook 时仍有一次行为选择调用，之后仍必须通过可执行兼容性检查。
+
+全套 **154 项测试通过**（243.064 秒，无 skip），新增10项覆盖 hash 绑定、父版本篡改拒绝、减法确定性、保留工具实际隔离运行、不兼容监督拒绝和独立 target 子进程。原接口 mock 只调整为新的 path/content 响应，原断言保留。训练、优势、策略同步、统计规则与外层循环9个关键文件本轮哈希不变；前次接线修改保留。真实 API/模型/GPU/官方任务未运行。详见 [接口说明](VERSIONED_HARNESS.md) 与 [验证记录](validation/proposer-binding-report.json)。
+
+## 2026-09-14：数据、已接受 Agent 与最终评价接线
+
+统一 `AcceptedAgentState` / `load_accepted_state` 已接通新版循环、CLI 周期恢复和最终评价，绑定 checkpoint、可执行 Harness、manifest/protocol 身份。通用、ALFWorld、AppWorld 导入器按周期数生成 acceptance/retirement；启动前集中检查，数据不足报错。最终评价要求 --state 或显式 --baseline，未知/损坏状态不回退为空 Harness。
+
+全套 **144 项测试通过**，旧三周期 demo **90 文件逐字节一致**，原20测试文件未改。合成接线证明保存于 `runs/accepted-agent-pipeline-proof`：mock 搜索分数，最终 runner 实际在隔离进程调用已接受的新工具。旧代码 deployment + 原 protocol 加载已实际复核。
+
+边界：LawBench 专用整类原生评价器暂不支持代码 revision，现明确报 unsupported；部分后端未配置可选 target/check_internalization 时仍只演化、不训练；未执行真实 HF/veRL/GPU/API proposer 或官方任务。详见 [运行说明](ACCEPTED_AGENT_PIPELINE.md) 与 [验收记录](validation/agent-pipeline-report.json)。
+
 ## 2026-09-13：版本化代码演化＋选择性内化
 
 完整接口、准确命令、产物位置和边界见 [VERSIONED_HARNESS.md](VERSIONED_HARNESS.md)。新模式显式传入 Harness revision，旧模块模式保留。

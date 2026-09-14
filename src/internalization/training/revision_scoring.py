@@ -4,6 +4,7 @@ import math
 
 from ..core.types import Cost, Journal, write_json
 from ..harness.code_runtime import augment_context
+from ..harness.control_runtime import score_control_context
 from .teacher_scoring import ModuleSignal
 
 
@@ -26,7 +27,10 @@ def score_revision(scorer,trajectories):
             if len(step.response_ids)!=len(step.old_log_probs) or not step.response_ids:
                 raise ValueError("Missing current rollout response IDs/log probabilities")
             if step.state.fingerprint in signals: raise ValueError("Duplicate student state")
-            enhanced,selected,used=augment_context(policy,target.full_revision,step.student_prompt,step.state.step,audit=scorer.journal)
+            if target.target_control_id is not None:
+                enhanced,selected,used=score_control_context(policy,target,step,audit=scorer.journal)
+            else:
+                enhanced,selected,used=augment_context(policy,target.full_revision,step.student_prompt,step.state.step,audit=scorer.journal)
             cost+=used
             selected=selected or scorer.mode=="all"
             lp=()

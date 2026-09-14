@@ -1,0 +1,140 @@
+{
+  "date": "2026-09-14",
+  "status": "PASS",
+  "scope": "Complete environment event returns independent of student decisions",
+  "tests": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "passed": 182,
+    "new": 11,
+    "skipped": 0,
+    "seconds": 254.208,
+    "log": "environment-events-tests.txt"
+  },
+  "targeted_tests": {
+    "environment_events": 11,
+    "named_control_regressions": 17
+  },
+  "source_files_changed_this_task": [
+    "src/internalization/core/trajectory.py",
+    "src/internalization/core/serialization.py",
+    "src/internalization/harness/code_runtime.py",
+    "src/internalization/harness/control_runtime.py",
+    "src/internalization/training/revision_rollout.py",
+    "src/internalization/training/trainer.py",
+    "src/internalization/evolution/code_proposer.py"
+  ],
+  "protected_files_unchanged_sha256": {
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/training/verl_backend.py": "1ef8729b7d406a3d2a688e74c8a073bf53b3f0b44f8456def129f2453205e69b",
+    "src/internalization/training/revision_scoring.py": "cb2652c387a6a74e383f073dd4aae9c24bd3c8d79394d2dfec600134bd45e4f2",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+    "src/internalization/revision_loop.py": "9a8e92d1faecaf2b4b0ae2fd36c4c20d0afa97586712033a027d70d8e51ac195"
+  },
+  "legacy_parity": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 90,
+    "original_demo_differences": [],
+    "original_demo_files_byte_equal": 90,
+    "acceptance_schema_only_changes": [],
+    "additional_demo_files": [],
+    "python_files_parsed": 96,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "persistent_proof": {
+    "path": "runs/environment-events-proof/proof.json",
+    "result": {
+      "mode": "mock policy/environment; actual sandbox and batch construction",
+      "prepare_terminal": {
+        "return": 3.0,
+        "success": 1.0,
+        "student_decisions": 0,
+        "model_calls": 0,
+        "tool_calls": 1
+      },
+      "next_prepare_terminal": {
+        "return": 3.5,
+        "student_decisions": 1,
+        "responses": [
+          [
+            3,
+            4
+          ]
+        ],
+        "token_level_rewards": [
+          [
+            0.0,
+            3.5
+          ]
+        ],
+        "response_mask": [
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "all_tool_only_training": {
+        "training_batches_completed": 2,
+        "actor_update_calls": 0,
+        "batches_skipped_no_student_decisions": 2,
+        "cost": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "model_calls": 0,
+          "auxiliary_calls": 0,
+          "tool_calls": 2,
+          "latency_s": 0.06994535960257053
+        },
+        "teacher_snapshot": "policy-0",
+        "kl_reference_snapshot": "phase-reference",
+        "module_scorer_refresh": "each_batch_behavior_policy",
+        "checkpoint": "/data/miyapeng/harness-internalization/runs/environment-events-proof/prepare_terminal/training/checkpoint",
+        "advantage_config": {
+          "module_weight": 0.001,
+          "mode": "mean_std_norm",
+          "normalize_module": false,
+          "clip_module": null,
+          "invalid_action_penalty": 0.1,
+          "epsilon": 1e-06
+        }
+      },
+      "GPU": false,
+      "real_model": false,
+      "official_benchmark": false
+    }
+  },
+  "semantics": {
+    "versioned_return": "sum of environment_events rewards only",
+    "legacy_return": "unchanged sum of transition rewards for old traces",
+    "all_zero_decision_batch": "record outcomes/costs; skip scorer and actor; consume allocated batch without resampling",
+    "mixed_batch": "only actual decisions get response-loss rows and their own complete episode return",
+    "proposer": "search-only public reset/tool/model-call parameters and results; no environment/evaluator object dump",
+    "teacher": "unchanged actual student context; event history never appended"
+  },
+  "unchanged": [
+    "module advantage formula",
+    "batch behavior-policy synchronization",
+    "retirement and attribution gates",
+    "benchmark/task split protocols",
+    "existing test assertions"
+  ],
+  "validation_modes": {
+    "candidate_execution": "actual kernel sandbox",
+    "model_environment_and_proposer": "scripted/mock fixtures",
+    "optimizer_regression": "actual tiny CPU SGD"
+  },
+  "limitations": [
+    "historical missing events cannot recover lost rewards",
+    "completed calls with adapter-returned outcomes form reward ledger; failed evaluation remains a failure"
+  ],
+  "not_run": [
+    "real API proposer",
+    "real HF model",
+    "external veRL/GPU training",
+    "official benchmark tasks"
+  ],
+  "prior_uncommitted_changes": "preserved"
+}

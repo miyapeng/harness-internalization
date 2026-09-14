@@ -11,10 +11,8 @@ from .core.types import Cost, EpisodeResult, Journal, write_json
 
 
 def serialize_harness(harness):
-    from .harness.revision import HarnessRevision
-    if isinstance(harness,HarnessRevision): return harness.to_dict()
-    return {"version": harness.version, "modules": [
-        {"name": m.name, "version": m.version, "source": m.source} for m in harness.modules]}
+    from .core.accepted_state import serialize_harness as serialize
+    return serialize(harness)
 
 
 class CommandBackend:

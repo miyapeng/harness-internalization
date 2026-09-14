@@ -1,0 +1,1 @@
+Use the available task interface. Registered local tools use JSON {"tool":"name","arguments":{...}}. Other actions are sent to the environment.

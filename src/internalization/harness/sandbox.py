@@ -26,12 +26,15 @@ class SandboxLimits:
 class SandboxedCode:
     def __init__(self,limits=SandboxLimits()): self.limits=limits
 
-    def call(self,revision,entrypoint,payload,broker,*,audit=None):
+    def call(self,revision,entrypoint,payload,broker,*,audit=None,hide_control_config=False):
         files=revision.files()
         validate_entrypoint(entrypoint,files,revision.policy)
         limits=self.limits
         request={"root":revision.path,"entrypoint":entrypoint,"payload":payload,
                  "memory_mb":limits.memory_mb,"cpu_s":limits.cpu_seconds}
+        if hide_control_config:
+            if entrypoint.split(":")[0]=="config/harness.json": raise ValueError("Invalid control entrypoint")
+            request["readable_files"]=[p for p in files if p!="config/harness.json"]
         # -I/-S removes ambient PYTHONPATH/site customization. Do not pass credentials.
         process=subprocess.Popen([sys.executable,"-I","-S",str(Path(__file__).with_name("sandbox_worker.py"))],
             stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,

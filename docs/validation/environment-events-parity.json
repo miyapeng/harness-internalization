@@ -1,0 +1,11 @@
+{
+  "original_test_files_unchanged": 4,
+  "original_demo_files_equal": 90,
+  "original_demo_differences": [],
+  "original_demo_files_byte_equal": 90,
+  "acceptance_schema_only_changes": [],
+  "additional_demo_files": [],
+  "python_files_parsed": 96,
+  "private_import_or_path_hits": [],
+  "removal_required": true
+}

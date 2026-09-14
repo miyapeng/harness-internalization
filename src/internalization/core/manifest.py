@@ -19,6 +19,8 @@ class TaskManifest:
         obj = cls(data["benchmark"], data["environment_revision"],
                   {k: tuple(v) for k, v in data["partitions"].items()})
         obj.validate()
+        if "manifest_hash" in data and data["manifest_hash"] != obj.fingerprint:
+            raise ValueError("Manifest content/hash mismatch")
         return obj
 
     def validate(self):
@@ -41,3 +43,20 @@ class TaskManifest:
         if name.startswith("test"):
             raise ValueError("Outer-loop selection cannot access final test partitions")
         return self.partitions[name]
+
+    def validate_loop(self, cycles, *, versioned=False, cohort_minimum=None):
+        """Validate the entire planned allocation before any rollout or proposal."""
+        self.validate()
+        names = ("train", *loop_cohort_names(cycles, versioned=versioned))
+        missing = [name for name in names if name not in self.partitions]
+        if missing: raise ValueError("Incomplete loop manifest; missing partitions: " + ", ".join(missing))
+        if cohort_minimum is not None:
+            small = [name for name in names if name.startswith(("acceptance_", "retirement_"))
+                     and len(self.partitions[name]) < cohort_minimum]
+            if small: raise ValueError("Insufficient independent tasks in cohorts: " + ", ".join(small))
+
+
+def loop_cohort_names(cycles, *, versioned=True):
+    if type(cycles) is not int or cycles < 1: raise ValueError("cycles must be a positive integer")
+    return ("search", "dev", *(f"retirement_{i}" for i in range(cycles)),
+            *((f"acceptance_{i}" for i in range(cycles)) if versioned else ()))

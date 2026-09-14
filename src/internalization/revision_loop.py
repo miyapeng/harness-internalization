@@ -8,10 +8,14 @@ from .evolution.revision_search import search_revisions, public_history
 from .evaluation.attribution import evaluate_attribution
 from .evaluation.retirement import PairedRetirementEvaluator
 from .harness.revision import InternalizationTarget
+from .core.accepted_state import AcceptedAgentState
 
 
-def run_revision_loop(components,manifest,checkpoint,initial_harness,output,config,policy,attribution_policy):
-    manifest.validate()
+def run_revision_loop(components,manifest,checkpoint,initial_harness,output,config,policy,attribution_policy,*,accepted_state=None):
+    manifest.validate_loop(config.cycles, versioned=True,
+        cohort_minimum=max(policy.min_tasks,attribution_policy.min_tasks))
+    if accepted_state is not None: accepted_state.check_resume(manifest,config,policy,attribution_policy)
+    start_cycle=accepted_state.next_cycle if accepted_state is not None else 0
     train,search,dev=(manifest.partition(p) for p in ("train","search","dev"))
     cohorts=[manifest.partition(f"retirement_{i}") for i in range(config.cycles)]
     acceptance=[manifest.partition(f"acceptance_{i}") for i in range(config.cycles)]
@@ -19,13 +23,17 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
     journal=Journal(output/"events.jsonl")
     harness=initial_harness
     evaluator=components.retirement or PairedRetirementEvaluator(components.runner,policy)
-    write_json(output/"protocol.json",{"mode":"versioned_code_selective_internalization","loop":asdict(config),
+    protocol=accepted_state.protocol if accepted_state is not None else {"mode":"versioned_code_selective_internalization","loop":asdict(config),
         "retirement":asdict(policy),"attribution":asdict(attribution_policy),"harness_acceptance":asdict(attribution_policy),
-        "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint,"initial_harness":harness.to_dict()})
+        "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint,"initial_harness":harness.to_dict()}
+    write_json(output/"protocol.json",protocol)
+    initial=accepted_state or AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,0)
+    write_json(output/"initial_agent.json",initial.to_dict())
     archive=[]
 
     def save(folder,reason,*,candidate=None,target=None,model_decision="unchanged",module_decision="retain",**extra):
-        entry={"cycle":cycle,"reason":reason,"checkpoint":checkpoint,"harness_revision":harness.to_dict(),
+        entry={**AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,cycle+1).to_dict(),
+            "cycle":cycle,"reason":reason,
             "model_decision":model_decision,"module_decision":module_decision,
             "candidate_id":candidate.candidate_id if candidate else None,
             "target":target.to_dict() if target else None,**extra}
@@ -33,7 +41,7 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
         write_json(folder/"state.json",entry)
         journal.append("cycle_complete",**entry)
 
-    for cycle in range(config.cycles):
+    for cycle in range(start_cycle,config.cycles):
         folder=output/f"cycle_{cycle:02d}"
         folder.mkdir()
         parent=harness
@@ -57,7 +65,7 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
         if not gate["passed"]:
             save(folder,"harness_acceptance_failed",candidate=candidate);continue
         harness=full  # Durable acceptance precedes any attempt to construct H-minus.
-        write_json(folder/"accepted_harness.json",{"checkpoint":checkpoint,"harness_revision":harness.to_dict()})
+        write_json(folder/"accepted_harness.json",AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol).to_dict())
         target=None
         try:
             provider=components.targets or (components.proposer if hasattr(components.proposer,"propose_target") else None)
@@ -106,6 +114,6 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
         save(folder,"internalization_audited",candidate=candidate,target=target,
             model_decision=verdict["model_decision"],module_decision=verdict["module_decision"],
             before_checkpoint=before_checkpoint,proposed_checkpoint=proposed)
-    result={"checkpoint":checkpoint,"harness_revision":harness.to_dict(),"archive":archive}
+    result={**AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol,config.cycles).to_dict(),"archive":archive}
     write_json(output/"deployment.json",result)
     return result

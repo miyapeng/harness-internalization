@@ -4,7 +4,7 @@
 
 工程是独立实现，不需要 OPID 或 Meta-Harness 的嵌套运行仓库。训练优化器通过可选外部依赖 `verl==0.5.0` 使用。原 planning/review/recovery 模块模式仍兼容。
 
-**验证状态：127 项测试通过，最后诊断与日志细化另有 21 项针对性验证。真实 API proposer、HF 模型、外部 veRL、GPU 和官方 benchmark 实验均未运行。** CPU/mock 结果用于验证工程流程，不能作为模型内化效果或论文性能证据。
+**验证状态：182 项测试通过，包含完整环境事件回报、无学生决策 batch、具名控制及既有数据接线、训练与生命周期回归。真实 API proposer、HF 模型、外部 veRL、GPU 和官方 benchmark 实验均未运行。** CPU/mock 结果用于验证工程流程，不能作为模型内化效果或论文性能证据。
 
 ## 方法
 
@@ -18,7 +18,11 @@
 
 `HarnessCandidate` 表示完整代码改进；`InternalizationTarget` 表示本次准备旁路的行为。H− 不必等于父版本，例如撤除诊断控制后仍可保留新增的日志工具。有效改进没有目标或无法接入当前监督桥时，保留 H+、模型不变、不训练。
 
+schema 2 使用具名控制 ID；例如只关闭 review_v1，保留 recovery_v1 和工具。独立控制读取相同基础上下文，教师复用学生实际生成的非目标内容，按部署顺序插入目标结果。顺序依赖组合仍能运行，但暂不支持内化；旧单 hook 格式保持兼容。见 [具名控制协议与示例](docs/NAMED_CONTROLS.md)。
+
 模块信号仍是同一 batch 的 old policy 对同一 response IDs 的概率差：`logp_old(response | enhanced_context) - old_log_prob(response | student_context)`，与原任务优势相加。模型回滚与行为退役分别判定，统计门槛没有为了演示而放宽。
+
+环境事件与学生决策分开记录：prepare 中完成任务也计入完整 return，没有学生生成 token 就没有对应 actor loss。公开工具/模型调用参数与结果进入允许的 search 提案轨迹。见 [环境事件与回报](docs/ENVIRONMENT_EVENTS.md)。
 
 任意候选代码必须在独立 Linux Landlock/seccomp 进程中运行；缺少隔离会报错。当前内化桥支持显式内部计算 hook 的旁路，不能把任意代码修改强行转换成文本指导。详细边界见 [版本化 Harness 说明](docs/VERSIONED_HARNESS.md)。
 
@@ -35,7 +39,7 @@ src/internalization/
   outer_loop.py  只通过本项目接口编排三个周期
 configs/         保留的实验协议与进程配置
 scripts/         提案、训练、评价、manifest与迁移验证入口
-tests/           原有100测试及27项版本化演化/内化回归
+tests/           训练、版本化演化、数据/状态/最终评价接线回归
 docs/            方法、运行、迁移、来源与验证记录
 licenses/        保留的第三方许可证和NOTICE
 ```
@@ -54,6 +58,7 @@ python3.12 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python3.12 -m unittest discover -s tests -v
 python3.12 scripts/demo_versioned_harness.py \
   --config configs/versioned_demo.json --output runs/my-versioned-demo
+python3.12 scripts/demo_named_controls.py --output runs/my-named-controls-demo
 ```
 
 输出目录必须不存在。版本化 demo 实际执行代码、工具和隔离；模型行为与 trainer checkpoint 转换是 scripted mock，实际 optimizer updates 为 0。另有 CPU 小模型 SGD 测试验证训练桥。运行产物、模型权重、凭据及官方任务数据不随仓库发布；执行上述命令会在 `runs/` 生成完整候选、精简版本、目标和评价记录。
@@ -65,13 +70,17 @@ python3.12 -m internalization.cli validate-module harness_modules/recovery.py
 python3.12 -m internalization.cli demo --output runs/my-legacy-demo
 ```
 
-真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。新模式额外要求独立的 `acceptance_0..2`，不能复用 retirement/test。
+真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。新版导入器按 `--cycles` 生成独立 acceptance/retirement；三周期通用导入默认需至少270个非测试任务。演化恢复使用 `--state`，最终评价必须显式选择 `--state` 或 `--baseline`，不能复用 retirement/test。
 
 ## 文档与实验边界
 
 - [方法](docs/METHOD.md)、[当前状态](docs/STATUS.md)、[工作记录](docs/WORKLOG.md)
 - [版本化接口、配置和运行命令](docs/VERSIONED_HARNESS.md)
-- [127 项测试与验收记录](docs/validation/versioned-harness-report.json)
+- [数据准备到最终评价的运行说明](docs/ACCEPTED_AGENT_PIPELINE.md)
+- [144 项测试与接线验收记录](docs/validation/agent-pipeline-report.json)
+- [154 项测试与 proposer 接口简化验收记录](docs/validation/proposer-binding-report.json)
+- [171 项测试与具名控制验收记录](docs/validation/named-controls-report.json)
+- [182 项测试与环境事件回报验收记录](docs/validation/environment-events-report.json)
 
 完整迁移表和验证边界见 [docs/MIGRATION.md](docs/MIGRATION.md)，操作见 [docs/RUNBOOK.md](docs/RUNBOOK.md)，版权见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。源commit记录在 `upstream.lock.json`，仅作来源记录，不用于加载代码。历史flat模块和旧脚本名只是本项目代码的兼容入口。
 

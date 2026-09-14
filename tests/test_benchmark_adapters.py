@@ -141,10 +141,11 @@ class AdapterTests(unittest.TestCase):
             with self.assertRaises(ValueError): make_catalog_manifest("hotpotqa","v1",rows,rows)
 
     def test_train_partition_keeps_three_disjoint_retirement_cohorts(self):
-        train=[{"id":str(i),"split":"train","record":{"question":str(i)}} for i in range(180)]
+        train=[{"id":str(i),"split":"train","record":{"question":str(i)}} for i in range(270)]
         test=[{"id":"heldout","split":"test","record":{"question":"heldout"}}]
         _,manifest=make_catalog_manifest("hotpotqa","v1",test,train)
         self.assertEqual([len(manifest.partitions[f"retirement_{i}"]) for i in range(3)],[30]*3)
+        self.assertEqual([len(manifest.partitions[f"acceptance_{i}"]) for i in range(3)],[30]*3)
         self.assertEqual(len(manifest.partitions["train"]),30)
         with self.assertRaises(ValueError): make_catalog_manifest("hotpotqa","v1",test,train,cohort_size=1)
 

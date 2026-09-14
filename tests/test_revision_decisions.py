@@ -79,8 +79,8 @@ class RevisionDecisionTests(unittest.TestCase):
             def request_json(self,contract,public,output):
                 output.mkdir(parents=True)
                 self.public=public
-                return {'candidates':[{'patch':[{'path':'../trainer.py','before_hash':None,'content':'pass'}],'rationale':'bad'},
-                    {'patch':candidate.to_dict()['patch'],'rationale':'new tool'}]}
+                return {'candidates':[{'patch':[{'path':'../trainer.py','content':'pass'}],'rationale':'bad'},
+                    {'patch':[{"path":p.path,"content":p.content} for p in candidate.patch],'rationale':'new tool'}]}
         proposer=MockProposer(self.store)
         request=ProposalRequest('old',self.parent,('search',),(),(),(),0,2,self.root/'proposals')
         proposals=proposer.propose(request)

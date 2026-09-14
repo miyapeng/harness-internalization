@@ -1,0 +1,17 @@
+{
+  "schema": 2,
+  "entrypoint": "agent/main.py:run",
+  "composition": "independent_suffix",
+  "controls": [
+    {
+      "id": "recovery_v1",
+      "entrypoint": "controls/recovery.py:run",
+      "enabled": true
+    },
+    {
+      "id": "review_v1",
+      "entrypoint": "controls/review.py:run",
+      "enabled": true
+    }
+  ]
+}

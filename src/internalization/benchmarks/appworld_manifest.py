@@ -19,7 +19,7 @@ def scenario_groups(ids):
     return [sorted(groups[key]) for key in sorted(groups)]
 
 
-def build_manifest(splits, revision, *, seed=42, cycles=3, search_size=15, dev_size=15, cohort_size=30):
+def build_manifest(splits, revision, *, seed=42, cycles=3, search_size=15, dev_size=15, cohort_size=30, versioned=True):
     if set(splits) != {"train", "dev", "test_normal", "test_challenge"}:
         raise ValueError("All official AppWorld splits required")
     if cycles < 1 or cohort_size < 30 or any(n <= 0 or n % 3 for n in (search_size, dev_size, cohort_size)):
@@ -36,7 +36,8 @@ def build_manifest(splits, revision, *, seed=42, cycles=3, search_size=15, dev_s
     if len(train) <= search_size//3 or len(dev) < dev_size//3: raise ValueError("Insufficient train/dev tasks")
     search, train = train[:search_size//3], train[search_size//3:]
     chosen_dev, held_out = dev[:dev_size//3], dev[dev_size//3:]
-    need = cycles * cohort_size//3
+    cohort_names=tuple(f"retirement_{i}" for i in range(cycles)) + (tuple(f"acceptance_{i}" for i in range(cycles)) if versioned else ())
+    need = len(cohort_names) * cohort_size//3
     from_train = max(0, need-len(held_out))
     if len(train) <= from_train: raise ValueError("Insufficient non-test data; cannot weaken attribution or reuse cohorts")
     held_out += train[:from_train]
@@ -47,12 +48,12 @@ def build_manifest(splits, revision, *, seed=42, cycles=3, search_size=15, dev_s
     rng.shuffle(held_out)
     flatten = lambda groups: tuple(task for group in groups for task in group)
     partitions = {"train":flatten(train), "search":flatten(search), "dev":flatten(chosen_dev)}
-    for cycle in range(cycles):
-        start = cycle*cohort_size//3
-        partitions[f"retirement_{cycle}"] = flatten(held_out[start:start+cohort_size//3])
+    for index,name in enumerate(cohort_names):
+        start = index*cohort_size//3
+        partitions[name] = flatten(held_out[start:start+cohort_size//3])
     for name in ("test_normal", "test_challenge"): partitions[name] = tuple(splits[name])
     result = TaskManifest("appworld", revision, partitions)
-    result.validate()
+    result.validate_loop(cycles,versioned=versioned,cohort_minimum=30)
     return result
 
 

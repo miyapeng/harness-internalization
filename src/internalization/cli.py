@@ -21,12 +21,15 @@ def main():
     run = commands.add_parser("run")
     run.add_argument("--manifest", type=Path, required=True)
     run.add_argument("--backend", type=Path, required=True)
-    run.add_argument("--checkpoint", required=True)
+    run.add_argument("--checkpoint", help="Required for a fresh run; optional check when resuming --state")
     run.add_argument("--output", type=Path, required=True)
-    run.add_argument("--train-steps", type=int, default=300)
+    run.add_argument("--train-steps", type=int, help="Total planned budget; default 300, or preserved from resumed protocol")
+    run.add_argument("--cycles", type=int, help="Total planned cycles; default 3, or preserved from resumed protocol")
     code_source=run.add_mutually_exclusive_group()
     code_source.add_argument("--harness-workspace",type=Path,help="Import a configured executable Harness source tree")
     code_source.add_argument("--harness-revision",type=Path,help="JSON HarnessRevision or accepted state/deployment")
+    code_source.add_argument("--state",type=Path,help="Continue from an accepted checkpoint/Harness/protocol pair")
+    run.add_argument("--protocol",type=Path,help="Protocol sidecar for a relocated historical state")
     run.add_argument("--revision-store",type=Path,default=Path("runs/harness-revisions"))
     run.add_argument("--attribution-policy", type=Path,
                      help="Fixed pre-training gate JSON; defaults to 95%% task bootstrap, lower gain > 0")
@@ -69,23 +72,48 @@ def main():
         from .manifest import TaskManifest
         from .outer_loop import LoopConfig, run_outer_loop
         from .evaluation.attribution import AttributionPolicy
+        from .evaluation.retirement import RetirementPolicy
+        from .core.accepted_state import load_accepted_state
         if args.output.exists(): raise FileExistsError(args.output)
-        config = json.loads(args.backend.read_text())
-        backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
-        attribution_policy = AttributionPolicy.load(args.attribution_policy) if args.attribution_policy else AttributionPolicy()
+        manifest=TaskManifest.load(args.manifest)
+        accepted=None
+        raw_revision=None
+        state_path=args.state
+        if args.harness_revision:
+            raw_revision=json.loads(args.harness_revision.read_text())
+            if raw_revision.get("format")!="code_revision_v1": state_path=args.harness_revision
+        if state_path:
+            accepted=load_accepted_state(state_path,manifest,checkpoint=args.checkpoint,protocol_path=args.protocol)
+            if "loop" not in accepted.protocol: raise ValueError("Accepted state has no resumable loop protocol")
+        elif args.protocol: raise ValueError("--protocol requires an accepted --state")
+        options=dict(accepted.protocol["loop"]) if accepted else {}
+        if args.cycles is not None: options["cycles"]=args.cycles
+        if args.train_steps is not None: options["total_train_steps"]=args.train_steps
+        if "seeds" in options: options["seeds"]=tuple(options["seeds"])
+        loop=LoopConfig(**options)
+        policy=RetirementPolicy(**accepted.protocol["retirement"]) if accepted else RetirementPolicy()
+        attribution_policy=(AttributionPolicy.load(args.attribution_policy) if args.attribution_policy else
+            AttributionPolicy(**accepted.protocol.get("attribution",{})) if accepted else AttributionPolicy())
         initial_harness=None
+        from .harness.revision import HarnessRevision
+        versioned=bool(args.harness_workspace or (raw_revision and not state_path) or
+            (accepted and isinstance(accepted.harness,HarnessRevision)))
+        manifest.validate_loop(loop.cycles,versioned=versioned,
+            cohort_minimum=max(policy.min_tasks,attribution_policy.min_tasks) if versioned else None)
+        if accepted:
+            accepted.check_resume(manifest,loop,policy,attribution_policy)
+            checkpoint=accepted.checkpoint
+        else:
+            if not args.checkpoint: raise ValueError("A fresh run requires --checkpoint")
+            checkpoint=str(Path(args.checkpoint).resolve(strict=True))
         if args.harness_workspace:
             from .harness.revision import RevisionStore
             initial_harness=RevisionStore(args.revision_store).import_directory(args.harness_workspace)
-        elif args.harness_revision:
-            from .harness.revision import HarnessRevision
-            value=json.loads(args.harness_revision.read_text())
-            if "checkpoint" in value and Path(value["checkpoint"]).resolve()!=Path(args.checkpoint).resolve():
-                raise ValueError("Accepted revision state/checkpoint mismatch")
-            initial_harness=HarnessRevision.from_dict(value.get("harness_revision",value))
-        result = run_outer_loop(backend, TaskManifest.load(args.manifest), str(Path(args.checkpoint).resolve(strict=True)),
-                  args.output, LoopConfig(total_train_steps=args.train_steps), attribution_policy=attribution_policy,
-                  initial_harness=initial_harness)
+        elif raw_revision and not state_path: initial_harness=HarnessRevision.from_dict(raw_revision)
+        config = json.loads(args.backend.read_text())
+        backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
+        result = run_outer_loop(backend,manifest,checkpoint,args.output,loop,policy,
+                  attribution_policy=attribution_policy,initial_harness=initial_harness,accepted_state=accepted)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

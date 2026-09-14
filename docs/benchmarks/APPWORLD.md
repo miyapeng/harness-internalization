@@ -63,28 +63,29 @@ smoke仅在第一条官方train任务执行print并调用官方grader，成功�
 ```bash
 python scripts/build_appworld_manifest.py \
   --revision YOUR_DOWNLOADED_DATA_REVISION \
-  --output configs/local-appworld-manifest.json
+  --cycles 1 --output configs/local-appworld-manifest.json
 python -m internalization.cli run \
   --manifest configs/local-appworld-manifest.json \
   --backend configs/appworld_backend.json \
   --attribution-policy configs/attribution.json \
   --checkpoint /absolute/local/hf-checkpoint \
-  --train-steps 300 --output runs/new-appworld-run
+  --harness-workspace examples/versioned_harness/base \
+  --cycles 1 --train-steps 100 --output runs/new-appworld-run
 ```
 
 proposer使用原HI_PROPOSER_MODEL/HI_PROPOSER_BASE_URL/HI_PROPOSER_API_KEY。模型使用本地HF checkpoint；真实veRL/GPU仍未验证。搜索、A/B/C/D、训练都经同一AppWorld配置，outer_loop不导入AppWorld类型。
 
-最终评价必须显式传入正式接受的checkpoint；有residual模块时同时传最后周期state：
+最终评价必须选择已接受 state 或显式 baseline；checkpoint 默认从 state 读取，额外指定时进行一致性检查：
 
 ```bash
 python scripts/evaluate_appworld.py \
   --manifest configs/local-appworld-manifest.json \
   --checkpoint /absolute/accepted-checkpoint \
-  --state runs/new-appworld-run/cycle_02/state.json \
+  --state runs/new-appworld-run/deployment.json \
   --partition test_normal --output runs/new-appworld-test-normal
 ```
 
-另跑test_challenge时使用新的输出目录。脚本检查state的checkpoint与传入模型一致，载入其中active_modules及其Harness hash。Hcore-only基线可省略state。最终test不参与候选选择或P0判定。
+另跑test_challenge时使用新的输出目录。脚本经统一入口检查配对身份，加载实际 harness_revision 或兼容的完整旧模块。Hcore-only基线必须显式 --baseline --checkpoint；不能仅省略state。最终test不参与候选选择或P0判定。
 
 ## 实现定位与验收
 
@@ -99,3 +100,5 @@ python scripts/evaluate_appworld.py \
 | 真实AppWorld、数据、API proposer、HF/veRL/GPU实验 | NOT YET VERIFIED | 未安装/未运行；不能用stub成功率作为benchmark结果 |
 
 71项测试通过，其中AppWorld新增13项；原20测试文件未改。P0-3之后的三周期demo全部90文件逐字节一致。完整日志和机器记录见 [appworld-tests.txt](../validation/appworld-tests.txt)、[appworld-report.json](../validation/appworld-report.json)。测试使用项目自写test double，不包含官方数据或参考解；持久化mock目录为runs/appworld-proof。
+
+新版导入按 --cycles 预先划独立 acceptance/retirement，保持完整 scenario families；数据不足报错，不能借 test。上面示例显式规划一个周期；默认三周期需更多非测试任务。旧分区模式需 --legacy-modules。恢复与身份检查见 [接线说明](../ACCEPTED_AGENT_PIPELINE.md)。

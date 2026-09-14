@@ -107,7 +107,7 @@ python scripts/build_benchmark_manifest.py --benchmark lawbench \
 
 ```bash
 python scripts/evaluate_lawbench.py --manifest data/lawbench-import/manifest.json \
-  --config configs/lawbench.json --checkpoint /absolute/model \
+  --config configs/lawbench.json --baseline --checkpoint /absolute/model \
   --output runs/lawbench-final
 ```
 
@@ -115,24 +115,25 @@ LawBench是非交互机制实验，不能当成多步Agent能力证据；本轮�
 
 ## 划分、运行与记录
 
-TB2、Pro、LawBench导入默认只有`test`，不能直接启动outer loop。只有显式提供**独立**`--train-source`，且至少180个任务时，才建立train/search/dev/三个retirement cohort；每个cohort至少30任务。不能用公开测试数据再次导入冒充train：跨源ID与题面重复会拒绝。独立训练源的合法来源仍需研究者核实，本工具不证明外部数据没有语义近重复。
+TB2、Pro、LawBench导入默认只有`test`，不能直接启动outer loop。只有显式提供**独立**`--train-source`，新版默认三周期至少270个任务，建立train/search/dev、三个retirement与三个acceptance cohort；每个cohort至少30任务。`--cycles`预先调整周期数，`--legacy-modules`显式生成旧模式（三周期180任务）。不能用公开测试数据再次导入冒充train：跨源ID与题面重复会拒绝。独立训练源的合法来源仍需研究者核实，本工具不证明外部数据没有语义近重复。
 
-search、dev和retirement来自训练源的互斥保留子集；官方测试源完全隔离。主入口对catalog的test行默认拒绝，独立最终评价脚本才增加`--final-evaluation`，train/propose不能使用此flag。bootstrap仍以task ID为cluster，多个seed不是额外任务。
+search、dev、acceptance和retirement来自训练源的互斥保留子集；官方测试源完全隔离。主入口对catalog的test行默认拒绝，独立最终评价脚本才增加`--final-evaluation`，train/propose不能使用此flag。bootstrap仍以task ID为cluster，多个seed不是额外任务。
 
 ```bash
 # 先单任务engine/verifier验收；无模型smoke不是benchmark成绩。
 python scripts/check_benchmark.py --config configs/terminalbench2.json \
   --task-id <imported-task-id> --output runs/tb2-engine-smoke
 
-# 独立最终评价，可通过--state加载正式接受的residual Harness。
+# 显式初始基线；评价演化结果时改用 --state .../deployment.json。
 python scripts/evaluate_benchmark.py --manifest data/tb2-import/manifest.json \
-  --backend configs/terminalbench2_backend.json --checkpoint /absolute/model \
+  --backend configs/terminalbench2_backend.json --baseline --checkpoint /absolute/model \
   --partition test --output runs/tb2-final
 
-# 只有带独立train/search/dev/retirement分区的manifest才能运行此命令。
+# 版本化模式要求独立 train/search/dev/acceptance/retirement 分区。
 python -m internalization.cli run --manifest data/hotpot-import/manifest.json \
   --backend configs/hotpotqa_backend.json --checkpoint /absolute/model \
-  --output runs/hotpot-cycle --train-steps 300
+  --harness-workspace examples/versioned_harness/base \
+  --cycles 3 --output runs/hotpot-cycle --train-steps 300
 ```
 
 以上命令中的依赖/数据路径必须替换为实际准备路径；本轮未运行真实任务命令。`environment/identity.json`保存task/seed/catalog与镜像或task bundle hash，`grade.json`保存terminal指标，worker/grader日志留在episode目录。训练和模型成本沿用原ledger。tool_calls计学生search/lookup/exec（Pro还计patch capture）；不把内部测试用例数当agent工具调用。总wall latency含环境启动、官方评分和关闭；最终LawBench重新聚合的额外时间进入stage latency。镜像准备/下载、环境安装和人工准备费用尚未纳入在线token/tool账目，论文总预算需另外记录。
@@ -144,3 +145,5 @@ python -m internalization.cli run --manifest data/hotpot-import/manifest.json \
 新增回归见`tests/test_benchmark_adapters.py`，全量日志见`docs/validation/benchmark-adapters-tests.txt`，机器报告见`docs/validation/benchmark-adapters-report.json`。旧P0和AppWorld测试继续保留，CPU三周期demo与上一版90个文件逐字节一致。原20项测试文件不变。
 
 本轮直接检查了[Harbor Trial](https://github.com/laude-institute/harbor/blob/main/src/harbor/trial/trial.py)、[BaseAgent](https://github.com/laude-institute/harbor/blob/main/src/harbor/agents/base.py)、[Harbor 0.23.0发布](https://pypi.org/project/harbor/0.23.0/)、[Pro evaluator](https://github.com/scaleapi/SWE-bench_Pro-os/blob/main/swe_bench_pro_eval.py)、[HotpotQA evaluator](https://github.com/hotpotqa/hotpot/blob/master/hotpot_evaluate_v1.py)、[LawBench dispatcher](https://github.com/open-compass/LawBench/blob/main/evaluation/main.py)与相应评分函数。没有复制这些上游源码到src；来源及尚未解析的commit见THIRD_PARTY_NOTICES。来源可读不代表这些依赖已在本机运行。
+
+统一状态加载与恢复见 [ACCEPTED_AGENT_PIPELINE.md](../ACCEPTED_AGENT_PIPELINE.md)。LawBench 专用整类原生评价暂不支持代码 revision，会在模型加载前明确拒绝；不会回退为空 Harness。

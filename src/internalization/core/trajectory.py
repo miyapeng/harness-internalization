@@ -19,6 +19,27 @@ class Transition:
 
 
 @dataclass(frozen=True)
+class ControlOutput:
+    control_id: str
+    entrypoint: str
+    suffix: str
+    selected: bool
+
+
+@dataclass(frozen=True)
+class ControlContext:
+    base_context: str
+    composition: str
+    outputs: tuple[ControlOutput, ...]
+
+
+@dataclass(frozen=True)
+class RevisionTransition(Transition):
+    # Only schema-2 traces need composition metadata; old serialized traces remain unchanged.
+    control_context: ControlContext | None = None
+
+
+@dataclass(frozen=True)
 class Trajectory:
     task_id: str
     episode_id: str
@@ -44,6 +65,58 @@ class Trajectory:
     @property
     def total_reward(self):
         return sum(step.reward for step in self.transitions)
+
+
+@dataclass(frozen=True)
+class EnvironmentEvent:
+    index: int
+    step: int
+    phase: str
+    action: str
+    observation: str
+    reward: float
+    done: bool
+    success: float
+    action_valid: bool
+    tool_calls: int
+    control_id: str | None = None
+
+
+@dataclass(frozen=True)
+class RuntimeCall:
+    index: int
+    step: int
+    phase: str
+    operation: str
+    parameters: dict
+    result: str | dict
+    cost: Cost
+    control_id: str | None = None
+
+
+@dataclass(frozen=True)
+class EventTrajectory(Trajectory):
+    """Complete tool returns independent of whether a student decision was generated.
+
+    An explicitly empty event ledger means zero environment reward. It must never
+    fall back to transition rewards or add them again. Old Trajectory JSON stays valid.
+    """
+    environment_events: tuple[EnvironmentEvent, ...] = ()
+    public_calls: tuple[RuntimeCall, ...] = ()
+    initial_observation: str = ""
+
+    def __post_init__(self):
+        super().__post_init__()
+        for records in (self.environment_events,self.public_calls):
+            for index,record in enumerate(records):
+                if record.index!=index or not 0<=record.step<=len(self.transitions):
+                    raise ValueError("Runtime event index/decision step mismatch")
+        if any(event.done for event in self.environment_events[:-1]):
+            raise ValueError("Environment event recorded after task termination")
+
+    @property
+    def total_reward(self):
+        return sum(event.reward for event in self.environment_events)
 
 
 @dataclass(frozen=True)

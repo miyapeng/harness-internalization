@@ -14,7 +14,7 @@ import sys
 import sysconfig
 
 
-def confine(root, memory_mb, cpu_s):
+def confine(root, memory_mb, cpu_s, readable_files=None):
     libc = ctypes.CDLL(None,use_errno=True)
     abi = libc.syscall(444,0,0,1)
     if abi < 3: raise RuntimeError("Required Landlock ABI >=3 unavailable")
@@ -32,10 +32,16 @@ def confine(root, memory_mb, cpu_s):
     fd=libc.syscall(444,ctypes.byref(rules),ctypes.sizeof(rules),0)
     if fd<0: raise OSError(ctypes.get_errno(),"landlock_create_ruleset")
     try:
-        for path in {str(root),sysconfig.get_path("stdlib"),sysconfig.get_path("platstdlib")}:
+        permissions={p:(1<<2)|(1<<3) for p in {sysconfig.get_path("stdlib"),sysconfig.get_path("platstdlib")}}
+        if readable_files is None: permissions[str(root)]=(1<<2)|(1<<3)
+        else:
+            # Named independent controls cannot branch on the target's ON/OFF config.
+            permissions[str(root)]=1<<3
+            for name in readable_files: permissions[str(root/name)]=1<<2
+        for path, access in permissions.items():
             parent=os.open(path,os.O_PATH|os.O_CLOEXEC)
             try:
-                rule=PathRule((1<<2)|(1<<3),parent)
+                rule=PathRule(access,parent)
                 if libc.syscall(445,fd,1,ctypes.byref(rule),0): raise OSError(ctypes.get_errno(),"landlock_add_rule")
             finally: os.close(parent)
         if libc.prctl(38,1,0,0,0) or libc.syscall(446,fd,0):
@@ -76,7 +82,9 @@ def main():
     sys.path.insert(0,str(root))
     wire=sys.stdout
     try:
-        isolation=confine(root,request["memory_mb"],request["cpu_s"])
+        if "readable_files" in request:
+            isolation=confine(root,request["memory_mb"],request["cpu_s"],request["readable_files"])
+        else: isolation=confine(root,request["memory_mb"],request["cpu_s"])
     except BaseException as exc:
         wire.write(json.dumps({"event":"isolation_error","error":"Required candidate isolation unavailable: "+str(exc)})+"\n")
         wire.flush()

@@ -1,0 +1,51 @@
+{
+  "date": "2026-09-14",
+  "status": "PASS",
+  "scope": "Host-bound proposal hashes and deterministic supervision-hook reduction",
+  "tests": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "passed": 154,
+    "new": 10,
+    "skipped": 0,
+    "seconds": 243.064,
+    "log": "proposer-binding-tests.txt"
+  },
+  "source_files_changed_this_task": [
+    "src/internalization/evolution/code_proposer.py",
+    "src/internalization/harness/revision.py"
+  ],
+  "protected_files_unchanged_sha256": {
+    "src/internalization/training/trainer.py": "07342b61b5b1cb882c46b425688320debaa4a4783bac1898569a055a18f63b8f",
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/teacher_scoring.py": "cec132f7cbbfdd9c653811f59d5377249be8fdfc148f8d98a14cb084a243ccb4",
+    "src/internalization/training/revision_scoring.py": "f2f39b189434ae3b8c4877ddc2c532f1b5e0e8f8b22ab787d5038d3e7977d3cf",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/training/verl_backend.py": "1ef8729b7d406a3d2a688e74c8a073bf53b3f0b44f8456def129f2453205e69b",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+    "src/internalization/revision_loop.py": "9a8e92d1faecaf2b4b0ae2fd36c4c20d0afa97586712033a027d70d8e51ac195"
+  },
+  "interface_changes": {
+    "api_patch": "path/content only; before_hash calculated on host",
+    "internal_patch": "FileEdit and archive schema unchanged",
+    "target": "removed_behavior/supervision_adapter or null; no model-written patch",
+    "reduction": "only config.supervision -> null; all other files byte-identical",
+    "calls": "No hook: 0 target API calls. Registered hook: 1 selection call remains."
+  },
+  "validation": [
+    "mock API transport, real hash binding and tampered-parent rejection",
+    "deterministic reduction matches prior valid reduction hash",
+    "reduced revision runs retained log tool in actual kernel sandbox",
+    "unsupported environment interaction rejected by existing executable checker",
+    "standalone no-hook target process works without API configuration",
+    "existing P0/old-policy/mask/isolation/lifecycle tests pass"
+  ],
+  "existing_test_adjustment": "test_revision_decisions.py mock response uses path/content only; original assertions retained",
+  "prior_uncommitted_changes": "preserved",
+  "not_run": [
+    "real API proposer",
+    "real HF model",
+    "external veRL/GPU training",
+    "official benchmark tasks"
+  ]
+}

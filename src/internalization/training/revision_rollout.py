@@ -4,7 +4,7 @@ import time
 
 from ..harness.code_runtime import CodeRuntime
 from ..core.types import Cost, Journal, State
-from ..core.trajectory import Trajectory, Transition, RolloutResult
+from ..core.trajectory import EventTrajectory, Transition, RevisionTransition, RolloutResult
 
 
 def rollout_revision(runner,model,harness,tasks,*,seeds,output,training=False):
@@ -19,11 +19,14 @@ def rollout_revision(runner,model,harness,tasks,*,seeds,output,training=False):
         for replica,seed in enumerate(seeds):
             env=runner.environment_factory()
             episode=f"{task}:{seed}"+(f":replica:{replica}" if training else "")
-            runtime=CodeRuntime(model,harness,env,sandbox=runner.code_sandbox,audit=audit)
+            runtime=CodeRuntime(model,harness,env,sandbox=runner.code_sandbox,audit=audit,task_id=task,episode_id=episode)
             steps,cost,success=[],Cost(),0.
             started=time.perf_counter()
             try:
-                history=env.reset(task,seed)
+                history=initial_observation=env.reset(task,seed)
+                audit.append("environment_reset",task_id=task,episode_id=episode,
+                    model_version=model.snapshot_id,harness_version=harness.version,
+                    parameters={"task_id":task,"seed":seed},result={"observation":initial_observation})
                 for index in range(runner.max_steps):
                     prompt,done=runtime.prepare(history,index)
                     if done:
@@ -45,8 +48,10 @@ def rollout_revision(runner,model,harness,tasks,*,seeds,output,training=False):
                     outcome=runtime.execute(action.text,history,index)
                     step_cost=runtime.broker.cost+action.cost+scoring
                     cost+=step_cost
-                    transition=Transition(state,prompt,action.text,ids,outcome.reward,outcome.done,
-                        outcome.action_valid,tuple(old),step_cost,tuple(model.prompt_ids(prompt)) if training else ())
+                    transition_type=RevisionTransition if runtime.control_context is not None else Transition
+                    transition=transition_type(state,prompt,action.text,ids,outcome.reward,outcome.done,
+                        outcome.action_valid,tuple(old),step_cost,tuple(model.prompt_ids(prompt)) if training else (),
+                        **({"control_context":runtime.control_context} if runtime.control_context is not None else {}))
                     steps.append(transition)
                     history,success=outcome.observation,outcome.success
                     journal.append("transition",state=asdict(state),action=action.text,student_prompt=prompt,
@@ -60,7 +65,8 @@ def rollout_revision(runner,model,harness,tasks,*,seeds,output,training=False):
                 raise
             finally: env.close()
             fields=asdict(cost);fields["latency_s"]=time.perf_counter()-started
-            trajectory=Trajectory(task,episode,seed,model.snapshot_id,harness.version,tuple(steps),success,Cost(**fields),task)
+            trajectory=EventTrajectory(task,episode,seed,model.snapshot_id,harness.version,tuple(steps),success,Cost(**fields),task,
+                tuple(runtime.environment_events),tuple(runtime.public_calls),initial_observation)
             trajectories.append(trajectory)
             journal.append("trajectory",trajectory=asdict(trajectory),harness_path=harness.path)
     return RolloutResult(tuple(trajectories),tuple(t.outcome for t in trajectories))

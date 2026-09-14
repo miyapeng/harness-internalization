@@ -1,0 +1,125 @@
+{
+  "date": "2026-09-14",
+  "status": "PASS",
+  "scope": "Named control IDs, single-control reduction, deployment-aligned replay",
+  "tests": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "passed": 171,
+    "new": 17,
+    "skipped": 0,
+    "seconds": 244.863,
+    "log": "named-controls-tests.txt"
+  },
+  "targeted_tests": {
+    "passed": 17,
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -p 'test_named_control*.py' -v"
+  },
+  "protected_files_unchanged_sha256": {
+    "src/internalization/training/trainer.py": "07342b61b5b1cb882c46b425688320debaa4a4783bac1898569a055a18f63b8f",
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/training/verl_backend.py": "1ef8729b7d406a3d2a688e74c8a073bf53b3f0b44f8456def129f2453205e69b",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+    "src/internalization/revision_loop.py": "9a8e92d1faecaf2b4b0ae2fd36c4c20d0afa97586712033a027d70d8e51ac195"
+  },
+  "legacy_parity": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 90,
+    "original_demo_differences": [],
+    "original_demo_files_byte_equal": 90,
+    "acceptance_schema_only_changes": [],
+    "additional_demo_files": [],
+    "python_files_parsed": 96,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "named_demo": {
+    "command": "PYTHONPATH=src python3.12 scripts/demo_named_controls.py --output runs/named-controls-proof",
+    "proof": {
+      "mode": "scripted CPU model; actual sandbox and same-state scoring",
+      "full_revision": {
+        "format": "code_revision_v1",
+        "version": "b5318963e2bbd4664a08c2bea252686c6756225b2fddb13425b0a927e01b9ec1",
+        "path": "/data/miyapeng/harness-internalization/runs/named-controls-proof/revisions/b5318963e2bbd4664a08c2bea252686c6756225b2fddb13425b0a927e01b9ec1-83c2c3ef1fea",
+        "policy": {
+          "editable_prefixes": [
+            "agent/",
+            "prompts/",
+            "tools/",
+            "controls/",
+            "config/"
+          ],
+          "capabilities": [
+            "model",
+            "environment"
+          ],
+          "max_files": 64,
+          "max_bytes": 262144
+        }
+      },
+      "reduced_revision": {
+        "format": "code_revision_v1",
+        "version": "9f401f1166e536e64731a8cc461b7a237246b2564b3f0ddf44b95b4ec274e095",
+        "path": "/data/miyapeng/harness-internalization/runs/named-controls-proof/revisions/9f401f1166e536e64731a8cc461b7a237246b2564b3f0ddf44b95b4ec274e095-f2e87e9ccb5d",
+        "policy": {
+          "editable_prefixes": [
+            "agent/",
+            "prompts/",
+            "tools/",
+            "controls/",
+            "config/"
+          ],
+          "capabilities": [
+            "model",
+            "environment"
+          ],
+          "max_files": 64,
+          "max_bytes": 262144
+        }
+      },
+      "target_control_id": "review_v1",
+      "full_enabled": [
+        "recovery_v1",
+        "review_v1"
+      ],
+      "reduced_enabled": [
+        "recovery_v1"
+      ],
+      "student_success": 1.0,
+      "full_success": 1.0,
+      "student_tool_calls": 2,
+      "selected_states": 1,
+      "scoring_model_calls": 2,
+      "actual_optimizer_updates": 0,
+      "real_model": false,
+      "GPU": false,
+      "official_benchmark": false
+    }
+  },
+  "validation_modes": {
+    "sandbox_and_registered_tool_execution": "actual Linux Landlock/seccomp",
+    "named_teacher_scoring": "scripted policy with actual code execution",
+    "optimizer_tests": "real CPU SGD on tiny fixture model",
+    "two_cycle_acceptance_retirement_rollback": "mock task scores/checkpoint transitions with unchanged real statistical gates"
+  },
+  "unchanged": [
+    "P0 acceptance/attribution/rollback rules",
+    "advantage formula and same-batch old-policy alignment",
+    "task partitions and benchmark adapters",
+    "legacy single-hook/module interfaces and serialization"
+  ],
+  "unsupported": [
+    "sequential control composition for internalization",
+    "new environment observations during independent control/scoring",
+    "missing or inconsistent rollout composition records",
+    "automatic arbitrary-program dependency/equivalence analysis"
+  ],
+  "not_run": [
+    "real API proposer",
+    "real HF model",
+    "external veRL/GPU training",
+    "official benchmark tasks"
+  ],
+  "prior_uncommitted_changes": "preserved"
+}

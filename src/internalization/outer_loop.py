@@ -30,26 +30,34 @@ class LoopConfig:
 
 def run_outer_loop(backend, manifest: TaskManifest, checkpoint: str,
                    output: Path, config=LoopConfig(), policy=RetirementPolicy(), *,
-                   attribution_policy=AttributionPolicy(), initial_harness=None):
+                   attribution_policy=AttributionPolicy(), initial_harness=None, accepted_state=None):
     components = components_for(backend)
+    if accepted_state is not None:
+        if initial_harness is not None: raise ValueError("Choose an accepted Agent or an initial Harness, not both")
+        accepted_state.check_resume(manifest,config,policy,attribution_policy)
+        if checkpoint != accepted_state.checkpoint: raise ValueError("Accepted checkpoint mismatch")
+        from .harness.revision import HarnessRevision
+        if isinstance(accepted_state.harness,HarnessRevision): initial_harness=accepted_state.harness
     if initial_harness is not None:
         from .harness.revision import HarnessRevision
         from .revision_loop import run_revision_loop
         if not isinstance(initial_harness,HarnessRevision): raise TypeError("Expected an explicit runnable HarnessRevision")
-        return run_revision_loop(components,manifest,checkpoint,initial_harness,output,config,policy,attribution_policy)
-    manifest.validate()
+        return run_revision_loop(components,manifest,checkpoint,initial_harness,output,config,policy,attribution_policy,
+                                 accepted_state=accepted_state)
+    manifest.validate_loop(config.cycles)
     train, search, dev = (manifest.partition(p) for p in ("train", "search", "dev"))
     cohorts = [manifest.partition(f"retirement_{k}") for k in range(config.cycles)]
     output.mkdir(parents=True, exist_ok=False)
     journal = Journal(output / "events.jsonl")
     candidate_archive = CandidateArchive(output / "candidate_archive.jsonl")
     evaluator = components.retirement or PairedRetirementEvaluator(components.runner, policy)
-    write_json(output / "protocol.json", {"loop": asdict(config), "retirement": asdict(policy),
+    write_json(output / "protocol.json", accepted_state.protocol if accepted_state else
+               {"loop": asdict(config), "retirement": asdict(policy),
                "manifest_hash": manifest.fingerprint, "initial_checkpoint": checkpoint})
     # Immutable artifact written before any rollout/candidate evaluation.
     write_json(output / "attribution_policy.json", asdict(attribution_policy))
-    harness, archive = Harness(), []
-    for cycle in range(config.cycles):
+    harness, archive = accepted_state.harness if accepted_state else Harness(), []
+    for cycle in range(accepted_state.next_cycle if accepted_state else 0,config.cycles):
         folder = output / f"cycle_{cycle:02d}"
         folder.mkdir()
         base_search = evaluate_tasks(components.runner, checkpoint, harness, search, config.seeds, folder / "baseline_search")

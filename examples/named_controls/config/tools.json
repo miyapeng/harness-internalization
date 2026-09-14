@@ -1,0 +1,6 @@
+{
+  "log_query": {
+    "entry": "tools.log_query:run",
+    "description": "Search public log lines; argument needle:string"
+  }
+}

@@ -1,5 +1,7 @@
 # 版本化 Harness：接口、运行与验收
 
+当前新增 schema 2 具名控制：只撤除 target_control_id，保留其他控制；训练复用非目标输出并按部署位置插入目标。完整新协议见 [NAMED_CONTROLS.md](NAMED_CONTROLS.md)。下文单 supervision hook 的描述对应仍保留的 schema 1 兼容模式。
+
 本次是已有工程的增量扩展，没有迁移训练框架、加入上游目录或新增 benchmark。修改前文件哈希、100 项测试日志和关键文件副本位于 `docs/history/revision-baseline/`。已有测试断言未改；旧接口默认仍走原模块路径。
 
 ## 接口迁移
@@ -18,7 +20,7 @@
 | `core/interfaces.py`、`serialization.py` | 类型联合、可选 `Components.targets` 和版本格式 `code_revision_v1` | 旧调用签名及模块序列化仍接受 |
 | `outer_loop.py`、`revision_loop.py` | `initial_harness=revision` 启用新循环，先接受改进再尝试内化 | 未提供 revision 时保持旧三周期逻辑 |
 | `command_backend.py`、`training/entrypoint.py` | JSON 传输 revision/target；增加 `target` / `check_internalization` stage | 训练器仍由原外部 veRL adapter 提供 |
-| `cli.py` | `--harness-workspace` 或 `--harness-revision`，以及 `--revision-store` | 原命令不变 |
+| `cli.py` | 工作区/revision 初始化，`--state` 恢复已接受配对 | 状态加载与最终评价统一，见 [接线说明](ACCEPTED_AGENT_PIPELINE.md) |
 | `revision_demo.py`、`scripts/demo_versioned_harness.py` | 新增明确标注 mock 的 CPU 生命周期演示 | 不作为真实 benchmark 或学习效果证据 |
 
 训练器 `training/trainer.py`、`module_advantage.py`、`behavior_policy.py`、`verl_backend.py`、归因/退役统计实现和所有 benchmark 文件本次未修改。新增目标通过 `HarnessRevision.without(target)` 与原训练器对接；没有引入第二个阶段冻结 scorer。
@@ -26,6 +28,8 @@
 ## 可执行工作区与权限
 
 起始实例在 `examples/versioned_harness/base/`。可编辑前缀默认是 `agent/`、`prompts/`、`tools/`、`controls/`、`config/`；可多文件修改，支持 Python、JSON、文本与 Markdown，总计最多 64 文件、256 KiB。补丁是 `FileEdit(path, before_hash, content)` 列表：原文件 UTF-8 文本 SHA256 防止套错父版本，新增文件 before_hash=null，content=null 只从新快照排除文件。不会原地删除父快照文件。
+
+API proposer 只输出 `{"path":"tools/example.py","content":"完整的新文件内容"}`；不再要求或接受模型提供 `before_hash`。`RevisionStore.bind_patch(parent, changes)` 在宿主验证锁定父版本后计算文件 hash，再交给原 `apply()` 独立复核。归档的 `HarnessCandidate.patch` 仍含宿主填入的 `before_hash`，已有使用 `FileEdit` 的 Python/归档接口不变。API mock 或外部生成器需将响应更新为仅 path/content；新增文件 hash 为 null，删除文件仍用 content=null。父版本被篡改、重复路径、越权路径或错误基准仍拒绝。
 
 完整树连同固定权限配置一起计算版本哈希；每个候选写入独立的新目录，文件设为只读。`config/harness.json` 指定 `entrypoint: "agent/main.py:run"`、`schema: 1` 和可选 `supervision`。入口必须真实返回以下协议：
 
@@ -39,9 +43,13 @@
 
 默认每入口 30 秒 wall deadline、5 秒 CPU、256 MiB 地址空间、16 次 broker 请求、1 MiB 输出上限。broker 的同步模型/环境调用仍由现有 backend 的超时机制约束；本地 wall deadline 在 broker 返回后检查，不能抢占已阻塞的父进程 backend。此限制有明确边界，不能把路径白名单、单一子进程或上述 smoke 测试称为完整安全审计。内核接口参照 [Landlock 官方文档](https://docs.kernel.org/userspace-api/landlock.html) 和 [libseccomp 手册](https://man7.org/linux/man-pages/man3/seccomp_init.3.html)，此处集成代码为项目自写，未复制第三方实现。
 
-## 选择性内化范围
+## schema 1 兼容模式的选择性内化范围
 
 当前桥只支持旁路 `config.supervision` 指定的一个内部控制 hook。H_plus 与 H_minus 的其他文件、注册、prompt、配置保持一致，hook 源码保留归档但 H_minus 不调用。它可以多次调用当前 policy 做内部计算，但在 teacher scoring 中不能接触环境；要求新观察的候选可用于正常任务运行，同时被判为不支持当前训练桥。
+
+目标提案接口现在只选择行为，返回 `{"target":null}` 或 `{"target":{"removed_behavior":"旁路诊断控制，保留日志工具","supervision_adapter":"controls/diagnosis.py:augment"}}`。模型不输出精简 patch、配置或 hash；宿主 `InternalizationTarget.from_supervision()` 验证所选 hook 与已接受版本注册项相同，确定性生成仅将 supervision 置空的新快照，然后执行原结构与运行兼容性检查。无注册 hook 时不调用目标 API，记录 `no_supervision_hook` 和零模型调用成本；有 hook 时仍有一次可选择拒绝的目标选择调用，不声称全部消除了第二次 API 请求。
+
+产物中 `target_selection.json` 保存模型选择或跳过原因；`internalization_target.json` 保存实际 full/reduced 路径、hash 与监督入口；`cost.json` 记录调用成本。新回归 `tests/test_code_proposer_binding.py` 覆盖无需模型算 hash、父版本修改拒绝、确定性减法、保留新工具的真实隔离执行、无 hook 零 API 调用、独立 target 子进程及不兼容监督拒绝。
 
 兼容性检查使用 search 任务的一条真实 H_minus rollout 和同 token 评分；实际训练继续逐状态检查。预检查不等于穷尽所有状态。如果随后遇到不兼容、timeout 或训练/评价异常，保留旧模型和已接受的 H_plus，并记录失败；不部署部分训练 checkpoint。
 
@@ -73,7 +81,7 @@ PYTHONPATH=src python -m internalization.cli run \
   --output runs/alfworld-code-experiment --train-steps 300
 ```
 
-此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2、**acceptance_0..2**；不能借用 retirement/test 填充 acceptance，也不会自动重新划分既有数据。该要求只针对新模式，原模式 manifest 不变。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。恢复运行可传 `--harness-revision .../deployment.json` 并给相同 checkpoint，以及全新未使用的独立评价 cohort 和输出目录；脚本不负责自动再划分数据或断点续跑。
+此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2、**acceptance_0..2**；不能借用 retirement/test 填充 acceptance，也不会自动重新划分既有数据。该要求只针对新模式，原模式 manifest 不变。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。最终评价必须显式选择 `--state` 或 `--baseline`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
 
 ## 产物与验收证据
 

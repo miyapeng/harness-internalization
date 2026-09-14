@@ -1,0 +1,92 @@
+{
+  "date": "2026-09-14",
+  "base_commit": "b3e3451599c628d6ddc5e8d8c03c7b7f50e9508c",
+  "full_suite": {
+    "passed": 144,
+    "new_pipeline_tests": 17,
+    "skipped": 0,
+    "seconds": 248.049,
+    "log": "agent-pipeline-tests.txt"
+  },
+  "fixed": [
+    "Importer creates acceptance and retirement cohorts for actual cycle count before execution",
+    "Final evaluation loads the accepted checkpoint and executable revision, with no implicit empty Harness",
+    "Canonical state carries manifest/protocol identities and next_cycle",
+    "Cycle resume preserves protocol and skips completed cohorts; no budget redistribution"
+  ],
+  "shared_loader": "src/internalization/core/accepted_state.py:load_accepted_state",
+  "preflight": "src/internalization/core/manifest.py:TaskManifest.validate_loop",
+  "backward_compatibility": {
+    "old_code_state_with_protocol": true,
+    "old_module_state_with_source_and_protocol": true,
+    "names_only_old_deployment": "rejected; requires source-bearing cycle state",
+    "historical_attribution_settings_preserved": true
+  },
+  "partition_defaults": {
+    "mode": "versioned",
+    "cycles": 3,
+    "cohort_size": 30,
+    "generic_minimum_train_source_tasks": 270,
+    "legacy_flag": "--legacy-modules",
+    "legacy_three_cycle_minimum": 180,
+    "test_tasks_borrowed": false
+  },
+  "semantically_updated_old_tests": [
+    {
+      "file": "tests/test_benchmark_adapters.py",
+      "change": "Three-cycle fixture 180 -> 270 tasks; assert acceptance cohorts"
+    },
+    {
+      "file": "tests/test_appworld.py",
+      "change": "Existing small fixture explicitly selects legacy; new test checks versioned scenario separation"
+    }
+  ],
+  "unchanged_training_and_statistics": [
+    "src/internalization/training/trainer.py",
+    "src/internalization/training/module_advantage.py",
+    "src/internalization/training/teacher_scoring.py",
+    "src/internalization/training/revision_scoring.py",
+    "src/internalization/training/behavior_policy.py",
+    "src/internalization/training/verl_backend.py",
+    "src/internalization/evaluation/attribution.py",
+    "src/internalization/evaluation/retirement.py"
+  ],
+  "legacy_demo_parity": {
+    "original_test_files_unchanged": 4,
+    "original_demo_files_equal": 90,
+    "original_demo_differences": [],
+    "original_demo_files_byte_equal": 90,
+    "acceptance_schema_only_changes": [],
+    "additional_demo_files": [],
+    "python_files_parsed": 94,
+    "private_import_or_path_hits": [],
+    "removal_required": true
+  },
+  "persisted_pipeline_fixture": {
+    "passed": true,
+    "mode": "mock search scores; actual isolated candidate tool execution during final evaluation",
+    "accepted_checkpoint": "/data/miyapeng/harness-internalization/runs/accepted-agent-pipeline-proof/model",
+    "accepted_harness": "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8",
+    "protocol_hash": "0843b514509f787490ba49993b7d0ccefc02198e03d29e950e6e4a03f94c5d91",
+    "manifest_hash": "132aa8c8674bb5bee3605e4b0e20d3893bfa20050b521b5e2b2fa345d973a71e",
+    "test_task_ids": [
+      "test-0000"
+    ],
+    "old_persisted_code_deployment_loads": true,
+    "historical_next_cycle": 3,
+    "GPU": false,
+    "official_benchmark": false
+  },
+  "fixture_directory": "runs/accepted-agent-pipeline-proof",
+  "commands_documented_in": "docs/ACCEPTED_AGENT_PIPELINE.md",
+  "limitations": [
+    "LawBench native complete-category final evaluator explicitly rejects code revisions before loading the model",
+    "Some existing backends lack optional target/check_internalization commands and therefore accept code without training",
+    "Resume is at completed-cycle boundaries, not within a training batch or a global experiment scheduler"
+  ],
+  "not_run": [
+    "real API proposer",
+    "real HF/veRL/GPU training",
+    "official benchmark tasks"
+  ]
+}
