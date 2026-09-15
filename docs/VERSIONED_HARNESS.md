@@ -1,6 +1,6 @@
 # 版本化 Harness：接口、运行与验收
 
-当前生产 proposer 为 [ClaudeCodeProposer](CLAUDE_PROPOSER.md)，APITransport/CodeProposer 仅供显式历史回归 fixture。以下早期 API 编辑说明描述宿主仍使用的 canonical path/content 协议，Claude 本身编辑工作区而不输出 patch JSON。
+当前生产 proposer 为 [WorkspaceProposalHost + 显式 scaffold profile](PROPOSER_SCAFFOLDS.md)，APITransport/CodeProposer 仅供显式历史回归 fixture。以下早期 API 编辑说明描述宿主仍使用的 canonical path/content 协议，scaffold 编辑工作区而不输出 patch JSON。
 
 当前新增 schema 2 具名控制：只撤除 target_control_id，保留其他控制；训练复用非目标输出并按部署位置插入目标。完整新协议见 [NAMED_CONTROLS.md](NAMED_CONTROLS.md)。下文单 supervision hook 的描述对应仍保留的 schema 1 兼容模式。
 
@@ -83,7 +83,7 @@ PYTHONPATH=src python -m internalization.cli run \
   --output runs/alfworld-code-experiment --train-steps 300
 ```
 
-此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2；不再要求 acceptance_0..2。旧文件中多出的 acceptance 分区保留不用，不自动重新划分既有数据或借用 retirement/test。生产 Claude session 的模型在 execution.proposer 中固定，认证使用 ANTHROPIC_API_KEY；不再读取 HI_PROPOSER_*。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。三个正式 benchmark 的初始/最终评价都必须使用实际 `--state`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
+此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2；不再要求 acceptance_0..2。旧文件中多出的 acceptance 分区保留不用，不自动重新划分既有数据或借用 retirement/test。生产 session 的模型、scaffold 和 provider 在 execution.proposer 的 resolved profile 中固定，认证由 provider.api_key_env 显式指定；不再读取 HI_PROPOSER_*。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。三个正式 benchmark 的初始/最终评价都必须使用实际 `--state`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
 
 ## 产物与验收证据
 

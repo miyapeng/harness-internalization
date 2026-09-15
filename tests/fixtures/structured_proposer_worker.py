@@ -4,20 +4,21 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from internalization.evolution import claude_proposer
+from internalization.evolution import proposer_host
+from internalization.evolution.scaffolds.claude_code import ClaudeCodeScaffold
 from internalization.training.entrypoint import main
 from fixtures.fake_claude import editing_session
 
 output = Path(sys.argv[sys.argv.index('--response') + 1]).parent
-original = claude_proposer.ClaudeCodeProposer
+original = proposer_host.WorkspaceProposalHost
 calls = []
 
 class ScriptedProposer(original):
     def __init__(self, *args, **kwargs):
         rows = json.loads((output/'mock_response.json').read_text())['candidates']
-        super().__init__(*args, **kwargs, runner=editing_session(rows,calls))
+        super().__init__(*args, **kwargs, scaffold=ClaudeCodeScaffold(runner=editing_session(rows,calls)), compatibility=True)
 
-claude_proposer.ClaudeCodeProposer = ScriptedProposer
+proposer_host.WorkspaceProposalHost = ScriptedProposer
 try:
     main('propose')
 finally:

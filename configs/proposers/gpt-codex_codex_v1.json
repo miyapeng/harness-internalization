@@ -1,0 +1,19 @@
+{
+  "profile_id": "gpt-codex_codex_v1",
+  "scaffold": "codex",
+  "provider": {
+    "id": "openai",
+    "protocol": "responses",
+    "base_url": "https://api.openai.com/v1",
+    "api_key_env": "OPENAI_API_KEY"
+  },
+  "model": null,
+  "limits": {
+    "max_turns": null,
+    "max_wall_time_s": 600,
+    "max_tool_calls": null
+  },
+  "workflow": "codex",
+  "cli_version": null,
+  "experiment_mode": "native"
+}

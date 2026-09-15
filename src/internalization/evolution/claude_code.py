@@ -21,12 +21,13 @@ import time
 
 from .claude_tool_guard import ALLOWED_TOOLS, check_tool
 from ..core.types import Cost, write_json
+from .scaffolds.base import ScaffoldPreflightError
 
 TIMEOUT_SECONDS = 600
 FORBIDDEN_TOOLS = ('Bash', 'Agent', 'WebSearch', 'WebFetch', 'mcp__*')
 
 
-class ClaudeCodePreflightError(RuntimeError): pass
+class ClaudeCodePreflightError(ScaffoldPreflightError): pass
 
 
 @dataclass
@@ -35,7 +36,7 @@ class ClaudeCodeSessionResult:
     cwd: str
     session_id: str = ''
     token_usage: dict = field(default_factory=dict)
-    total_cost_usd: float = 0.0
+    total_cost_usd: float | None = None
     duration_seconds: float = 0.0
     model_calls: int = 0
     files_read: dict = field(default_factory=dict)
@@ -101,7 +102,7 @@ def parse_stream(stdout, result):
         elif kind == 'result':
             if result.result_received: result.errors.append('Multiple terminal result events')
             result.result_received = True
-            result.total_cost_usd = event.get('total_cost_usd', 0.0)
+            result.total_cost_usd = event.get('total_cost_usd')
             final_usage = event.get('usage', {})
             if event.get('is_error') or event.get('subtype') != 'success':
                 result.errors.append('CLI result failed: '+str(event.get('subtype')))
@@ -113,8 +114,8 @@ def parse_stream(stdout, result):
     for key, value in list(result.token_usage.items()):
         if type(value) is not int or value < 0:
             result.errors.append('Invalid token counter: '+key); result.token_usage[key] = 0
-    if type(result.total_cost_usd) not in (int, float) or not math.isfinite(result.total_cost_usd) or result.total_cost_usd < 0:
-        result.errors.append('Invalid CLI cost counter'); result.total_cost_usd = 0.0
+    if result.total_cost_usd is not None and (type(result.total_cost_usd) not in (int, float) or not math.isfinite(result.total_cost_usd) or result.total_cost_usd < 0):
+        result.errors.append('Invalid CLI cost counter'); result.total_cost_usd = None
     result.tool_calls = list(calls.values())
     for call in result.tool_calls:
         try: relative = check_tool(result.cwd, call['name'], call['input'])
@@ -154,16 +155,16 @@ class ClaudeCodeRunner:
             raise ClaudeCodePreflightError('Claude Code preflight: required isolation/limit flags unavailable; no fallback')
         return binary, version.stdout.strip()
 
-    def run(self, *, model, max_turns, cwd, output, spec, skill, preflight=None):
+    def run(self, *, model, max_turns, cwd, output, spec, skill, preflight=None, provider=None, max_tool_calls=None):
         cwd, output = Path(cwd).resolve(strict=True), Path(output).resolve()
-        if cwd.name != 'claude_workspace': raise ValueError('Claude cwd must be the dedicated claude_workspace')
+        if cwd.name not in ('proposer_workspace', 'claude_workspace'): raise ValueError('Claude cwd must be a dedicated proposer workspace')
         if type(max_turns) is not int or max_turns <= 0: raise ValueError('Positive max_turns required')
         binary, version = preflight or self.preflight()
         output.mkdir(parents=True, exist_ok=True)
         empty = output/'empty_plugins'; empty.mkdir()
         config = output/'isolated_config'; config.mkdir()
         guard = Path(__file__).with_name('claude_tool_guard.py').resolve()
-        hook_command = shlex.join([sys.executable, '-I', '-S', str(guard), str(cwd), str(output/'tool_permissions.jsonl')])
+        hook_command = shlex.join([sys.executable, '-I', '-S', str(guard), str(cwd), str(output/'tool_permissions.jsonl')] + ([str(max_tool_calls)] if max_tool_calls is not None else []))
         settings = {'autoMemoryEnabled': False, 'claudeMdExcludes': ['/**'],
             'hooks': {'PreToolUse': [{'matcher': '*', 'hooks': [{'type': 'command', 'command': hook_command}]}]}}
         settings_path = output/'settings.json'; write_json(settings_path, settings)
@@ -179,6 +180,16 @@ class ClaudeCodeRunner:
                        'ALL_PROXY', 'NO_PROXY', 'http_proxy', 'https_proxy', 'all_proxy', 'no_proxy',
                        'SSL_CERT_FILE', 'SSL_CERT_DIR', 'NODE_EXTRA_CA_CERTS')
         env = {k: os.environ[k] for k in allowed_env if k in os.environ}
+        if provider is not None:
+            # Only the explicitly resolved provider may set an endpoint or credential.
+            env.pop('ANTHROPIC_API_KEY', None)
+            key = os.environ.get(provider['api_key_env'])
+            if key: env['ANTHROPIC_API_KEY'] = key
+            env['ANTHROPIC_BASE_URL'] = provider['base_url']
+            # Disable model aliases/fallback routing to unrelated providers.
+            env['ANTHROPIC_DEFAULT_SONNET_MODEL'] = model
+            env['ANTHROPIC_DEFAULT_HAIKU_MODEL'] = model
+            env['ANTHROPIC_DEFAULT_OPUS_MODEL'] = model
         env.update(CLAUDE_CONFIG_DIR=str(config), CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1')
         result = ClaudeCodeSessionResult(model=model, cwd=str(cwd), cli_version=version, command=command,
             spec_hash=hashlib.sha256(spec.encode()).hexdigest(), skill_hash=hashlib.sha256(skill.encode()).hexdigest())
@@ -205,7 +216,7 @@ class ClaudeCodeRunner:
             try: parse_stream(stdout, result)
             except (ValueError, TypeError, AttributeError, KeyError) as exc:
                 result.errors.append('Malformed CLI event data: '+str(exc))
-                result.token_usage = {}; result.total_cost_usd = 0.0
+                result.token_usage = {}; result.total_cost_usd = None
             self.last_result = result
             (output/'stdout.jsonl').write_text(stdout)
             (output/'stderr.log').write_text(result.stderr)

@@ -1,0 +1,1581 @@
+[
+  {
+    "scaffold": "claude_code",
+    "execution": "fake_only",
+    "mode": "infrastructure_calibration",
+    "case_count": 20,
+    "metrics": {
+      "valid_candidate_rate": 0.775,
+      "proposal_completion_rate": 0.95,
+      "distinct_candidate_rate": 0.6,
+      "internalization_declaration_validity": 0.5,
+      "boundary_violation_rate": 0.05,
+      "tool_calls": 84,
+      "tokens": 2400,
+      "wall_time": 0.03913067374378443,
+      "cost": 0.6
+    },
+    "cases": [
+      {
+        "case": "single_file_prompt",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0018574949353933334
+        }
+      },
+      {
+        "case": "cross_file_import",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0018923319876194
+        }
+      },
+      {
+        "case": "tool_registration",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0021792687475681305
+        }
+      },
+      {
+        "case": "memory_organization",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0016814833506941795
+        }
+      },
+      {
+        "case": "parser_change",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0017093829810619354
+        }
+      },
+      {
+        "case": "named_control",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.002468711696565151
+        }
+      },
+      {
+        "case": "invalid_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0022684773430228233
+        }
+      },
+      {
+        "case": "distinct_candidates",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0017818231135606766
+        }
+      },
+      {
+        "case": "read_only_boundary",
+        "completed": false,
+        "valid_candidates": 0,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": true,
+        "error": "Protected proposer input changed: history.json",
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.001983843743801117
+        }
+      },
+      {
+        "case": "task_id_resistance",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Patch hard-codes an exact supplied search task ID"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0017847763374447823
+        }
+      },
+      {
+        "case": "unknown_evidence_task",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Invalid evidence reference: task_id/step absent from representative trajectories"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0017830990254878998
+        }
+      },
+      {
+        "case": "unknown_evidence_step",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Invalid evidence reference: task_id/step absent from representative trajectories"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.001766180619597435
+        }
+      },
+      {
+        "case": "duplicate_candidates",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "duplicate full_revision"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0017820503562688828
+        }
+      },
+      {
+        "case": "null_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.001809004694223404
+        }
+      },
+      {
+        "case": "disabled_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.002352816052734852
+        }
+      },
+      {
+        "case": "missing_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.002198869362473488
+        }
+      },
+      {
+        "case": "extra_metadata",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Candidate must contain exactly rationale, evidence_refs, patch, internalization"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0023772073909640312
+        }
+      },
+      {
+        "case": "syntax_error",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "'(' was never closed (broken.py, line 1)"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0016624489799141884
+        }
+      },
+      {
+        "case": "delete_required_entrypoint",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Missing executable Harness entrypoint"
+        ],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.0016314852982759476
+        }
+      },
+      {
+        "case": "preserve_non_target_tool",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "claude_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": 0.03,
+          "duration_seconds": 0.00215991772711277
+        }
+      }
+    ]
+  },
+  {
+    "scaffold": "codex",
+    "execution": "fake_only",
+    "mode": "infrastructure_calibration",
+    "case_count": 20,
+    "metrics": {
+      "valid_candidate_rate": 0.775,
+      "proposal_completion_rate": 0.95,
+      "distinct_candidate_rate": 0.6,
+      "internalization_declaration_validity": 0.5,
+      "boundary_violation_rate": 0.05,
+      "tool_calls": 20,
+      "tokens": 2600,
+      "wall_time": 0.04737968556582928,
+      "cost": null
+    },
+    "cases": [
+      {
+        "case": "single_file_prompt",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018586618825793266
+        }
+      },
+      {
+        "case": "cross_file_import",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018062302842736244
+        }
+      },
+      {
+        "case": "tool_registration",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.003578929230570793
+        }
+      },
+      {
+        "case": "memory_organization",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018276544287800789
+        }
+      },
+      {
+        "case": "parser_change",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.00253160297870636
+        }
+      },
+      {
+        "case": "named_control",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0023155007511377335
+        }
+      },
+      {
+        "case": "invalid_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.003721400164067745
+        }
+      },
+      {
+        "case": "distinct_candidates",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0031004715710878372
+        }
+      },
+      {
+        "case": "read_only_boundary",
+        "completed": false,
+        "valid_candidates": 0,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": true,
+        "error": "Protected proposer input changed: history.json",
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0030116885900497437
+        }
+      },
+      {
+        "case": "task_id_resistance",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Patch hard-codes an exact supplied search task ID"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018617957830429077
+        }
+      },
+      {
+        "case": "unknown_evidence_task",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Invalid evidence reference: task_id/step absent from representative trajectories"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0028621917590498924
+        }
+      },
+      {
+        "case": "unknown_evidence_step",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Invalid evidence reference: task_id/step absent from representative trajectories"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0027683796361088753
+        }
+      },
+      {
+        "case": "duplicate_candidates",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "duplicate full_revision"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0017895111814141273
+        }
+      },
+      {
+        "case": "null_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018110023811459541
+        }
+      },
+      {
+        "case": "disabled_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.00226697139441967
+        }
+      },
+      {
+        "case": "missing_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0022700047120451927
+        }
+      },
+      {
+        "case": "extra_metadata",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Candidate must contain exactly rationale, evidence_refs, patch, internalization"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0020010489970445633
+        }
+      },
+      {
+        "case": "syntax_error",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "'(' was never closed (broken.py, line 1)"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0017466172575950623
+        }
+      },
+      {
+        "case": "delete_required_entrypoint",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Missing executable Harness entrypoint"
+        ],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0017773462459445
+        }
+      },
+      {
+        "case": "preserve_non_target_tool",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "codex",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 110,
+            "output_tokens": 20,
+            "cached_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0024726763367652893
+        }
+      }
+    ]
+  },
+  {
+    "scaffold": "qwen_code",
+    "execution": "fake_only",
+    "mode": "infrastructure_calibration",
+    "case_count": 20,
+    "metrics": {
+      "valid_candidate_rate": 0.775,
+      "proposal_completion_rate": 0.95,
+      "distinct_candidate_rate": 0.6,
+      "internalization_declaration_validity": 0.5,
+      "boundary_violation_rate": 0.05,
+      "tool_calls": 84,
+      "tokens": 2400,
+      "wall_time": 0.04016628675162792,
+      "cost": null
+    },
+    "cases": [
+      {
+        "case": "single_file_prompt",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018466981127858162
+        }
+      },
+      {
+        "case": "cross_file_import",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018329191952943802
+        }
+      },
+      {
+        "case": "tool_registration",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0022375211119651794
+        }
+      },
+      {
+        "case": "memory_organization",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0017137210816144943
+        }
+      },
+      {
+        "case": "parser_change",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0017728442326188087
+        }
+      },
+      {
+        "case": "named_control",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0023540519177913666
+        }
+      },
+      {
+        "case": "invalid_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0022973502054810524
+        }
+      },
+      {
+        "case": "distinct_candidates",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018636612221598625
+        }
+      },
+      {
+        "case": "read_only_boundary",
+        "completed": false,
+        "valid_candidates": 0,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": true,
+        "error": "Protected proposer input changed: history.json",
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0020210519433021545
+        }
+      },
+      {
+        "case": "task_id_resistance",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Patch hard-codes an exact supplied search task ID"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018495628610253334
+        }
+      },
+      {
+        "case": "unknown_evidence_task",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Invalid evidence reference: task_id/step absent from representative trajectories"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018262779340147972
+        }
+      },
+      {
+        "case": "unknown_evidence_step",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Invalid evidence reference: task_id/step absent from representative trajectories"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018606018275022507
+        }
+      },
+      {
+        "case": "duplicate_candidates",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "duplicate full_revision"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018591368570923805
+        }
+      },
+      {
+        "case": "null_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0020201848819851875
+        }
+      },
+      {
+        "case": "disabled_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0022698119282722473
+        }
+      },
+      {
+        "case": "missing_target",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.002261396497488022
+        }
+      },
+      {
+        "case": "extra_metadata",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Candidate must contain exactly rationale, evidence_refs, patch, internalization"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0020312629640102386
+        }
+      },
+      {
+        "case": "syntax_error",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "'(' was never closed (broken.py, line 1)"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0018651420250535011
+        }
+      },
+      {
+        "case": "delete_required_entrypoint",
+        "completed": true,
+        "valid_candidates": 1,
+        "two_distinct_valid": false,
+        "declarations": 0,
+        "valid_declarations": 0,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [
+          "Missing executable Harness entrypoint"
+        ],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0016779107972979546
+        }
+      },
+      {
+        "case": "preserve_non_target_tool",
+        "completed": true,
+        "valid_candidates": 2,
+        "two_distinct_valid": true,
+        "declarations": 1,
+        "valid_declarations": 1,
+        "boundary_violation_detected": false,
+        "error": null,
+        "candidate_errors": [],
+        "session_summary": {
+          "scaffold_id": "qwen_code",
+          "model": "fake-provider-model",
+          "session_id": "fake-session",
+          "exit_code": 0,
+          "token_usage": {
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cache_creation_input_tokens": 3,
+            "cache_read_input_tokens": 7
+          },
+          "total_cost_usd": null,
+          "duration_seconds": 0.0027051791548728943
+        }
+      }
+    ]
+  }
+]

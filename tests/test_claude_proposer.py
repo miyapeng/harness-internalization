@@ -69,7 +69,7 @@ class ClaudeProposerTests(unittest.TestCase):
 
     def test_workspace_search_only_and_exact_tool_and_setting_arguments(self):
         (_, _), proposer, calls, request = self.run_proposal()
-        call = calls[0]; argv = call['argv']; workspace = request.output/'claude_workspace'
+        call = calls[0]; argv = call['argv']; workspace = request.output/'proposer_workspace'
         self.assertEqual(Path(call['cwd']), workspace.resolve())
         self.assertEqual(argv[argv.index('--tools')+1].split(','), list(ALLOWED_TOOLS))
         self.assertEqual(argv[argv.index('--allowedTools')+1].split(','), list(ALLOWED_TOOLS))
@@ -91,7 +91,7 @@ class ClaudeProposerTests(unittest.TestCase):
 
     def test_read_write_boundary_and_symlink_rejection(self):
         (_, _), _, _, request = self.run_proposal()
-        root = request.output/'claude_workspace'
+        root = request.output/'proposer_workspace'
         for tool, args in [('Bash', {'command':'true'}), ('Agent', {}), ('Read', {'file_path':str(self.root/'secret')}),
                            ('Write', {'file_path':'parent/agent/main.py'}), ('Edit', {'file_path':'history.json'}),
                            ('Glob', {'pattern':'../../*'}), ('Glob', {'pattern':'{../*,**}'}),
@@ -117,7 +117,7 @@ class ClaudeProposerTests(unittest.TestCase):
         proposer = ClaudeCodeProposer(self.data.store, runner=runner)
         request = self.data.request()
         with self.assertRaisesRegex(ClaudeCodePreflightError, 'claude executable not found'): proposer.propose(request)
-        self.assertFalse((request.output/'claude_workspace').exists())
+        self.assertFalse((request.output/'proposer_workspace').exists())
         self.assertEqual(json.loads((request.output/'preflight_error.json').read_text())['proposal_sessions'], 0)
 
     def test_nonzero_and_timeout_preserve_logs_cost_and_no_candidates(self):
@@ -125,7 +125,7 @@ class ClaudeProposerTests(unittest.TestCase):
             calls=[]; runner=editing_session([self.data.row(),self.data.row('other')],calls,**options)
             proposer=ClaudeCodeProposer(self.data.store,runner=runner);request=self.data.request(name=name)
             with self.assertRaisesRegex(RuntimeError, 'session failed'): proposer.propose(request)
-            session=json.loads((request.output/'claude_session/session.json').read_text())
+            session=json.loads((request.output/'scaffold_session/session.json').read_text())
             self.assertEqual(session['timed_out'], name=='timeout')
             self.assertEqual(session['exit_code'], -9 if name=='timeout' else 7)
             self.assertEqual(session['stderr'], 'scripted stderr')
@@ -135,7 +135,7 @@ class ClaudeProposerTests(unittest.TestCase):
 
     def test_cost_cache_and_file_logs_are_not_double_counted(self):
         _, proposer, _, request=self.run_proposal()
-        session=json.loads((request.output/'claude_session/session.json').read_text())
+        session=json.loads((request.output/'scaffold_session/session.json').read_text())
         self.assertEqual(proposer.last_cost.input_tokens,110)
         self.assertEqual(proposer.last_cost.output_tokens,20)
         self.assertEqual(proposer.last_cost.model_calls,1)
@@ -145,12 +145,13 @@ class ClaudeProposerTests(unittest.TestCase):
         self.assertEqual(len(session['raw_events']),4)
         protocol=json.loads((request.output/'proposer_protocol.json').read_text())
         self.assertEqual(protocol['session_id'],'fake-session');self.assertEqual(protocol['cli_version'],'fake-cli-1')
-        self.assertEqual(protocol['spec_hash'],hashlib.sha256((request.output/'claude_workspace/PROPOSER_SPEC.md').read_bytes()).hexdigest())
+        self.assertEqual(protocol['spec_hash'],hashlib.sha256((request.output/'proposer_workspace/PROPOSER_SPEC.md').read_bytes()).hexdigest())
 
-    def test_config_only_new_proposer_fields_and_no_task_knob_changes(self):
-        value=resolve_execution({'proposer':{'model':'claude-test-exact','max_turns':3}})
-        self.assertEqual(value['proposer'],{'backend':'claude_code','model':'claude-test-exact','max_turns':3})
-        for row in ({'temperature':0},{'max_tokens':8192},{'model':'sonnet'},{'max_turns':0},{'max_turns':True},{'backend':'api'}):
+    def test_config_only_explicit_profiles_and_no_task_knob_changes(self):
+        value=resolve_execution({'proposer':{'profile':'claude-sonnet5_claude-code_v1'}})
+        self.assertEqual(value['proposer']['model'],'claude-sonnet-5')
+        self.assertEqual(value['proposer']['scaffold'],'claude_code')
+        for row in ({'temperature':0},{'max_tokens':8192},{'model':'sonnet'},{'max_turns':0},{'backend':'api'}):
             with self.assertRaises(ValueError):resolve_execution({'proposer':row})
 
     def test_diff_add_update_delete_is_deterministic(self):
@@ -190,7 +191,7 @@ class ClaudeProposerTests(unittest.TestCase):
         self.assertIsInstance(bad,dict);good.validate(self.data.parent);self.assertEqual(len(calls),1)
 
     def test_stream_duplicate_usage_terminal_errors_and_unexpected_tools(self):
-        root=self.root/'claude_workspace';root.mkdir()
+        root=self.root/'proposer_workspace';root.mkdir()
         init={'type':'system','subtype':'init','model':'claude-test','tools':list(ALLOWED_TOOLS),'session_id':'session'}
         message={'type':'assistant','message':{'id':'same','usage':{'input_tokens':5,'output_tokens':2,'cache_read_input_tokens':4},'content':[]}}
         final={'type':'result','subtype':'success','session_id':'session','usage':{'input_tokens':6,'output_tokens':3,'cache_read_input_tokens':8},'total_cost_usd':.2}
@@ -202,7 +203,7 @@ class ClaudeProposerTests(unittest.TestCase):
 
     def test_trusted_hook_runs_without_agent_bash_permission(self):
         from internalization.evolution import claude_tool_guard
-        root=self.root/'claude_workspace';root.mkdir()
+        root=self.root/'proposer_workspace';root.mkdir()
         for name,target,decision in [('Read','../private','deny'),('Write','parent/x','deny'),('Write','candidate_0/tools/x.py','allow')]:
             result=subprocess.run([sys.executable,'-I','-S',claude_tool_guard.__file__,str(root),str(self.root/'guard.jsonl')],
                 input=json.dumps({'tool_name':name,'tool_input':{'file_path':target}}),capture_output=True,text=True)

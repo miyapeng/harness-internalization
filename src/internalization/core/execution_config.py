@@ -29,7 +29,7 @@ DEFAULTS = {
     "advantage": {"module_weight": .001, "mode": "mean_std_norm", "normalize_module": False,
                   "clip_module": None, "invalid_action_penalty": .1, "epsilon": 1e-6},
     "optimizer": {"learning_rate": 1e-6, "weight_decay": .01},
-    "proposer": {"backend":"claude_code", "model":"claude-sonnet-5", "max_turns":12},
+    "proposer": {"profile":"claude-sonnet5_claude-code_v1"},
 }
 
 
@@ -37,7 +37,8 @@ def _merge(base, changes, path="execution"):
     if not isinstance(changes, dict): raise ValueError(f"{path} must be an object")
     for key, value in changes.items():
         if key not in base: raise ValueError(f"Unknown configuration field: {path}.{key}")
-        if isinstance(base[key], dict): _merge(base[key], value, path+"."+key)
+        if key == "proposer" and path == "execution": base[key] = deepcopy(value)
+        elif isinstance(base[key], dict): _merge(base[key], value, path+"."+key)
         else: base[key] = value
 
 
@@ -76,13 +77,8 @@ def resolve_execution(raw=None, *, benchmark_limits=None):
     if adv["epsilon"] <= 0 or value["optimizer"]["learning_rate"] <= 0: raise ValueError("epsilon/lr must be positive")
     if adv["clip_module"] is not None and (type(adv["clip_module"]) not in (int,float) or
             not math.isfinite(adv["clip_module"]) or adv["clip_module"] <= 0): raise ValueError("Invalid module clip")
-    proposer=value["proposer"]
-    if proposer["backend"] != "claude_code": raise ValueError("Invalid proposer.backend")
-    if (not isinstance(proposer["model"], str) or not proposer["model"].startswith("claude-") or
-            proposer["model"].endswith("-latest") or any(c.isspace() for c in proposer["model"])):
-        raise ValueError("Proposer requires an exact Claude model ID")
-    if type(proposer["max_turns"]) is not int or proposer["max_turns"] < 1:
-        raise ValueError("Invalid proposer.max_turns")
+    from ..evolution.proposer_profiles import resolve_profile
+    value["proposer"] = resolve_profile(value["proposer"])
     return value
 
 

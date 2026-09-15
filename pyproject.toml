@@ -29,7 +29,9 @@ license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "licenses/*.txt"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-"internalization.evolution" = ["PROPOSER_SPEC.md"]
+"internalization.evolution" = ["PROPOSER_SPEC.md", "workflows/*.md"]
 
 [tool.setuptools.data-files]
 "share/harness-internalization" = [".claude/skills/harness-internalization-proposer/SKILL.md"]
+
+"share/harness-internalization/proposers" = ["configs/proposers/*.json"]

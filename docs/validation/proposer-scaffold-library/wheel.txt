@@ -1,0 +1,9 @@
+Processing /data/miyapeng/harness-internalization
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: harness-internalization
+  Building wheel for harness-internalization (pyproject.toml): started
+  Building wheel for harness-internalization (pyproject.toml): finished with status 'done'
+  Created wheel for harness-internalization: filename=harness_internalization-0.2.0-py3-none-any.whl size=185619 sha256=c2f4e449da94a87a8df02799b7d99da06d6c802818654641d0d317ca4f843f28
+  Stored in directory: /tmp/pip-ephem-wheel-cache-o9xpaqwo/wheels/3d/ef/af/cbcee81e4a00bfdea5156704a07d4280d4f6b1524d442e4565
+Successfully built harness-internalization

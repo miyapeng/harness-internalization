@@ -32,7 +32,7 @@ schema 2 使用具名控制 ID；例如只关闭 review_v1，保留 recovery_v1 
 src/internalization/
   core/          数据结构、真实任务manifest、四种独立backend接口
   harness/       代码revision、隔离runtime、工具broker与兼容模块
-  evolution/     API transport、代码proposer、候选lineage、配对搜索与事件归档
+  evolution/     共享 proposer host、模型/scaffold profiles、候选 lineage、配对搜索与事件归档
   training/      on-policy rollout、同批次策略H+评分、优势、更新、checkpoint
   evaluation/    训练前归因、模型接受/回滚、四格退役、bootstrap与成本
   benchmarks/    ALFWorld、WebShop、AppWorld、TB2、SWE-bench Pro、HotpotQA、LawBench适配
@@ -64,6 +64,8 @@ python3.12 scripts/demo_named_controls.py --output runs/my-named-controls-demo
 输出目录必须不存在。版本化 demo 实际执行代码、工具和隔离；模型行为与 trainer checkpoint 转换是 scripted mock，实际 optimizer updates 为 0。另有 CPU 小模型 SGD 测试验证训练桥。运行产物、模型权重、凭据及官方任务数据不随仓库发布；执行上述命令会在 `runs/` 生成完整候选、精简版本、目标和评价记录。
 
 真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。正式数据数量、导入命令和来源以 [BUDGET_V1.md](docs/BUDGET_V1.md) 为准，不再分配 acceptance。既有 manifest 的 acceptance 分区保留闲置，不重划 retirement/test。演化恢复使用 `--state`，三个正式 benchmark 的初始/最终评价分别读取 `--state .../initial_agent.json` 和 `--state .../deployment.json`，不能复用 retirement/test。初始版本与来源见 [SEED_HARNESSES.md](docs/SEED_HARNESSES.md)。
+
+Proposer 执行层支持显式 Claude Code / Codex / Qwen Code profiles，共享一次 proposal phase、两个结构化候选和同一搜索信息边界。ALFWorld 暂定 DeepSeek V4.1 Flash + Claude Code；生产前需固定 profile 的精确 CLI version，Codex/Qwen 还需验证独立隔离运行时。参见 [PROPOSER_SCAFFOLDS.md](docs/PROPOSER_SCAFFOLDS.md)；当前仅 CPU/fake 验证，未证明最佳 scaffold。
 
 ## 文档与实验边界
 

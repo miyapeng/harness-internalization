@@ -1,0 +1,277 @@
+{
+  "baseline_commit": "235e525b2b38cd31ee81adaf2b8d49dff8f54971",
+  "head_after": "235e525b2b38cd31ee81adaf2b8d49dff8f54971",
+  "status_before": " M README.md\n?? requirement.txt\n",
+  "preexisting_changes_preserved": [
+    "README.md installation paragraph",
+    "requirement.txt (not edited)"
+  ],
+  "modified_files": [
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+    "configs/budget_v1/alfworld.json",
+    "configs/budget_v1/alfworld_backend.json",
+    "configs/budget_v1/hotpotqa.json",
+    "configs/budget_v1/hotpotqa_backend.json",
+    "configs/budget_v1/webshop.json",
+    "configs/budget_v1/webshop_backend.json",
+    "configs/proposers/claude-sonnet5_claude-code_v1.json",
+    "configs/proposers/deepseek-v41-flash_claude-code_v1.json",
+    "configs/proposers/gpt-codex_codex_v1.json",
+    "configs/proposers/qwen-coder_qwen-code_v1.json",
+    "docs/BUDGET_V1.md",
+    "docs/CLAUDE_PROPOSER.md",
+    "docs/EXECUTION_WIRING.md",
+    "docs/METHOD.md",
+    "docs/PROPOSER_SCAFFOLDS.md",
+    "docs/STATUS.md",
+    "docs/STRUCTURED_PROPOSALS.md",
+    "docs/VERSIONED_HARNESS.md",
+    "docs/WORKLOG.md",
+    "docs/validation/proposer-scaffold-library-report.json",
+    "docs/validation/proposer-scaffold-library/calibration.json",
+    "docs/validation/proposer-scaffold-library/full-tests-final.txt",
+    "docs/validation/proposer-scaffold-library/full-tests-first.txt",
+    "docs/validation/proposer-scaffold-library/invariants.json",
+    "docs/validation/proposer-scaffold-library/packaging.json",
+    "docs/validation/proposer-scaffold-library/targeted-final.txt",
+    "docs/validation/proposer-scaffold-library/wheel.txt",
+    "pyproject.toml",
+    "src/internalization/cli.py",
+    "src/internalization/core/execution_config.py",
+    "src/internalization/evolution/claude_code.py",
+    "src/internalization/evolution/claude_proposer.py",
+    "src/internalization/evolution/claude_tool_guard.py",
+    "src/internalization/evolution/proposer_host.py",
+    "src/internalization/evolution/proposer_profiles.py",
+    "src/internalization/evolution/scaffolds/__init__.py",
+    "src/internalization/evolution/scaffolds/base.py",
+    "src/internalization/evolution/scaffolds/claude_code.py",
+    "src/internalization/evolution/scaffolds/cli_process.py",
+    "src/internalization/evolution/scaffolds/codex.py",
+    "src/internalization/evolution/scaffolds/isolation.py",
+    "src/internalization/evolution/scaffolds/qwen_code.py",
+    "src/internalization/evolution/scaffolds/qwen_guard.py",
+    "src/internalization/evolution/workflows/claude_code.md",
+    "src/internalization/evolution/workflows/codex.md",
+    "src/internalization/evolution/workflows/qwen_code.md",
+    "src/internalization/training/entrypoint.py",
+    "tests/fixtures/fake_scaffolds.py",
+    "tests/fixtures/structured_proposer_worker.py",
+    "tests/proposer_calibration/__init__.py",
+    "tests/proposer_calibration/suite.py",
+    "tests/proposer_calibration/test_suite.py",
+    "tests/test_budget_v1.py",
+    "tests/test_claude_proposer.py",
+    "tests/test_proposer_scaffolds.py"
+  ],
+  "migration": [
+    {
+      "from": "claude_proposer.py workspace/tree/metadata logic",
+      "to": "proposer_host.py::WorkspaceProposalHost",
+      "mechanism": "same canonical diff and unchanged materialize_candidates"
+    },
+    {
+      "from": "ClaudeCodeProposer production constructor",
+      "to": "WorkspaceProposalHost + explicit profile registry",
+      "compatibility": "injected old Claude regression constructor only"
+    },
+    {
+      "from": "claude_code.py::ClaudeCodeRunner",
+      "to": "retained MIT-attributed runner + scaffolds/claude_code.py interface adapter"
+    },
+    {
+      "from": "inline backend/model/max_turns",
+      "to": "strict profile reference -> resolved config/hash, with immutable resume binding"
+    },
+    {
+      "from": "explicit Claude skill injection",
+      "to": "packaged workflow library (Claude workflow equals original skill bytes)"
+    }
+  ],
+  "supported_scaffolds": {
+    "claude_code": {
+      "models": "Claude and explicitly configured Anthropic-compatible providers including DeepSeek",
+      "verification": "fake process and CPU trusted hook; real runtime not verified"
+    },
+    "codex": {
+      "models": "explicit Responses provider/model",
+      "verification": "fake native exec/process events and filesystem capsule command tests only",
+      "limits": "wall-time enforced; unsupported internal model-turn/tool cap must be null or fail closed"
+    },
+    "qwen_code": {
+      "models": "explicit OpenAI-compatible provider/Qwen model",
+      "verification": "fake headless/process events, CPU native guard and capsule command tests only"
+    }
+  },
+  "profiles": {
+    "alfworld": "deepseek-v41-flash_claude-code_v1",
+    "webshop": "claude-sonnet5_claude-code_v1",
+    "hotpotqa": "claude-sonnet5_claude-code_v1",
+    "deepseek_example": {
+      "provider": "official DeepSeek",
+      "model": "deepseek-flash",
+      "source": "https://api-docs.deepseek.com/",
+      "retrieved": "2026-09-15"
+    },
+    "required_before_production": [
+      "Fill exact CLI version in each used profile",
+      "Select exact GPT/Qwen model IDs (templates use null)",
+      "Configure only the chosen provider credential environment variable",
+      "Verify actual native runtime isolation/capabilities on pinned CLI; missing capability is fail closed"
+    ]
+  },
+  "tests": {
+    "full_suite": {
+      "tests": 254,
+      "seconds": 251.006,
+      "status": "passed",
+      "mode": "CPU/fake; no real proposer API"
+    },
+    "final_targeted_suite": {
+      "tests": 49,
+      "seconds": 7.557,
+      "status": "passed",
+      "mode": "CPU/fake; no real proposer API"
+    },
+    "verification_order": "Full suite includes all original training/outer-loop tests. Final targeted suite rerun after removing duplicate Qwen stdin spec injection; includes all proposer and synthetic calibration tests.",
+    "first_full_run": {
+      "tests": 251,
+      "failures": 1,
+      "errors": 1,
+      "log": "proposer-scaffold-library/full-tests-first.txt",
+      "resolved": [
+        "Expanded-profile versus raw-reference assertion migrated; non-proposer values checked equal",
+        "Restored fresh CLI missing-entrypoint validation before manifest/model IO"
+      ]
+    },
+    "calibration": {
+      "synthetic_cases_per_scaffold": 20,
+      "scaffolds": 3,
+      "fake_cases_executed": 60,
+      "metrics": "proposer-scaffold-library/calibration.json",
+      "not_a_model_quality_comparison": true
+    },
+    "cli_help": {
+      "project_propose": true,
+      "project_run": true,
+      "project_training_entrypoint": true,
+      "actual_native_CLI_help_or_version": "not executed"
+    },
+    "current_document_links": "passed",
+    "git_diff_check": "passed",
+    "packaging": {
+      "status": "passed",
+      "offline_build": true,
+      "wheel_sha256": "c2f4e449da94a87a8df02799b7d99da06d6c802818654641d0d317ca4f843f28",
+      "source_files_checked": 90,
+      "all_source_and_profile_bytes_match": true
+    }
+  },
+  "method_invariants": {
+    "unchanged_count": 79,
+    "hash_file": "proposer-scaffold-library/invariants.json",
+    "unchanged_files": {
+      "src/internalization/revision_loop.py": "e63892d87b0eb692afdcc2392ece59e2f714c892d68024d4c910c5be1c625182",
+      "src/internalization/outer_loop.py": "b8c40c35ab24e5b96c500effbd900013c00f83806f89389e1fb9746b126b9c61",
+      "src/internalization/revision_demo.py": "59a11af57d95f4ca29adbf7379d5accc11cfcfac5cd36380328d83ff7e4a57c2",
+      "src/internalization/__init__.py": "16393c65ab39dd19b939c3a46e0320296b394d9ac0c916a11aaaf265ad5e129e",
+      "src/internalization/command_backend.py": "3bfe1b1bd2c00004801db6c86fed189fd0fb6d720a05696b768e7fd9f1199b45",
+      "src/internalization/core/serialization.py": "aa9edc9ef1ee9fd1aad36ecb6e5c23e1ea8cf541791d04b10f9e52d269e2de6f",
+      "src/internalization/core/manifest.py": "443dfecd37c7d484b90c0c5b79b1c33fccba5ddb852b9abaa35d946e400e6284",
+      "src/internalization/core/adapters.py": "5ae20129a969a62a117f808f47acca9b285763af4486ba560254b4801ba9c3e6",
+      "src/internalization/core/__init__.py": "8bbf33faddcc88975dc1572e6e9253d86f56c5d008ee333b983ce1f1cac31775",
+      "src/internalization/core/interfaces.py": "5598eea5878a03935932c84757d508fd7af05285153bffa1d7db1b6bde533337",
+      "src/internalization/core/types.py": "d3d6777279d0d589f88b0eff6d1fe3d2cd69b240f4feeb3c4508bdad78400aea",
+      "src/internalization/core/accepted_state.py": "bbc89d03c7cd578723ff315f8ab3e24cb00bb48ba87253ada7f8ad4a78b8cd9c",
+      "src/internalization/core/trajectory.py": "992bdd6384200d3174558e952ccf1617c9e8843db494937ce945821d22b99a7d",
+      "src/internalization/core/seed_harnesses.py": "1eba304794bb7d3157e239d0920ee39dd69237901c1a969a94d17a895309025a",
+      "src/internalization/core/sampling.py": "59b81f2fb9f5bf0b79153d6f999081c8a5944f81901ab968208df9f002c263ea",
+      "src/internalization/evolution/search.py": "51fa42ebffc61cc50395ed92711ad3a1f483ed18f1ecac231f88dc0c45b7ab02",
+      "src/internalization/evolution/__init__.py": "6340f40e9d662814825353e6b5b13bafb65739cfd9c9958a22817c66d1b4a64d",
+      "src/internalization/evolution/candidate.py": "2a3520bfe658dfb7b53b0ac8f752a1f4d21b3618870845251f230544e1fa254d",
+      "src/internalization/evolution/code_proposer.py": "912a028ecbe46720f4cbfa90e642fc72da870a70a187d70171c44befd3758224",
+      "src/internalization/evolution/materialization.py": "253ebd7ebdc82bdb07eff1eb8f7c2b0a88576d30620332baeed54c36403649f0",
+      "src/internalization/evolution/proposer.py": "35d4ded51b0e61c3b5dbc235b86c53a4d5064c80518d2e7bb314b49f1fff00eb",
+      "src/internalization/evolution/PROPOSER_SPEC.md": "c0564fd2d7293cffcfc3c90ff8fef85193326a5bc3e19fca28c52f3bf5552e3f",
+      "src/internalization/evolution/revision_search.py": "e981e468013a3e257652a891364902ce4f4a2e1eb409b784a6199b356b2a39dd",
+      "src/internalization/harness/runtime.py": "f8112cbbcaf675d75a53829861a4ce51238eb21b82c7bd320df55fd95890a4c4",
+      "src/internalization/harness/revision.py": "adbb661f1f149f656be490507c2e27d57b2ada479e3fd400c1529025f1ab6a26",
+      "src/internalization/harness/control_runtime.py": "5889074a8bf07ffd46728da93067ddf7af161ab1389bef4b20b57633d9b746dd",
+      "src/internalization/harness/code_runtime.py": "0a395d1ff323735a7ad7867e3051f5acbec9c0436446bfc811e3e904fff7a34a",
+      "src/internalization/harness/module.py": "9652c7b607a9f4f0ab57afe1345a1bbad35a88c601623d64d198b79fbfbcc87f",
+      "src/internalization/harness/__init__.py": "f305366ebacdf5295ddedd748bed070f11828a97d1bd276e4c974eca8ed00980",
+      "src/internalization/harness/sandbox_worker.py": "55114c07c84a8e9756bae5975b9214843cd0da374c8604a890c4032953e5b1db",
+      "src/internalization/harness/sandbox.py": "35332e0cd1e479801afb3c7bba7fa043d819d6508434dc1a0afc392319891dde",
+      "src/internalization/evaluation/__init__.py": "63e695d0670c426fd978e760a28be46ca780bf6e566317bffa9e8cd385159bc4",
+      "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+      "src/internalization/evaluation/cost.py": "85f4a6d012329d65a52eaecf1b2e793a70de1dff54bd42733b22d12d8c18f11a",
+      "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+      "src/internalization/benchmarks/terminalbench.py": "2b2f7d94922af404ab1d469e7892186c970dacfc8a318e34eada4ec325eb76d7",
+      "src/internalization/benchmarks/importers.py": "f4eeda3cd482e89fcb3e8284cf11c84d9197b9593c23d0a10d203519ea608b98",
+      "src/internalization/benchmarks/alfworld_projection.py": "e794d1217d613ef4b550cfe4bfd0b39b4deb10d47493f31f78aef7b5ebf6dd98",
+      "src/internalization/benchmarks/worker.py": "ab46f8397922dbd463bed66546ac906c4d7d37ab6c5e0f5401aa547aee27d24f",
+      "src/internalization/benchmarks/lawbench_final.py": "f1f4e82d9618b45504e3e2d2d2b406ac0f05b144157e11c8450860be81cbbcbc",
+      "src/internalization/benchmarks/alfworld.py": "1863143e4b8bd7fb31579c8877dc431d857b9f2b47dc4fe0f7d24ae30d568f2d",
+      "src/internalization/benchmarks/isolated.py": "07b73f99e7de5a5ffafe7f6d92b27af011d900280e1cac33f89382efda62aaec",
+      "src/internalization/benchmarks/webshop.py": "3652e91ccd5d67337ffb63cf8a9cc6b0186419266ed3470eed4f8a6055222071",
+      "src/internalization/benchmarks/appworld.py": "11edabe9d9ef7362be184f225799109bc642fecdc47609cfdd6ca26af23b0aec",
+      "src/internalization/benchmarks/appworld_manifest.py": "a074d50a4a08e1cca26cdc2fd8371d0471fd4842cc14553b0d031e6cee4155e3",
+      "src/internalization/benchmarks/swebench.py": "65d484a2300bc6deac8842a9d082e29894e044e14e8b7db48960a7946df624dc",
+      "src/internalization/benchmarks/aggregate.py": "9c5aea08474a5f48866ae8630bb0dac110e1478172b4d519270dd26a900d37b2",
+      "src/internalization/benchmarks/lawbench.py": "8591941aece3c3ed16fa9857a46c7acc05d39aa78d75c412dff44d48318543e3",
+      "src/internalization/benchmarks/webshop_projection.py": "9168d925de64984fd2d4b568a93b8d540ee379c550e8768efdfcd38ccf38e493",
+      "src/internalization/benchmarks/lawbench_scoring.py": "c9550cc3b1c95a819a3b354ba00931ece842708c9ace67ebf5f5c1d0f6a7ff8d",
+      "src/internalization/benchmarks/__init__.py": "47699dd1cc389ce71af0eeddfc5d3bd7c1e912d4b4d920fbf32ea2b3215509b5",
+      "src/internalization/benchmarks/budget_data.py": "5bed92d530bc5eb4d715cc2300fc52d58c544ddb7fb5d28b29fe586013a2e435",
+      "src/internalization/benchmarks/alfworld_prompts.py": "fb89f5e3144a52c1f210662fb29ecf2e22243b3854d92f5522a1385019480aa4",
+      "src/internalization/benchmarks/hotpotqa.py": "860638e41d0aefec8eb8a908bf370dc826d2803d243f4c29d838c359da3a4e0e",
+      "src/internalization/benchmarks/webshop_prompts.py": "849da2f6ddf4e94db24ff646935457bf6e48975ba0d318bb13d2ec7d1a454894",
+      "src/internalization/benchmarks/common.py": "ea2a00a0a2219193e96b48b3a842633883424f5a35ad8157e428492ac4f7447e",
+      "src/internalization/benchmarks/harbor_agent.py": "7e278798f3f179fceb7e28436b078f17b07906e5b69a3474aba17a5f4f12f4d6",
+      "src/internalization/benchmarks/search_qa.py": "58f30009c8393e58677e6ef3514c72e30fef569a31b2e3702f52deb5f96b7f2c",
+      "src/internalization/benchmarks/appworld_worker.py": "20233bf9255e3f1ee1fd0d7783d19562d2dfb6ea79b121c8ba275278aceccddc",
+      "src/internalization/training/rollout.py": "15e55dff04a68ec4e54136eac159e3216da171c92308233fbbf8994d963dcfe2",
+      "src/internalization/training/revision_rollout.py": "4ffb723a12ef7f2b4396b36ee290629ee5f58f191eeb967dabfb36d4cac7d1bc",
+      "src/internalization/training/verl_backend.py": "7a6be70f0eb56ba96cc1c2c26728720e828c3548d22de6cd1c74902cfbc91686",
+      "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+      "src/internalization/training/smoke.py": "fc078c2be238a4bd4b52d503690310cad2842c27baad562f33ace9a5fc063fe8",
+      "src/internalization/training/trainer.py": "9c5980ef9557dba80ef223e3bca0cd04cc30816a3ab0834b3a7173afc744ed6f",
+      "src/internalization/training/__init__.py": "049174ba2ac33f1e48281be0195eb6e89e55cfbd84dd18b4f8411d396587505d",
+      "src/internalization/training/checkpoint.py": "dff35df9ce065a1f451279b08a2a8604727ecec600268bd8f411e137a5ff88b5",
+      "src/internalization/training/revision_scoring.py": "b5a51617ae0237b6a13f5dacab258afcdb2060d0d5e46647f1d2e774a29ed696",
+      "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+      "src/internalization/training/teacher_scoring.py": "6eb4d1fd3bcf663853e0f74b636f7b5182aad7167bb7d16d815d1b8fa8c1342f",
+      "src/internalization/training/teacher_backend.py": "e12c7eee01f31fc4c46fa70f5cca60df49e56f6fb8f1bb726581ca8acdc7ea5e",
+      "seed_harnesses/webshop/agent/main.py": "3990003ed3b0cac47aa7554aa724a97785349f5f12cb057320688e459b81d247",
+      "seed_harnesses/webshop/config/harness.json": "415d9b9ac0def9133006ed9d1443846504fe9f50aa02b45d47b60c9f13e5195d",
+      "seed_harnesses/alfworld/agent/main.py": "11d3b27d0e9d2089abcc4b15440bdfb4c34b79d0e6313d52701d5d4fd2089fd8",
+      "seed_harnesses/alfworld/config/harness.json": "415d9b9ac0def9133006ed9d1443846504fe9f50aa02b45d47b60c9f13e5195d",
+      "seed_harnesses/hotpotqa/agent/main.py": "4a87049894aa513965876587bdc8371837cf6e648e7222afa65cdaa0f8d36f49",
+      "seed_harnesses/hotpotqa/config/harness.json": "415d9b9ac0def9133006ed9d1443846504fe9f50aa02b45d47b60c9f13e5195d",
+      "licenses/Meta-Harness-MIT.txt": "6fda8a33f4381e19a48a6a597ff8353cc9fbe97eccc1377a5fb6dd6f9ed49f76",
+      "upstream.lock.json": "3bf81ea9cecf724f5dfab9842bf3f5bd00da197eb4ad7b94c7966c2d77549648"
+    },
+    "training_evaluate_branch_ast_unchanged": true,
+    "extracted_tree_diff_history_helpers_ast_unchanged": true,
+    "all_budget_v1_non_proposer_values_unchanged": true,
+    "command_backend_outer_loop_revision_loop_unchanged": true,
+    "search_8_candidate_2_dev_32_retirement_attribution_ppo_kl_seeds_batches_rewards_benchmarks_seeds_unchanged": true
+  },
+  "not_executed": [
+    "Actual Claude/Codex/Qwen CLI (including native --help/--version)",
+    "Paid proposer API and provider authentication",
+    "Native bwrap capsule and nested CLI sandbox integration",
+    "Real calibration/model-by-scaffold ranking",
+    "Benchmark downloads or official ALFWorld/WebShop/HotpotQA runs",
+    "GPU/distributed training",
+    "Git commit/push"
+  ],
+  "runtime_caveats": [
+    "Scaffold version is exact CLI --version output, unresolved templates fail before session",
+    "Codex native exec cannot certify equivalent internal model-call budgets; explicit null is not zero",
+    "Compatible third-party Claude provider cost remains null; raw CLI estimates preserved",
+    "CLI-tool restrictions depend on pinned native runtime; no host fallback if isolation unavailable"
+  ],
+  "worktree_status_after": " M README.md\n M THIRD_PARTY_NOTICES.md\n M configs/budget_v1/alfworld.json\n M configs/budget_v1/alfworld_backend.json\n M configs/budget_v1/hotpotqa.json\n M configs/budget_v1/hotpotqa_backend.json\n M configs/budget_v1/webshop.json\n M configs/budget_v1/webshop_backend.json\n M docs/BUDGET_V1.md\n M docs/CLAUDE_PROPOSER.md\n M docs/EXECUTION_WIRING.md\n M docs/METHOD.md\n M docs/STATUS.md\n M docs/STRUCTURED_PROPOSALS.md\n M docs/VERSIONED_HARNESS.md\n M docs/WORKLOG.md\n M pyproject.toml\n M src/internalization/cli.py\n M src/internalization/core/execution_config.py\n M src/internalization/evolution/claude_code.py\n M src/internalization/evolution/claude_proposer.py\n M src/internalization/evolution/claude_tool_guard.py\n M src/internalization/training/entrypoint.py\n M tests/fixtures/structured_proposer_worker.py\n M tests/test_budget_v1.py\n M tests/test_claude_proposer.py\n?? configs/proposers/\n?? docs/PROPOSER_SCAFFOLDS.md\n?? docs/validation/proposer-scaffold-library-report.json\n?? docs/validation/proposer-scaffold-library/\n?? requirement.txt\n?? src/internalization/evolution/proposer_host.py\n?? src/internalization/evolution/proposer_profiles.py\n?? src/internalization/evolution/scaffolds/\n?? src/internalization/evolution/workflows/\n?? tests/fixtures/fake_scaffolds.py\n?? tests/proposer_calibration/\n?? tests/test_proposer_scaffolds.py\n"
+}

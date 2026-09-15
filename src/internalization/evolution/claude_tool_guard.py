@@ -4,6 +4,7 @@ Invoked by the host's explicit CLI settings, never discovered from candidate fil
 The ordinary candidate execution sandbox remains a separate, unchanged component.
 """
 import json
+import fcntl
 from pathlib import Path
 import sys
 
@@ -41,15 +42,20 @@ def check_tool(workspace, name, arguments):
 
 
 def main():
-    workspace, audit_path = sys.argv[1:]
-    try:
-        request = json.load(sys.stdin)
-        path = check_tool(workspace, request['tool_name'], request.get('tool_input', {}))
-        decision, reason = 'allow', 'Scoped proposer file operation'
-    except Exception as exc:
-        decision, reason, path = 'deny', str(exc), None
+    workspace, audit_path = sys.argv[1:3]
+    limit = int(sys.argv[3]) if len(sys.argv) > 3 else None
     # Logging failure blocks the operation; no silent permission fallback.
-    with Path(audit_path).open('a') as stream:
+    with Path(audit_path).open('a+') as stream:
+        fcntl.flock(stream, fcntl.LOCK_EX)
+        try:
+            request = json.load(sys.stdin)
+            stream.seek(0)
+            if limit is not None and sum(1 for _ in stream) >= limit:
+                raise ValueError('Proposer tool-call budget exhausted')
+            path = check_tool(workspace, request['tool_name'], request.get('tool_input', {}))
+            decision, reason = 'allow', 'Scoped proposer file operation'
+        except Exception as exc:
+            decision, reason, path = 'deny', str(exc), None
         stream.write(json.dumps({'decision': decision, 'reason': reason, 'path': path}) + '\n')
     print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PreToolUse',
         'permissionDecision': decision, 'permissionDecisionReason': reason}}))

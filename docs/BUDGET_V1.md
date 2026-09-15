@@ -20,7 +20,7 @@
 
 96 题 search 池先按 run_seed 打乱，三周期取连续、不重叠的 8 题。两个候选和父版本使用相同任务、相同环境 seed。只按逐题配对**平均收益严格 >0**初筛，不对 8 题做显著性接受。正收益候选按 search 平均收益、较少 token、较小候选序号排序，最多一个进入 dev；dev 失败不补选第二个。只有出现 finalist 才执行父/候选的 32 题 dev；仍要求既有 task-cluster bootstrap 区间下界 >0。首周期筛选最多 88 次任务评价（24 search + 64 dev），无 search 收益则仅 24 次；兼容性检查、A/B/C/D、训练另记成本。
 
-proposer 得到全部 8 题分数，以及按最差/最好交替选取的最多 4 条完整代表轨迹；全部原始轨迹保存在各 runner 输出，未删除。生产提案使用一个 Claude Code session，显式配置 proposer.backend=claude_code、model=claude-sonnet-5、max_turns=12。一次 session 可含多轮模型/文件工具调用，只生成两个候选；实际 token/cache/USD/turn 证据留档。256 仍是执行期内部控制输出上限。
+proposer 得到全部 8 题分数，以及按最差/最好交替选取的最多 4 条完整代表轨迹；全部原始轨迹保存在各 runner 输出，未删除。生产提案使用显式 proposer.profile 引用，一个 proposal session 只生成两个候选。ALFWorld 暂定 deepseek-v41-flash_claude-code_v1；WebShop/HotpotQA 保留 Claude profile。配置解析冻结完整 provider/model/scaffold/limits/version 与 spec/workflow hash；实际 token/cache/USD 证据留档，不可用字段为 null。256 仍是执行期内部控制输出上限。
 
 训练队列以 run_seed 打乱，保存 task hash、seed、epoch、order、position、draws。每批四个不同任务、每题四次 fresh stochastic rollout；跨 epoch 边界推迟本批已出现任务，不丢任务。每次取样先持久化不可变 sampling 快照和原子最新游标；跨 cycle、无更新、失败、模型 rollback 后都不回到列表头。cycle state/deployment 包含游标；恢复时校验任务池和 seed。每阶段计划 100 批，无训练资格时不把该预算转移到其他周期。
 
@@ -77,7 +77,7 @@ smoke 验证更新前同 batch 缓存 logprob、进入 actor 的 advantage/mask�
 
 ## 正式运行与最终评价（本轮未启动）
 
-以下一次只启动一个 benchmark、一个 seed。生产 proposer 使用 Claude Code CLI 和显式 workflow/spec，需预先安装支持本项目隔离 flags 的 Claude Code，并在运行 shell 配置 ANTHROPIC_API_KEY（不写入配置或日志）；不再使用 HI_PROPOSER_MODEL/BASE_URL/API_KEY。裸会话不读取全局订阅登录、CLAUDE.md 或 skills。详见 [CLAUDE_PROPOSER.md](CLAUDE_PROPOSER.md)，本轮没有执行真实 Claude。
+以下一次只启动一个 benchmark、一个 seed。proposer 从 configs/proposers 的显式 profile 解析，准备精确 model/CLI version 与 profile 指定环境变量中的 credential；不要把 secret 写入配置。ALFWorld 默认官方 DeepSeek 的 DEEPSEEK_API_KEY，Claude profile 使用 ANTHROPIC_API_KEY。scaffold 的实际边界、native limits 和未验证项见 [PROPOSER_SCAFFOLDS.md](PROPOSER_SCAFFOLDS.md)。不再使用 HI_PROPOSER_*；本轮没有执行真实 proposer。示例 profile 的 cli_version=null 必须在生产前填写；Codex/Qwen 未验证的 native 隔离能力不可用时直接报错。
 
 ```bash
 "$HI_TRAIN_PYTHON" -m internalization.cli run \

@@ -1,5 +1,11 @@
 # 实现状态
 
+## 2026-09-15：共享 proposer scaffold library
+
+当前生产入口是 WorkspaceProposalHost + 显式 profile，注册 Claude Code、Codex、Qwen Code adapters；原 Claude constructor 仅保留注入测试支持。三者共用同一 workspace、spec、候选 materialization 和可选 deterministic target；没有第二个 proposal stage。ALFWorld 配置暂定官方 DeepSeek V4.1 Flash (`deepseek-flash`) + Claude Code。当前 profile 的 exact CLI version 需要填好，GPT/Qwen 示例 model 尚待选择；真实 native CLI/bwrap 隔离、API 可用性与模型效果均未验证。
+
+最终 CPU/fake 结果和不变哈希见 [library report](validation/proposer-scaffold-library-report.json)，方法边界与配置见 [PROPOSER_SCAFFOLDS.md](PROPOSER_SCAFFOLDS.md)。以下是先前阶段的历史状态，不代表当前生产只支持 Claude Code。未运行真实 proposer/benchmark/GPU；本轮不 push。
+
 ## 2026-09-15：Claude Code proposer 最小适配
 
 基于 fc725740，把生产 proposer 换成一个 Claude Code workspace session。两个候选都从同一 verified parent 复制；Claude 编辑目录和 metadata，宿主 canonical diff 后调用原候选 materialization。evidence、before_hash、task-ID 防硬编码、去重和可选 deterministic H−/fail-soft 语义保持不变，没有第二个 target/session。

@@ -1,0 +1,19 @@
+{
+  "profile_id": "qwen-coder_qwen-code_v1",
+  "scaffold": "qwen_code",
+  "provider": {
+    "id": "bailian",
+    "protocol": "openai",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "api_key_env": "DASHSCOPE_API_KEY"
+  },
+  "model": null,
+  "limits": {
+    "max_turns": 12,
+    "max_wall_time_s": 600,
+    "max_tool_calls": null
+  },
+  "workflow": "qwen_code",
+  "cli_version": null,
+  "experiment_mode": "native"
+}

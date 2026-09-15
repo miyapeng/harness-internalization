@@ -27,6 +27,11 @@ class BudgetTests(unittest.TestCase):
     def test_three_strict_configs_and_seed_variants(self):
         for name,steps,context,prompt in [('alfworld',30,8192,4096),('webshop',15,8192,4096),('hotpotqa',8,16384,12288)]:
             config=json.loads((ROOT/f'configs/budget_v1/{name}.json').read_text())
+            resolved=resolve_execution(config)
+            self.assertEqual({k:v for k,v in resolved.items() if k!='proposer'},
+                             {k:v for k,v in config.items() if k!='proposer'})
+            self.assertEqual(resolved['proposer']['profile_id'],config['proposer']['profile'])
+            config=resolved  # Requests carry the full resolved profile, not the file reference.
             self.assertEqual(resolve_execution(config),config)
             self.assertEqual((config['max_steps'],config['model']['max_context'],config['model']['max_prompt_tokens']),(steps,context,prompt))
             self.assertEqual((config['tasks_per_batch'],config['rollouts_per_task']),(4,4))

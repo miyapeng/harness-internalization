@@ -1,0 +1,19 @@
+{
+  "profile_id": "deepseek-v41-flash_claude-code_v1",
+  "scaffold": "claude_code",
+  "provider": {
+    "id": "deepseek",
+    "protocol": "anthropic",
+    "base_url": "https://api.deepseek.com/anthropic",
+    "api_key_env": "DEEPSEEK_API_KEY"
+  },
+  "model": "deepseek-flash",
+  "limits": {
+    "max_turns": 12,
+    "max_wall_time_s": 600,
+    "max_tool_calls": null
+  },
+  "workflow": "claude_code",
+  "cli_version": null,
+  "experiment_mode": "native"
+}

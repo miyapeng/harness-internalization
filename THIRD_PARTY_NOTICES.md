@@ -24,14 +24,14 @@ MIT, Copyright (c) 2026 Yoonho Lee; complete text remains in
 | --- | --- | --- |
 | `SessionResult`, `build_command`, `run` | `evolution/claude_code.py::ClaudeCodeSessionResult`, `ClaudeCodeRunner` | `claude -p`, stream-json, explicit cwd/model, timeout/exit and session accounting; fixed five file tools, no skip-permissions, no additional directories |
 | `parse_stream_events`, file-read/write accounting, `log_session` | `evolution/claude_code.py::parse_stream`, `ClaudeCodeRunner.run` | Tool ID/result correlation, tokens/cache/USD/session metadata and raw events; cumulative result usage overrides message totals; no generic artifact extraction |
-| Explicit skill loading/injection in `load_skill` / `run` | `evolution/claude_proposer.py::skill_path`, `ClaudeCodeRunner.run` | One host-selected workflow injected with the method spec; no skill discovery or multi-skill loader copied |
+| Explicit skill loading/injection in `load_skill` / `run` | `evolution/proposer_profiles.py::workflow_text`, `ClaudeCodeRunner.run` (formerly `claude_proposer.py::skill_path`) | One host-selected workflow injected with the method spec; no skill discovery or multi-skill loader copied |
 
 The source's WebSearch/WebFetch, Agent/subagent tools, MCP integration, plugins,
 demo utilities, generic artifact extraction and TB2-specific agent behavior are not
 migrated. The empty plugin directory and strict empty MCP configuration disable
 ambient integrations; they are not plugin or MCP implementations.
 
-`evolution/claude_proposer.py` workspace copying/canonicalization and
+`evolution/proposer_host.py` workspace copying/canonicalization (moved from `claude_proposer.py`) and
 `evolution/claude_tool_guard.py` path checks are project-written.
 `evolution/materialization.py` is this project's unchanged candidate validation
 mechanism extracted from its previous single-call API adapter. The method spec
@@ -146,3 +146,19 @@ Protected source URLs, commits, hashes and adapter contracts are recorded in
 HotpotQA uses the unchanged project-written distractor wrapper from commit
 `80e985af4429061417a4979d13daa5998afb0b34`, not an official or original ReAct Harness.
 The existing Apache-2.0 and MIT texts under `licenses/` remain applicable.
+
+## Model-conditioned scaffold library (2026-09-15)
+
+The shared host now calls `scaffolds/claude_code.py`, which adapts the existing
+MIT-attributed `evolution/claude_code.py` runner above. The Meta-Harness source
+commit, original functions and license remain unchanged; attribution is retained.
+
+`scaffolds/codex.py` invokes the external OpenAI Codex CLI (`codex exec`):
+https://github.com/openai/codex and https://developers.openai.com/codex/cli/reference.
+`scaffolds/qwen_code.py` invokes the external Qwen Code CLI (`qwen -p`):
+https://github.com/QwenLM/qwen-code and https://qwenlm.github.io/qwen-code-docs/en/users/features/headless/.
+No Codex/Qwen implementation source is copied or vendored. Adapter, capsule and
+normalization code is project-authored from public interfaces. External CLI
+versions must be pinned explicitly in resolved profiles and are checked at
+preflight; actual version/session metadata is written per proposal. Real runtimes
+were not executed in this refactor.

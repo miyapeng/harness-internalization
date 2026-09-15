@@ -1,8 +1,8 @@
 # Claude Code proposer：最小执行适配
 
-基于 `fc72574011b9da907030c835aa056d985dc46895`，只替换 proposer 执行 Harness。
+最初基于 `fc72574011b9da907030c835aa056d985dc46895` 适配；当前已纳入 [共享 Scaffold Library](PROPOSER_SCAFFOLDS.md)，生产不再限定 Claude Code。
 生产入口仍是 `CommandBackend → scripts/propose.py → propose stage`。
-每周期一个 Claude Code session、恰好两个候选，没有 target proposer 或第二次修复 session。
+在此 adapter 下每周期一个 Claude Code session、恰好两个候选，没有 target proposer 或第二次修复 session。
 single-call 在此指一次 proposal phase，并不表示 Claude session 内只有一次底层模型调用。
 
 ## 方法和接口没有分叉
@@ -10,7 +10,7 @@ single-call 在此指一次 proposal phase，并不表示 Claude session 内只�
 唯一方法规范为
 [`PROPOSER_SPEC.md`](../src/internalization/evolution/PROPOSER_SPEC.md)。
 [`SKILL.md`](../.claude/skills/harness-internalization-proposer/SKILL.md)
-只规定阅读、诊断、编辑两个候选、写 metadata 和停止的工作流程；由宿主显式读取并注入。
+只规定阅读、诊断、编辑两个候选、写 metadata 和停止的工作流程；其相同内容保存在包内 workflows/claude_code.md，由宿主显式读取并注入。
 不通过 Claude 自动 skill discovery 加载。spec 随包安装，skill 随 wheel 安装到
 `share/harness-internalization/SKILL.md`；源码运行优先读取上述唯一源文件。
 
@@ -30,7 +30,7 @@ workspace 按顺序必须为 candidate_0、candidate_1。没有新增 teacher/st
 
 ```text
 <proposal-output>/
-  claude_workspace/                ← 唯一 Claude cwd
+  proposer_workspace/                ← 唯一 Claude cwd
     parent/                       ← verified 当前 revision 的完整复制，只读
     candidate_0/                  ← 同一 parent 的独立可编辑复制
     candidate_1/                  ← 同一 parent 的独立可编辑复制
@@ -41,7 +41,7 @@ workspace 按顺序必须为 candidate_0、candidate_1。没有新增 teacher/st
     history.json                  ← 原 search-only 反馈；去掉宿主 revision 绝对路径
     PROPOSER_SPEC.md               ← 唯一方法规范的只读复制
     proposal.json                 ← session 写入的严格 metadata
-  claude_session/
+  scaffold_session/
     isolated_config/              ← 独立 CLI 状态，不放进 Claude 工作区
     empty_plugins/
     settings.json                 ← 宿主提供的固定权限 hook
@@ -79,35 +79,22 @@ flags、没有初始化权限证据、有效工具或模型不同、意外 MCP/p
 
 ## 配置与实际运行
 
-六份 budget_v1 experiment/backend JSON 的 proposer 部分统一为：
+生产改为 [共享 Scaffold Library](PROPOSER_SCAFFOLDS.md)：`proposer: {"profile":"..."}`。
+Claude Code 是其中一个 adapter，支持 Claude 和显式 Anthropic-compatible provider（包括官方 DeepSeek）。
+profile 指定 provider/base_url/api_key_env/exact model/limits/exact CLI version，解析进 effective_config 和 hash。
+不再要求模型名以 claude- 开头，不按字符串自动路由；正式运行未配置 model/version 会报错。
+ALFWorld 引用 deepseek-v41-flash_claude-code_v1；另外两个 benchmark 保留 Claude profile。
 
-```json
-{"backend":"claude_code","model":"claude-sonnet-5","max_turns":12}
-```
-
-这是本轮暂用的显式 model ID；正式启动前应改成你已开通并准备固定使用的精确 ID。
-不接受 `sonnet`/`opus` 或 `-latest` 快捷别名。除 proposer 字段外，所有现有配置值保持不变。
-旧 `max_tokens/temperature` 现在是未知字段，明确报错；不能继续把旧 effective_config 当成新配置。
-旧实验和 state 文件不重写，原严格恢复配置哈希检查仍保留，因此不将旧 API 实验静默续接到 Claude。
-
-不新增其他 execution 配置字段。wrapper 的默认 wall timeout 为 600 秒，构造器可显式注入 timeout
-供单元测试或直接调用；max_turns 限制单次 session，而不是训练 budget。实际 CLI version 在每次
-phase 前通过 version/help 预检并记录；CLI 升级应作为实验环境版本变化处理。
-
-正式认证只给隔离 CLI 传入 `ANTHROPIC_API_KEY`，不再消费 `HI_PROPOSER_BASE_URL/API_KEY/MODEL`。
-bare 模式不使用全局订阅登录；不要把 key 写入配置或产物。只保留网络代理/证书等必需环境，
-不继承 NODE_OPTIONS、用户 hooks、task model 凭据或自定义模型端点。未找到 claude 时先写
-preflight_error.json 和零调用成本，然后报清晰错误，不启动 session。
-
-三个 benchmark 的正式命令仍见 [BUDGET_V1.md](BUDGET_V1.md)，H0、数据准备和训练参数不变。
-本次不自动安装 CLI、不调用认证服务、不启动正式任务。仅验证配置和入口可用：
+Claude adapter 仍保持原五工具、bare、禁 ambient discovery、显式 guard、一次 session。
+只有解析后的 provider 可以设置端点和凭据；不消费 HI_PROPOSER_*。未知费用记录 null。
+恢复从 accepted state 的 resolved profile 读取，不依赖日后更改的同名文件。
 
 ```bash
-cd /data/miyapeng/harness-internalization
 PYTHONPATH=src python3.12 scripts/propose.py --help
-PYTHONPATH=src:tests python3.12 -m unittest test_claude_proposer -v
-PYTHONPATH=src python3.12 -m unittest discover -s tests -v
+PYTHONPATH=src:tests python3.12 -m unittest test_claude_proposer test_proposer_scaffolds -v
 ```
+
+以下历史240项测试记录仍保留；library 新测试见新报告，不能把历史测试当作真实 CLI 证明。
 
 ## 记账和失败语义
 
@@ -124,14 +111,14 @@ model_calls/auxiliary_calls 记录可观测的独立 assistant message 数，不
 
 超时会停止专属子进程组、收集剩余 stdout/stderr，并保存失败 session 和已有成本，不自动重试。
 session 失败时顶层 propose 进程报错；已有外层停止行为不改。该失败的 wrapper 成本保存在
-proposal/cost.json 与 claude_session/ 下，不能把它误当成功生成候选或已进行 search/dev。
+proposal/cost.json 与 scaffold_session/ 下，不能把它误当成功生成候选或已进行 search/dev。
 
 ## 变更与未变范围
 
 | 文件 | 变化 |
 | --- | --- |
 | `evolution/claude_code.py` | 最小 Claude subprocess、stream 解析、会话成本与日志 |
-| `evolution/claude_proposer.py` | 复制候选 workspace、一次会话、canonical diff、公共 helper |
+| `evolution/proposer_host.py` | 复制共享候选 workspace、一次会话、canonical diff、公共 helper |
 | `evolution/claude_tool_guard.py` | 显式五工具文件权限 hook；不执行候选代码 |
 | `evolution/materialization.py` | 提取既有 public evidence/schema/evidence/hash/target 校验 |
 | `evolution/code_proposer.py`, `proposer.py` | 保留明确的 API 回归 adapter，生产无选择入口 |

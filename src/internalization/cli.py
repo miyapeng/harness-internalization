@@ -50,7 +50,10 @@ def main():
             config["execution"] = json.loads(args.experiment_config.read_text())
         if args.run_seed is not None:
             config.setdefault("execution",{}).setdefault("seeds",{}).update(run_seed=args.run_seed,model_sampling_seed=args.run_seed)
-        backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
+        backend = None
+        if args.state is None and args.harness_revision is None:
+            # Preserve fresh-run fail-fast entrypoint checks before data/model IO.
+            backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
         if args.output.exists(): raise FileExistsError(args.output)
         manifest=TaskManifest.load(args.manifest)
         if config.get("benchmark") is not None and config["benchmark"] != manifest.benchmark:
@@ -65,6 +68,13 @@ def main():
             accepted=load_accepted_state(state_path,manifest,checkpoint=args.checkpoint,protocol_path=args.protocol)
             if "loop" not in accepted.protocol: raise ValueError("Accepted state has no resumable loop protocol")
         elif args.protocol: raise ValueError("--protocol requires an accepted --state")
+        if accepted and "effective_config" in accepted.protocol:
+            from .evolution.proposer_profiles import resume_profile
+            execution = config.setdefault("execution", {})
+            execution["proposer"] = resume_profile(execution.get("proposer"),
+                accepted.protocol["effective_config"]["proposer"])
+        if backend is None:
+            backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
         options=dict(accepted.protocol["loop"]) if accepted else {}
         if args.cycles is not None: options["cycles"]=args.cycles
         if args.train_steps is not None: options["total_train_steps"]=args.train_steps

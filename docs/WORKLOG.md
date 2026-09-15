@@ -213,3 +213,9 @@ CodeProposer 一次 API 返回两个独立候选，包含完整 patch、rational
 
 首轮定向测试因导入 TestCase 类发生重复收集，已改为导入 fixture 模块，最终全套240项不重复计算该类。离线 wheel 首次因默认 pip cache 位于只读 /root 失败，改用 --no-cache-dir 后成功，未下载依赖或修改环境。原API子进程测试改为fake Claude process往返；含缓存的输入token期望由100改为110，原未缓存usage仍为100，不放宽候选/训练断言。精确上游MIT来源已补入THIRD_PARTY_NOTICES.md，原许可证文件保留。
 最终复核增加Glob花括号/绝对路径展开的拒绝测试，复跑全套240项通过；未增加可执行工具或放宽权限。最终wheel重建并逐文件核对新增proposer源码与spec/skill资源。
+
+## 2026-09-15：Model-Conditioned Proposer Scaffold Library
+
+基于 main 235e525 增量提取 shared host，保留原 materialization/spec/candidate、search/dev、训练与 retirement 实现。新增显式 profile 解析与 state-resolved 恢复、三个 native workflow、Claude adapter、官方 Codex/Qwen CLI subprocess adapters及最小隔离 capsule、nullable 会话成本和20类 synthetic calibration。旧 Claude CPU 测试只迁移共享目录名和显式 profile 配置断言；budget 配置测试改为检查 reference 展开以及所有非 proposer 字段不变。
+
+首次全量 CPU 回归251项发现两处问题：旧 budget 测试假设源 JSON 已展开；CLI 恢复接线推迟 fresh-run 缺入口检查。已更新展开断言并恢复早期检查，未改预算、判据或训练。最终验证以新 library report 为准，首次失败日志也保留。原 README 安装段落和 requirement.txt 用户改动保留，未安装依赖、未调用真实 CLI/API、未跑官方 benchmark/GPU、未 commit/push。
