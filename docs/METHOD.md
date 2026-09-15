@@ -20,11 +20,11 @@ ALFWorld/WebShop/HotpotQA 的 budget_v1 版本化生产后端提供 propose/chec
 
 `HarnessCandidate` 是完整改进，记录 candidate_id、parent_revision、带文件基准哈希的 patch、可实际执行的 full_revision、rationale、evidence_refs 和可选 internalization_target。`InternalizationTarget` 是可选撤除目标，记录 full_revision、reduced_revision、removed_behavior 和可执行 supervision_adapter。H_parent 是接受修改前版本；H_plus 是完整改进；H_minus 是只旁路目标控制后的版本，**不要求等于 H_parent**。例如新增日志查询工具和诊断控制后，精简版本仍保留工具。
 
-每轮只有一次 proposer API 调用，一次返回两个 internalization-aware structured candidates：完整 patch、因果假设 rationale、来自代表 search 轨迹的精确 task_id/step 引用，以及可选的 internalization 声明。首要目标始终是完整 Harness 的泛化改进；internalization=null 同样有效，不奖励可内化性，不为满足声明字段而制造额外辅助调用。它是本项目的候选协议设计，不把相关论文描述为已经采用了这一机制。
+每轮只有一个 proposer phase，生产实现使用一次 Claude Code session，返回两个 internalization-aware structured candidates：完整 patch、因果假设 rationale、来自代表 search 轨迹的精确 task_id/step 引用，以及可选的 internalization 声明。首要目标始终是完整 Harness 的泛化改进；internalization=null 同样有效，不奖励可内化性，不为满足声明字段而制造额外辅助调用。它是本项目的候选协议设计，不把相关论文描述为已经采用了这一机制。
 
-模型只提出 path/content 修改和可选 target_control_id/removed_behavior；宿主从锁定父版本计算 before_hash，严格应用补丁。在 proposer 子进程中，宿主从每个完整候选的 schema-2 independent_suffix 注册项确定性构造 H−，只关闭声明的一个已开启 ID；随后把可执行 full/reduced 快照与目标一起序列化返回。模型不生成 H−、teacher/student prompt、预测分数或训练/退役决定。不再有第二次目标发现请求、target stage 或兼容转发接口。
+模型提出完整代码修改和可选 target_control_id/removed_behavior；宿主从锁定父版本计算 before_hash，严格应用补丁。Claude 只在独立工作区编辑两个候选并写 metadata；宿主 canonical diff 后沿用相同 materialization helper。在 proposer 子进程中，宿主从每个完整候选的 schema-2 independent_suffix 注册项确定性构造 H−，只关闭声明的一个已开启 ID；随后把可执行 full/reduced 快照与目标一起序列化返回。模型不生成 H−、teacher/student prompt、预测分数或训练/退役决定。不再有第二次目标发现请求、target stage 或兼容转发接口。
 
-目标声明错误时保留合法完整候选，目标降为 null，写 internalization_declaration_error.json；不请求模型修复。错误补丁、伪造 evidence_refs、包含本轮精确 search task ID 的补丁和重复 full_revision 会拒绝，合法兄弟候选继续。精确 ID 扫描不能证明无实例过拟合；源码的泛化仍需真实执行评价。proposer 只接收 search 反馈，不接收 dev 的分数、轨迹或包含其判定的状态。完整原始记录仍归档。协议和验收见 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md)。
+目标声明错误时保留合法完整候选，目标降为 null，写 internalization_declaration_error.json；不请求模型修复。错误补丁、伪造 evidence_refs、包含本轮精确 search task ID 的补丁和重复 full_revision 会拒绝，合法兄弟候选继续。精确 ID 扫描不能证明无实例过拟合；源码的泛化仍需真实执行评价。proposer 只接收 search 反馈，不接收 dev 的分数、轨迹或包含其判定的状态。完整原始记录仍归档。候选语义见 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md)，生产执行适配与权限见 [CLAUDE_PROPOSER.md](CLAUDE_PROPOSER.md)。单个 session 可以有多轮文件工具/模型调用，实际计费不将它们伪记为一次底层模型调用。
 
 每轮从正式接受的 checkpoint 和代码 revision 出发，固定模型生成两个候选。候选在独立代码目录构造，实际加载其入口、prompt、工具注册、实现和配置；search/dev 使用既有配对收益选择规则。无收益则保留父版本，不训练。budget_v1 的小 search 以配对平均正收益预筛，最多一个候选进入 dev；非 budget 版本化配置保留两个配对收益区间下界均严格大于 0 的规则。外层直接复用已执行的 dev 逐题结果正式接受 H_plus，记录 decision_source=dev，不再分配 acceptance_i 或重跑 acceptance_plus/acceptance_parent。bootstrap 置信度、次数、任务聚类及选择排序规则保持不变；接受后直接读取候选内置的可选目标，不再调用提案模型。
 

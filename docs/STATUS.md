@@ -1,5 +1,15 @@
 # 实现状态
 
+## 2026-09-15：Claude Code proposer 最小适配
+
+基于 fc725740，把生产 proposer 换成一个 Claude Code workspace session。两个候选都从同一 verified parent 复制；Claude 编辑目录和 metadata，宿主 canonical diff 后调用原候选 materialization。evidence、before_hash、task-ID 防硬编码、去重和可选 deterministic H−/fail-soft 语义保持不变，没有第二个 target/session。
+
+新增 ClaudeCodeRunner/SessionResult、固定五文件工具、显式 spec/skill 注入、只读输入复核与宿主 PreToolUse 路径检查；记录 CLI version、model、session、spec/skill hashes、stream/stderr/exit、token/cache/USD、工具与文件日志。无 CLI 或缺必需 flags 直接失败。生产不再使用 HI_PROPOSER_*；API adapter 只用于显式回归。当前默认 proposer 为 claude_code / claude-sonnet-5 / max_turns=12，采用 bare 会话及 ANTHROPIC_API_KEY，不读取全局登录/CLAUDE.md/skills。
+
+全套 **240 项 CPU 测试通过**（254.436 秒，0 skip），新增16项 Claude 专项回归；3个CLI help通过。真实 JSON subprocess、可信权限 hook 和离线 wheel 构建实际执行，Claude process 全部为 fake。wheel 内 spec/skill 与源文件一致。61个受保护文件仅 entrypoint 的 propose 构造器更换；训练/evaluate分支、候选类型、search/dev/训练/评分/统计/seed/benchmark不变，所有非proposer配置值与原候选校验AST一致。
+
+实际 Claude CLI（包括 version/help）、Claude认证/API、模型可用性、官方benchmark与GPU均 **未执行/未验证**。权限依赖受信任CLI正确执行flags/hooks，不把路径检查称为OS沙箱。来源、接口、认证方式和限制见 [CLAUDE_PROPOSER.md](CLAUDE_PROPOSER.md)，结果见 [validation/claude-proposer/results.json](validation/claude-proposer/results.json)。本轮不提交、不push；原README.md与requirement.txt改动保持原样。
+
 ## 2026-09-15：一次结构化 proposer 调用
 
 CodeProposer 一次 API 返回两个独立候选，包含完整 patch、rationale、精确 search evidence_refs 和可选 removable-control 声明；宿主在同一子进程构造并返回 H+/H− 快照。删除独立 target contract、propose_target、Components.targets 与 target stage；internalization 后端只要求 propose/check_internalization/evaluate/train。

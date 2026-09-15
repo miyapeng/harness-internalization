@@ -1,0 +1,7 @@
+{
+  "wheel": "/tmp/hi-claude-wheel/harness_internalization-0.2.0-py3-none-any.whl",
+  "sha256": "aa1e62986ba8d349cc1e953ab8c4521b4e18d3496aab33e403484d284e0c74b2",
+  "spec": "internalization/evolution/PROPOSER_SPEC.md",
+  "skill": "harness_internalization-0.2.0.data/data/share/harness-internalization/SKILL.md",
+  "matches_source": true
+}

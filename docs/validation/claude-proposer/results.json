@@ -1,0 +1,33 @@
+{
+  "base_commit": "fc72574011b9da907030c835aa056d985dc46895",
+  "full_suite": {
+    "tests": 240,
+    "seconds": 254.436,
+    "skips": 0,
+    "result": "passed",
+    "log": "full-tests-final.txt"
+  },
+  "claude_specific": {
+    "tests": 16,
+    "result": "passed",
+    "no_real_cli": true
+  },
+  "packaging": "passed",
+  "cli_help": 3,
+  "git_diff_check": "passed",
+  "source_reference_commit": "0cbc31e97c9e6d24232d1dc754827c02e1ec415c",
+  "actual_execution": [
+    "CPU unit/integration tests",
+    "real JSON subprocess with fake Claude process",
+    "trusted file permission hook subprocess",
+    "offline wheel build"
+  ],
+  "not_run": [
+    "Claude CLI including version/help",
+    "Claude API/authentication",
+    "official benchmarks",
+    "GPU training"
+  ],
+  "commit_or_push": "not_requested; not_performed",
+  "final_glob_expansion_boundary_test": "passed"
+}

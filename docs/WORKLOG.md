@@ -199,3 +199,17 @@ CodeProposer 一次 API 返回两个独立候选，包含完整 patch、rational
 首轮新增子进程 fixture 缺 proposer 模型环境变量，并误用不存在的 execution.proposer.model；改为项目既有 HI_PROPOSER_MODEL 配置，不放宽生产 schema。新增候选去重测试初次调用 create 的参数顺序错误，已修正测试。首轮全量回归另有旧历史状态 failed/search_failed 断言迁移，保留原失败隔离检查。失败日志与最终复验分别保存，不改写历史报告。
 
 全量 **224 项 CPU 回归通过**（250.012 秒，0 skip）；其中 19 项单次 proposer 测试及 4 个 CLI help 通过。沙箱执行和 JSON 子进程为实际运行，API/任务模型使用 scripted fixture，既有小模型 CPU 更新测试保留。`git diff --check` 与当前文档链接检查通过。完整结果、首轮失败日志和不变性检查见 [validation/structured-proposals/results.json](validation/structured-proposals/results.json)。真实 API、官方 benchmark 与 GPU 训练未执行。
+
+
+## 2026-09-15：Claude Code proposer 最小适配
+
+基于 fc725740，把生产 proposer 换成一个 Claude Code workspace session。两个候选都从同一 verified parent 复制；Claude 编辑目录和 metadata，宿主 canonical diff 后调用原候选 materialization。evidence、before_hash、task-ID 防硬编码、去重和可选 deterministic H−/fail-soft 语义保持不变，没有第二个 target/session。
+
+新增 ClaudeCodeRunner/SessionResult、固定五文件工具、显式 spec/skill 注入、只读输入复核与宿主 PreToolUse 路径检查；记录 CLI version、model、session、spec/skill hashes、stream/stderr/exit、token/cache/USD、工具与文件日志。无 CLI 或缺必需 flags 直接失败。生产不再使用 HI_PROPOSER_*；API adapter 只用于显式回归。当前默认 proposer 为 claude_code / claude-sonnet-5 / max_turns=12，采用 bare 会话及 ANTHROPIC_API_KEY，不读取全局登录/CLAUDE.md/skills。
+
+全套 **240 项 CPU 测试通过**（254.436 秒，0 skip），新增16项 Claude 专项回归；3个CLI help通过。真实 JSON subprocess、可信权限 hook 和离线 wheel 构建实际执行，Claude process 全部为 fake。wheel 内 spec/skill 与源文件一致。61个受保护文件仅 entrypoint 的 propose 构造器更换；训练/evaluate分支、候选类型、search/dev/训练/评分/统计/seed/benchmark不变，所有非proposer配置值与原候选校验AST一致。
+
+实际 Claude CLI（包括 version/help）、Claude认证/API、模型可用性、官方benchmark与GPU均 **未执行/未验证**。权限依赖受信任CLI正确执行flags/hooks，不把路径检查称为OS沙箱。来源、接口、认证方式和限制见 [CLAUDE_PROPOSER.md](CLAUDE_PROPOSER.md)，结果见 [validation/claude-proposer/results.json](validation/claude-proposer/results.json)。本轮不提交、不push；原README.md与requirement.txt改动保持原样。
+
+首轮定向测试因导入 TestCase 类发生重复收集，已改为导入 fixture 模块，最终全套240项不重复计算该类。离线 wheel 首次因默认 pip cache 位于只读 /root 失败，改用 --no-cache-dir 后成功，未下载依赖或修改环境。原API子进程测试改为fake Claude process往返；含缓存的输入token期望由100改为110，原未缓存usage仍为100，不放宽候选/训练断言。精确上游MIT来源已补入THIRD_PARTY_NOTICES.md，原许可证文件保留。
+最终复核增加Glob花括号/绝对路径展开的拒绝测试，复跑全套240项通过；未增加可执行工具或放宽权限。最终wheel重建并逐文件核对新增proposer源码与spec/skill资源。

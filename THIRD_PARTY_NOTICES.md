@@ -7,11 +7,37 @@ The pins below describe inspected sources, not runtime checkouts.
 | Source | Inspected revision | Use and destination |
 |---|---|---|
 | [OPID](https://github.com/jinyangwu/OPID) | `37a15a5f3c0f1ecc651e4be4a0c257b313fa0756` | Mechanism reference for on-policy module teacher scoring and reward combination; independently implemented in `training/{rollout,teacher_scoring,module_advantage,trainer,checkpoint}.py` |
-| [Meta-Harness](https://github.com/stanford-iris-lab/meta-harness) | `0cbc31e97c9e6d24232d1dc754827c02e1ec415c` | Code proposal/search mechanism reference; project-written `evolution/{proposer,candidate,archive,search}.py`. No Meta-Harness source, benchmarks or reference implementations copied |
+| [Meta-Harness](https://github.com/stanford-iris-lab/meta-harness) | `0cbc31e97c9e6d24232d1dc754827c02e1ec415c` | Code proposal/search reference; minimal adaptation of `reference_examples/terminal_bench_2/claude_wrapper.py` into `evolution/claude_code.py`, as detailed below. No benchmark or complete reference agent implementation copied |
 | [veRL](https://github.com/volcengine/verl/tree/v0.5.0) | external package `verl==0.5.0`, tag `v0.5.0` | Optional normal dependency. `training/verl_backend.py` calls its PPO actor and DataProto APIs; no veRL framework source vendored |
 
 All destination paths in these tables are relative to `src/internalization/`
 unless explicitly prefixed with `configs/` or `tests/`.
+
+## Minimal Claude Code proposer scaffold (2026-09-15)
+
+Source: [Meta-Harness claude_wrapper.py](https://github.com/stanford-iris-lab/meta-harness/blob/0cbc31e97c9e6d24232d1dc754827c02e1ec415c/reference_examples/terminal_bench_2/claude_wrapper.py),
+exact commit `0cbc31e97c9e6d24232d1dc754827c02e1ec415c`.
+MIT, Copyright (c) 2026 Yoonho Lee; complete text remains in
+[licenses/Meta-Harness-MIT.txt](licenses/Meta-Harness-MIT.txt).
+
+| Source functions/concepts adapted | Local destination | Adaptation |
+| --- | --- | --- |
+| `SessionResult`, `build_command`, `run` | `evolution/claude_code.py::ClaudeCodeSessionResult`, `ClaudeCodeRunner` | `claude -p`, stream-json, explicit cwd/model, timeout/exit and session accounting; fixed five file tools, no skip-permissions, no additional directories |
+| `parse_stream_events`, file-read/write accounting, `log_session` | `evolution/claude_code.py::parse_stream`, `ClaudeCodeRunner.run` | Tool ID/result correlation, tokens/cache/USD/session metadata and raw events; cumulative result usage overrides message totals; no generic artifact extraction |
+| Explicit skill loading/injection in `load_skill` / `run` | `evolution/claude_proposer.py::skill_path`, `ClaudeCodeRunner.run` | One host-selected workflow injected with the method spec; no skill discovery or multi-skill loader copied |
+
+The source's WebSearch/WebFetch, Agent/subagent tools, MCP integration, plugins,
+demo utilities, generic artifact extraction and TB2-specific agent behavior are not
+migrated. The empty plugin directory and strict empty MCP configuration disable
+ambient integrations; they are not plugin or MCP implementations.
+
+`evolution/claude_proposer.py` workspace copying/canonicalization and
+`evolution/claude_tool_guard.py` path checks are project-written.
+`evolution/materialization.py` is this project's unchanged candidate validation
+mechanism extracted from its previous single-call API adapter. The method spec
+and explicit workflow are project-authored; no claim is made that upstream uses
+our structured internalization candidates. Earlier historical migration reports
+that stated no Meta-Harness code was adapted describe their original commits.
 
 ## Files retained or adapted from the OPID snapshot
 

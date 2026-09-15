@@ -29,7 +29,7 @@ DEFAULTS = {
     "advantage": {"module_weight": .001, "mode": "mean_std_norm", "normalize_module": False,
                   "clip_module": None, "invalid_action_penalty": .1, "epsilon": 1e-6},
     "optimizer": {"learning_rate": 1e-6, "weight_decay": .01},
-    "proposer": {"max_tokens":8192, "temperature":0.0},
+    "proposer": {"backend":"claude_code", "model":"claude-sonnet-5", "max_turns":12},
 }
 
 
@@ -77,9 +77,12 @@ def resolve_execution(raw=None, *, benchmark_limits=None):
     if adv["clip_module"] is not None and (type(adv["clip_module"]) not in (int,float) or
             not math.isfinite(adv["clip_module"]) or adv["clip_module"] <= 0): raise ValueError("Invalid module clip")
     proposer=value["proposer"]
-    if type(proposer["max_tokens"]) is not int or proposer["max_tokens"]<1: raise ValueError("Invalid proposer.max_tokens")
-    if type(proposer["temperature"]) not in (int,float) or not 0<=proposer["temperature"]<=2:
-        raise ValueError("Invalid proposer.temperature")
+    if proposer["backend"] != "claude_code": raise ValueError("Invalid proposer.backend")
+    if (not isinstance(proposer["model"], str) or not proposer["model"].startswith("claude-") or
+            proposer["model"].endswith("-latest") or any(c.isspace() for c in proposer["model"])):
+        raise ValueError("Proposer requires an exact Claude model ID")
+    if type(proposer["max_turns"]) is not int or proposer["max_turns"] < 1:
+        raise ValueError("Invalid proposer.max_turns")
     return value
 
 

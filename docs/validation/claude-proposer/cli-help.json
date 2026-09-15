@@ -1,0 +1,29 @@
+[
+  {
+    "argv": [
+      "scripts/propose.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: propose.py [-h] --request REQUEST --response RESPONSE [--device DEVICE]\n                  [--benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}]\n                  [--env-config ENV_CONFIG] [--final-evaluation]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE       Legacy requests only; must match resolved config if\n                        supplied\n  --benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}\n  --env-config ENV_CONFIG\n  --final-evaluation    Held-out evaluation only, never training or search\n"
+  },
+  {
+    "argv": [
+      "-m",
+      "internalization.training.entrypoint",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: entrypoint.py [-h] --request REQUEST --response RESPONSE\n                     [--device DEVICE]\n                     [--benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}]\n                     [--env-config ENV_CONFIG] [--final-evaluation]\n                     {propose,check_internalization,evaluate,train}\n\npositional arguments:\n  {propose,check_internalization,evaluate,train}\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE       Legacy requests only; must match resolved config if\n                        supplied\n  --benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}\n  --env-config ENV_CONFIG\n  --final-evaluation    Held-out evaluation only, never training or search\n"
+  },
+  {
+    "argv": [
+      "-m",
+      "internalization.cli",
+      "run",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: hi run [-h] --manifest MANIFEST --backend BACKEND\n              [--experiment-config EXPERIMENT_CONFIG] [--run-seed RUN_SEED]\n              [--checkpoint CHECKPOINT] --output OUTPUT\n              [--planned-update-batches TRAIN_STEPS] [--cycles CYCLES]\n              [--harness-workspace HARNESS_WORKSPACE | --harness-revision HARNESS_REVISION | --state STATE]\n              [--protocol PROTOCOL] [--revision-store REVISION_STORE]\n              [--attribution-policy ATTRIBUTION_POLICY]\n\noptions:\n  -h, --help            show this help message and exit\n  --manifest MANIFEST\n  --backend BACKEND\n  --experiment-config EXPERIMENT_CONFIG\n                        Strict execution settings; replace backend execution\n                        settings\n  --run-seed RUN_SEED   Override run and model sampling seeds together\n                        (17/29/43)\n  --checkpoint CHECKPOINT\n                        Required for a fresh run; optional check when resuming\n                        --state\n  --output OUTPUT\n  --planned-update-batches TRAIN_STEPS, --train-steps TRAIN_STEPS\n                        Total planned update batches (not optimizer steps);\n                        default 300, or resumed protocol\n  --cycles CYCLES       Total planned cycles; default 3, or preserved from\n                        resumed protocol\n  --harness-workspace HARNESS_WORKSPACE\n                        Import a configured executable Harness source tree\n  --harness-revision HARNESS_REVISION\n                        JSON HarnessRevision or accepted state/deployment\n  --state STATE         Continue from an accepted checkpoint/Harness/protocol\n                        pair\n  --protocol PROTOCOL   Protocol sidecar for a relocated historical state\n  --revision-store REVISION_STORE\n  --attribution-policy ATTRIBUTION_POLICY\n                        Fixed pre-training gate JSON; defaults to 95% task\n                        bootstrap, lower gain > 0\n"
+  }
+]

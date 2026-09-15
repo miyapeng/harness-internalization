@@ -1,3 +1,4 @@
+"""Legacy API transport for explicit regression fixtures; not a production backend."""
 from __future__ import annotations
 
 import json

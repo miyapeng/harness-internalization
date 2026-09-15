@@ -1,0 +1,10 @@
+{
+  "protected_files": 61,
+  "only_protected_change": [
+    "src/internalization/training/entrypoint.py"
+  ],
+  "all_non_proposer_config_values_unchanged": true,
+  "candidate_validation_AST_unchanged": true,
+  "entrypoint_diff": "Only propose constructor/import switched; train/evaluate branches unchanged",
+  "preexisting_readme_and_requirement_unchanged": true
+}

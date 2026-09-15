@@ -1,0 +1,194 @@
+{
+  "actual_cli": false,
+  "fake_sessions": 1,
+  "artifacts": "runs/claude-proposer-20260915T080023",
+  "candidates": [
+    {
+      "candidate_id": "c5fb5e987f04c925a4e8c6970f5674c8720af87f68311a36516a52c54f7827df",
+      "parent_revision": "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3",
+      "patch": [
+        {
+          "path": "config/harness.json",
+          "before_hash": "fa49b00898fc344c1d5bdefbef26155202fd6fe051072891590aaf4b6938cd87",
+          "content": "{\"schema\": 2, \"entrypoint\": \"agent/main.py:run\", \"composition\": \"independent_suffix\", \"controls\": [{\"id\": \"recovery_v1\", \"entrypoint\": \"controls/recovery_v1.py:run\", \"enabled\": true}, {\"id\": \"review_v1\", \"entrypoint\": \"controls/review_v1.py:run\", \"enabled\": true}]}"
+        },
+        {
+          "path": "config/tools.json",
+          "before_hash": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+          "content": "{\"log_query\": {\"entry\": \"tools.log_query:run\", \"description\": \"Search log lines in the public history; argument needle:string\"}}"
+        },
+        {
+          "path": "controls/recovery_v1.py",
+          "before_hash": null,
+          "content": "def run(api,payload):\n    return {\"suffix\":'\\n<recovery_v1>',\"selected\":True}\n"
+        },
+        {
+          "path": "controls/review_v1.py",
+          "before_hash": null,
+          "content": "def run(api,payload):\n    return {\"suffix\":'\\n<review_v1>',\"selected\":True}\n"
+        },
+        {
+          "path": "tools/log_query.py",
+          "before_hash": null,
+          "content": "def run(api, payload):\n    needle=payload[\"arguments\"].get(\"needle\",\"\")\n    return \"LOG_QUERY_RESULT\\n\"+\"\\n\".join(line for line in payload[\"history\"].splitlines()\n        if line.startswith(\"log:\") and needle in line)\n"
+        }
+      ],
+      "full_revision": {
+        "format": "code_revision_v1",
+        "version": "97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf",
+        "path": "/data/miyapeng/harness-internalization/runs/claude-proposer-20260915T080023/revisions/97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf-c6b741c7b9e8",
+        "policy": {
+          "editable_prefixes": [
+            "agent/",
+            "prompts/",
+            "tools/",
+            "controls/",
+            "config/"
+          ],
+          "capabilities": [
+            "model",
+            "environment"
+          ],
+          "max_files": 64,
+          "max_bytes": 262144
+        }
+      },
+      "rationale": "Repeated failures -> clearer public context -> more appropriate actions",
+      "evidence_refs": [
+        {
+          "task_id": "search-instance-000",
+          "step": 0
+        }
+      ],
+      "internalization_target": {
+        "full_revision": {
+          "format": "code_revision_v1",
+          "version": "97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf",
+          "path": "/data/miyapeng/harness-internalization/runs/claude-proposer-20260915T080023/revisions/97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf-c6b741c7b9e8",
+          "policy": {
+            "editable_prefixes": [
+              "agent/",
+              "prompts/",
+              "tools/",
+              "controls/",
+              "config/"
+            ],
+            "capabilities": [
+              "model",
+              "environment"
+            ],
+            "max_files": 64,
+            "max_bytes": 262144
+          }
+        },
+        "reduced_revision": {
+          "format": "code_revision_v1",
+          "version": "6c9b78933a6040a3be1062c7d94f1edd1c93d4674fd978960e5f8c3d3c33619e",
+          "path": "/data/miyapeng/harness-internalization/runs/claude-proposer-20260915T080023/revisions/6c9b78933a6040a3be1062c7d94f1edd1c93d4674fd978960e5f8c3d3c33619e-a1bd808b19a0",
+          "policy": {
+            "editable_prefixes": [
+              "agent/",
+              "prompts/",
+              "tools/",
+              "controls/",
+              "config/"
+            ],
+            "capabilities": [
+              "model",
+              "environment"
+            ],
+            "max_files": 64,
+            "max_bytes": 262144
+          }
+        },
+        "removed_behavior": "Independent public-context review",
+        "supervision_adapter": "controls/review_v1.py:run",
+        "target_control_id": "review_v1"
+      }
+    },
+    {
+      "candidate_id": "640213189915db9cb0c9030d826f8c403e7ae0d3652c62e4285117becf146669",
+      "parent_revision": "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3",
+      "patch": [
+        {
+          "path": "prompts/system.txt",
+          "before_hash": "0e0ee4e77d14ef3fe205f3d7adfdbf8809ce013549af68df38d7085d41a8c558",
+          "content": "improve context"
+        }
+      ],
+      "full_revision": {
+        "format": "code_revision_v1",
+        "version": "b93fc217cf43f838fbd91e90a2af77c22a12e3cd000939f8979b9d9e7ce43b5b",
+        "path": "/data/miyapeng/harness-internalization/runs/claude-proposer-20260915T080023/revisions/b93fc217cf43f838fbd91e90a2af77c22a12e3cd000939f8979b9d9e7ce43b5b-3622e415c203",
+        "policy": {
+          "editable_prefixes": [
+            "agent/",
+            "prompts/",
+            "tools/",
+            "controls/",
+            "config/"
+          ],
+          "capabilities": [
+            "model",
+            "environment"
+          ],
+          "max_files": 64,
+          "max_bytes": 262144
+        }
+      },
+      "rationale": "Repeated failures -> clearer public context -> more appropriate actions",
+      "evidence_refs": [
+        {
+          "task_id": "search-instance-000",
+          "step": 0
+        }
+      ],
+      "internalization_target": null
+    }
+  ],
+  "protocol": {
+    "backend": "claude_code",
+    "proposal_sessions": 1,
+    "candidate_count": 2,
+    "parent_revision": "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3",
+    "model": "claude-sonnet-5",
+    "max_turns": 12,
+    "cli_version": "fake-cli-1",
+    "session_id": "fake-session",
+    "allowed_tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write"
+    ],
+    "spec_hash": "c0564fd2d7293cffcfc3c90ff8fef85193326a5bc3e19fca28c52f3bf5552e3f",
+    "skill_hash": "e344a59b4add839994cc91eedca4f25a78f01be969f0aa40e5024b1604c2d44c",
+    "total_cost_usd": 0.03,
+    "succeeded": true
+  },
+  "full_controls": [
+    {
+      "id": "recovery_v1",
+      "entrypoint": "controls/recovery_v1.py:run",
+      "enabled": true
+    },
+    {
+      "id": "review_v1",
+      "entrypoint": "controls/review_v1.py:run",
+      "enabled": true
+    }
+  ],
+  "reduced_controls": [
+    {
+      "id": "recovery_v1",
+      "entrypoint": "controls/recovery_v1.py:run",
+      "enabled": true
+    },
+    {
+      "id": "review_v1",
+      "entrypoint": "controls/review_v1.py:run",
+      "enabled": false
+    }
+  ]
+}

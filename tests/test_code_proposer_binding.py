@@ -210,15 +210,14 @@ class CodeProposerBindingTests(unittest.TestCase):
             'propose':['{python}','tests/fixtures/structured_proposer_worker.py',
                        '--request','{request}','--response','{response}'],
             'evaluate':['unused-fixture']},self.root/'process_ledger.jsonl')
-        with patch.dict(os.environ,{'HI_PROPOSER_MODEL':'mock'}):
-            candidate,sibling=backend.components().proposer.propose(request)
+        candidate,sibling=backend.components().proposer.propose(request)
         candidate.validate(self.parent);sibling.validate(self.parent)
         self.assertEqual(candidate.internalization_target.target_control_id,'review_v1')
         self.assertFalse(candidate.internalization_target.reduced_revision.config['controls'][1]['enabled'])
-        self.assertEqual(len((request.output/'transport_calls.jsonl').read_text().splitlines()),1)
+        self.assertEqual(len((request.output/'claude_invocations.jsonl').read_text().splitlines()),1)
         response=json.loads((request.output/'response.json').read_text())
         self.assertEqual(response['cost']['model_calls'],1)
-        self.assertEqual(response['cost']['input_tokens'],100)
+        self.assertEqual(response['cost']['input_tokens'],110)
         self.assertEqual(json.loads((request.output/'request.json').read_text())['effective_config'],backend.execution_config)
 
     def test_duplicate_candidate_not_evaluated_and_dev_result_not_in_search_feedback(self):

@@ -1,5 +1,7 @@
 # 一次结构化提案：迁移与验收
 
+生产执行层已适配为 [Claude Code workspace session](CLAUDE_PROPOSER.md)。本页记录 fc725740 的候选语义及当时 API transport 证据；当前模型编辑候选目录，由宿主得到相同 path/content patch，再复用这里的校验和构造流程。独立 target stage 仍不存在。
+
 基线为 e5ec547。开始时 README.md 和 requirement.txt 已有未提交的安装说明改动，本轮保留，不并入本次提交。
 
 | 路径/符号 | 调用方 | 本轮处理 |

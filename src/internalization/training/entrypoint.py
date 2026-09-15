@@ -62,8 +62,8 @@ def main(default_stage=None):
             tuple(request["history"]), request["cycle"], request["candidate_count"], out)
         from ..harness.revision import HarnessRevision, RevisionStore
         if isinstance(proposal.harness,HarnessRevision):
-            from ..evolution.code_proposer import CodeProposer
-            proposer=CodeProposer(RevisionStore(Path(proposal.harness.path).parent,proposal.harness.policy),
+            from ..evolution.claude_proposer import ClaudeCodeProposer
+            proposer=ClaudeCodeProposer(RevisionStore(Path(proposal.harness.path).parent,proposal.harness.policy),
                 **(execution["proposer"] if execution else {}))
             candidates=proposer.propose(proposal)
             result={"candidates":[c.to_dict() if hasattr(c,"to_dict") else c for c in candidates],"cost":asdict(proposer.last_cost)}

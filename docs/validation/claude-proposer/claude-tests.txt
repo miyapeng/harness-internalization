@@ -1,0 +1,21 @@
+test_claude_outer_loop_preserves_dev_null_preflight_and_attribution_branches (test_claude_proposer.ClaudeProposerTests.test_claude_outer_loop_preserves_dev_null_preflight_and_attribution_branches) ... ok
+test_config_only_new_proposer_fields_and_no_task_knob_changes (test_claude_proposer.ClaudeProposerTests.test_config_only_new_proposer_fields_and_no_task_knob_changes) ... ok
+test_cost_cache_and_file_logs_are_not_double_counted (test_claude_proposer.ClaudeProposerTests.test_cost_cache_and_file_logs_are_not_double_counted) ... ok
+test_diff_add_update_delete_is_deterministic (test_claude_proposer.ClaudeProposerTests.test_diff_add_update_delete_is_deterministic) ... ok
+test_foreign_evidence_rejected_before_any_session (test_claude_proposer.ClaudeProposerTests.test_foreign_evidence_rejected_before_any_session) ... ok
+test_invalid_optional_declaration_is_harness_only_without_repair (test_claude_proposer.ClaudeProposerTests.test_invalid_optional_declaration_is_harness_only_without_repair) ... ok
+test_metadata_extra_field_invalidates_candidate_only (test_claude_proposer.ClaudeProposerTests.test_metadata_extra_field_invalidates_candidate_only) ... ok
+test_no_binary_fails_before_copy_or_any_session (test_claude_proposer.ClaudeProposerTests.test_no_binary_fails_before_copy_or_any_session) ... ok
+test_nonzero_and_timeout_preserve_logs_cost_and_no_candidates (test_claude_proposer.ClaudeProposerTests.test_nonzero_and_timeout_preserve_logs_cost_and_no_candidates) ... ok
+test_one_session_two_common_parent_candidates_and_deterministic_target (test_claude_proposer.ClaudeProposerTests.test_one_session_two_common_parent_candidates_and_deterministic_target) ... ok
+test_protected_input_mutation_and_outside_tree_fail_closed (test_claude_proposer.ClaudeProposerTests.test_protected_input_mutation_and_outside_tree_fail_closed) ... ok
+test_read_write_boundary_and_symlink_rejection (test_claude_proposer.ClaudeProposerTests.test_read_write_boundary_and_symlink_rejection) ... ok
+test_shared_evidence_hardcoding_and_duplicate_checks (test_claude_proposer.ClaudeProposerTests.test_shared_evidence_hardcoding_and_duplicate_checks) ... ok
+test_stream_duplicate_usage_terminal_errors_and_unexpected_tools (test_claude_proposer.ClaudeProposerTests.test_stream_duplicate_usage_terminal_errors_and_unexpected_tools) ... ok
+test_trusted_hook_runs_without_agent_bash_permission (test_claude_proposer.ClaudeProposerTests.test_trusted_hook_runs_without_agent_bash_permission) ... ok
+test_workspace_search_only_and_exact_tool_and_setting_arguments (test_claude_proposer.ClaudeProposerTests.test_workspace_search_only_and_exact_tool_and_setting_arguments) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 1.214s
+
+OK

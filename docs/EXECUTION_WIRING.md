@@ -59,7 +59,7 @@ EnvironmentEvent 增加 observation_kind；完整事件、reward、cost、原始
 
 ## 命令
 
-以下从工程根目录运行。真实训练需要已经安装项目及外部 HF/veRL/ALFWorld 依赖、本地模型权重、真实任务数据、隔离支持和原 proposer API 配置；本轮未启动真实模型训练。
+以下从工程根目录运行。真实训练需要已经安装项目及外部 HF/veRL/ALFWorld 依赖、本地模型权重、真实任务数据、隔离支持和 [Claude proposer 配置](CLAUDE_PROPOSER.md)；本轮未启动真实模型训练。
 
 ```bash
 # CPU/合成回归：实际子进程、隔离 worker 和 tensor 更新；无 GPU 声称
