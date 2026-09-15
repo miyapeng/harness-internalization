@@ -4,7 +4,7 @@
 
 ## 入口与模式
 
-`configs/alfworld_backend.json`（与 `versioned_alfworld_backend.json` 相同）和 `configs/hotpotqa_backend.json` 均配置 propose、target、check_internalization、evaluate、train。`{python}` 使用主 CLI 的 Python 解释器，不再因子进程 PATH 选到另一个 Python。
+`configs/alfworld_backend.json`和 `configs/hotpotqa_backend.json` 均配置 propose、target、check_internalization、evaluate、train。`{python}` 使用主 CLI 的 Python 解释器，不再因子进程 PATH 选到另一个 Python。
 
 - `execution.mode=internalization`：启动时缺少任一入口就报错。候选没有可撤除控制、监督不兼容、接受/归因 gate 不通过，仍按原选择性内化规则跳过；这是候选级结果，不是配置缺失的静默降级。
 - `execution.mode=evolution_only`：只要求 propose/evaluate；版本化循环接受 H+ 后不请求 target/check/train，记录 `accepted_without_internalization` / `detail=evolution_only`。其他尚未配置完整入口的后端明确采用此模式。
@@ -16,7 +16,7 @@
 
 配置例子：`configs/alfworld_execution.json`、`configs/hotpotqa_execution.json`。可只提供部分字段：先继承 `core/execution_config.py` 的默认值，若后端配置了环境 JSON 则继承其模型/步数上限，最后应用显式实验设置；子进程只使用完整的解析结果，不再以本地默认值或设备环境变量覆盖。CLI 文件替换 backend 中的 execution 设置，不做两个用户配置间的隐式合并。
 
-严格拒绝未知 backend 字段、实验字段（含嵌套字段）、子进程 request 字段，以及非法值或不匹配哈希。`configs/experiment_protocol.json` 是历史研究预注册文档，**不是**本次运行配置 schema，不能直接传给 `--experiment-config`。
+严格拒绝未知 backend 字段、实验字段（含嵌套字段）、子进程 request 字段，以及非法值或不匹配哈希。`docs/history/experiment_protocol.json` 是历史研究预注册文档，**不是**本次运行配置 schema，不能直接传给 `--experiment-config`。
 
 | 配置字段 | 消费位置 / 含义 |
 | --- | --- |
@@ -69,7 +69,7 @@ PYTHONPATH=src python3.12 -m unittest discover -s tests -v
 # 已准备好完整 train/search/dev/retirement 分区的 ALFWorld manifest
 PYTHONPATH=src python3.12 -m internalization.cli run \
   --manifest data/alfworld/manifest.json \
-  --backend configs/versioned_alfworld_backend.json \
+  --backend configs/alfworld_backend.json \
   --experiment-config configs/alfworld_execution.json \
   --checkpoint /absolute/path/to/local-hf-checkpoint \
   --harness-workspace examples/versioned_harness/base \

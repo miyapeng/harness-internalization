@@ -1,0 +1,86 @@
+ M README.md
+ D configs/experiment_protocol.json
+ D configs/versioned_alfworld_backend.json
+ M docs/EXECUTION_WIRING.md
+ M docs/IMPLEMENTATION_AUDIT.md
+ M docs/METHOD.md
+ M docs/MIGRATION.md
+ M docs/RUNBOOK.md
+ M docs/STATUS.md
+ M docs/VERSIONED_HARNESS.md
+ M docs/WORKLOG.md
+ D docs/history/revision-baseline/src/internalization/cli.py
+ D docs/history/revision-baseline/src/internalization/command_backend.py
+ D docs/history/revision-baseline/src/internalization/core/interfaces.py
+ D docs/history/revision-baseline/src/internalization/core/serialization.py
+ D docs/history/revision-baseline/src/internalization/outer_loop.py
+ D docs/history/revision-baseline/src/internalization/training/entrypoint.py
+ D docs/history/revision-baseline/src/internalization/training/rollout.py
+ D docs/history/revision-baseline/src/internalization/training/teacher_scoring.py
+ D harness_modules/planner.py
+ D harness_modules/recovery.py
+ D harness_modules/review.py
+ M scripts/build_alfworld_manifest.py
+ D scripts/launch_opid_alfworld.sh
+ D scripts/meta_proposer.py
+ D scripts/train_opid.py
+ D scripts/verify_migration.py
+ D src/internalization/alfworld_eval.py
+ D src/internalization/backends.py
+ M src/internalization/cli.py
+ M src/internalization/command_backend.py
+ M src/internalization/core/adapters.py
+ M src/internalization/core/interfaces.py
+ D src/internalization/demo.py
+ D src/internalization/evolution/archive.py
+ M src/internalization/evolution/candidate.py
+ M src/internalization/evolution/code_proposer.py
+ M src/internalization/evolution/proposer.py
+ M src/internalization/evolution/search.py
+ M src/internalization/harness/module.py
+ D src/internalization/harness/planner.py
+ D src/internalization/harness/recovery.py
+ D src/internalization/harness/reviewer.py
+ M src/internalization/harness/runtime.py
+ D src/internalization/harness_modules.py
+ D src/internalization/manifest.py
+ D src/internalization/opid_adapter.py
+ M src/internalization/outer_loop.py
+ D src/internalization/records.py
+ D src/internalization/retirement_eval.py
+ D src/internalization/student_harness.py
+ D src/internalization/teacher_harness.py
+ M src/internalization/training/entrypoint.py
+ M src/internalization/training/rollout.py
+ D src/internalization/training/student_context.py
+ M src/internalization/training/teacher_scoring.py
+ M tests/test_agent_state_pipeline.py
+ M tests/test_appworld.py
+ M tests/test_attribution.py
+ M tests/test_behavior_policy.py
+ M tests/test_benchmark_adapters.py
+ M tests/test_budget_v1.py
+ M tests/test_core.py
+ M tests/test_execution_wiring.py
+ M tests/test_migration.py
+ M tests/test_model_acceptance.py
+ D tests/test_opid_bridge.py
+ D tests/test_outer_loop.py
+ D tests/test_student_harness.py
+?? docs/CLEANUP_REPORT.md
+?? docs/history/IMPLEMENTATION_AUDIT-pre-cleanup.md
+?? docs/history/MIGRATION-pre-cleanup.md
+?? docs/history/experiment_protocol.json
+?? docs/validation/cleanup/before.json
+?? docs/validation/cleanup/behavior-after.json
+?? docs/validation/cleanup/behavior-before.json
+?? docs/validation/cleanup/changes.json
+?? docs/validation/cleanup/checks.json
+?? docs/validation/cleanup/dependency-audit.txt
+?? docs/validation/cleanup/test-migration.json
+?? docs/validation/cleanup/working-tree.txt
+?? tests/fixtures/cleanup_probe.py
+?? tests/fixtures/code_training.py
+?? tests/fixtures/historical_recovery.txt
+?? tests/test_revision_scoring_boundary.py
+?? tests/test_source_boundaries.py

@@ -116,7 +116,7 @@ class AcceptedStatePipelineTests(unittest.TestCase):
         write_json(cycle.parent/'protocol.json',self.agent().protocol)
         write_json(cycle/'state.json',{'checkpoint':str(self.checkpoint),'harness_revision':self.full.to_dict(),'cycle':0})
         self.assertEqual(load_accepted_state(cycle/'state.json',self.manifest).next_cycle,1)
-        module=HarnessModule.from_source((ROOT/'harness_modules/recovery.py').read_text())
+        module=HarnessModule.from_source((ROOT/'tests/fixtures/historical_recovery.txt').read_text())
         old=Harness((module,))
         path=cycle/'legacy.json';write_json(path,{'checkpoint':str(self.checkpoint),'harness_version':old.version,
             'active_modules':[{'source':module.source}]})

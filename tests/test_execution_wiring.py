@@ -1,3 +1,4 @@
+from fixtures.code_training import pair
 """Task-one regressions: real file/process wiring, mock benchmark/model, CPU tensors."""
 import json
 import sys
@@ -13,7 +14,6 @@ from internalization.core.types import Cost, EpisodeResult
 from internalization.core.interfaces import Components
 from internalization.core.manifest import TaskManifest
 from internalization.core.trajectory import RolloutResult, read_trace_file
-from internalization.harness.module import Harness, HarnessModule
 from internalization.harness.revision import RevisionStore
 from internalization.harness.code_runtime import CodeRuntime
 from internalization.training.rollout import EnvironmentStep, InteractionTaskRunner
@@ -68,10 +68,9 @@ class ExecutionWiringTests(unittest.TestCase):
                 tasks_per_batch=2,rollouts_per_task=3,max_steps=2,
                 optimizer={'learning_rate':.023},advantage={'module_weight':weight})
             backend=CommandBackend(config,self.root/(mode+'.ledger'))
-            source=fixtures.SOURCE if active else fixtures.SOURCE.replace('return True','return False')
-            full=Harness((HarnessModule.from_source(source),))
+            full,target=pair(self.root/f'revisions-{active}',active=active)
             out=self.root/(mode+str(active))
-            try: result=backend.train('initial',full,Harness(),'target',('a','b','c'),2,out)
+            try: result=backend.train('initial',full,target.reduced_revision,target,('a','b','c'),2,out)
             except Exception:
                 self.fail((out/'stderr.log').read_text())
             request=json.loads((out/'request.json').read_text())
@@ -90,7 +89,7 @@ class ExecutionWiringTests(unittest.TestCase):
             self.assertEqual(len(samples),6);self.assertEqual({t.task_id for t in samples},{'a','b'})
             self.assertTrue(all(len(t.transitions)==2 for t in samples))
             rows=[json.loads(line) for line in (out/'training.jsonl').read_text().splitlines()]
-            signals=[row for row in rows if row['kind']=='teacher_state']
+            signals=[row for row in rows if row['kind']=='revision_teacher_state']
             self.assertTrue(signals)
             self.assertTrue(all(row['signal']['selected']==(active or mode=='all') for row in signals))
             self.assertTrue(Path(result).is_dir())
@@ -101,12 +100,13 @@ class ExecutionWiringTests(unittest.TestCase):
 
     def test_no_update_reply_preserves_checkpoint_and_rejects_fake_new_model(self):
         backend=CommandBackend(self.backend_config(),self.root/'ledger')
+        full,target=pair(self.root/'reply-revisions')
         reply={'planned_update_batches':2,'attempted_update_batches':2,'actor_update_calls':0,
                'optimizer_steps':None,'status':'no_actor_updates','checkpoint':'old','cost':asdict(Cost(tool_calls=2))}
         with patch.object(backend,'_call',return_value=reply):
-            with self.assertRaises(NoActorUpdates):backend.train('old',Harness(),Harness(),'m',('t',),2,self.root/'train')
+            with self.assertRaises(NoActorUpdates):backend.train('old',full,target.reduced_revision,target,('t',),2,self.root/'train')
         with patch.object(backend,'_call',return_value={**reply,'checkpoint':'fake'}):
-            with self.assertRaisesRegex(ValueError,'preserve'):backend.train('old',Harness(),Harness(),'m',('t',),2,self.root/'train')
+            with self.assertRaisesRegex(ValueError,'preserve'):backend.train('old',full,target.reduced_revision,target,('t',),2,self.root/'train')
 
     def test_verl_constructor_honors_optimizer_settings_and_counts_actual_steps(self):
         import torch
@@ -159,10 +159,10 @@ class ExecutionWiringTests(unittest.TestCase):
             def rollout(*args,**kwargs): raise RuntimeError('collection failed')
         trainer=ModuleTrainer(Runner())
         policy=fixtures.BehaviorPolicyTests().policy()
-        full=Harness((HarnessModule.from_source(fixtures.SOURCE),))
+        full, target = pair(self.root/"revisions")
         with self.assertRaisesRegex(RuntimeError,'collection failed'):
-            trainer.train(policy,fixtures.BehaviorPolicyTests().reference(),full,Harness(),
-                tasks=('task',),target='target',budget=5,output=self.root/'failed')
+            trainer.train(policy,fixtures.BehaviorPolicyTests().reference(),full,target.reduced_revision,
+                tasks=('task',),target=target,budget=5,output=self.root/'failed')
         summary=json.loads((self.root/'failed/training_summary.json').read_text())
         self.assertEqual([summary[k] for k in ('planned_update_batches','attempted_update_batches','actor_update_calls')],[5,1,0])
         self.assertEqual(summary['status'],'failed')

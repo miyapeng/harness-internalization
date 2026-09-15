@@ -2,9 +2,9 @@
 
 版本化 Harness 代码演化与选择性内化：先用可执行代码改进当前 Agent，再尝试把其中的控制计算蒸馏进模型，通过独立四格评价决定保留还是撤除。
 
-工程是独立实现，不需要 OPID 或 Meta-Harness 的嵌套运行仓库。训练优化器通过可选外部依赖 `verl==0.5.0` 使用。原 planning/review/recovery 模块模式仍兼容。
+工程是独立实现，不需要 OPID 或 Meta-Harness 的嵌套运行仓库。训练优化器通过可选外部依赖 `verl==0.5.0` 使用。正式演化与训练仅支持可执行 Harness revision；历史模块类型仅用于原生基线和历史状态评价。
 
-**验证状态：213 项测试通过（CPU/mock、子进程与代码隔离）。budget_v1 配置、调度、数据导入和真实 smoke 入口已落地；官方数据分布、真实 API/HF/veRL/GPU 实验尚未运行，WebShop 官方完整环境仍 not ready。** 见 [budget_v1 运行说明](docs/BUDGET_V1.md) 和 [验收报告](docs/validation/budget-v1-report.json)。
+**验证状态：清理后 210 项 CPU/mock、子进程与隔离测试通过（0 skip）；配置及行为对照一致。详见 [清理报告](docs/CLEANUP_REPORT.md)。budget_v1 配置、调度、数据导入和真实 smoke 入口已落地；官方数据分布、真实 API/HF/veRL/GPU 实验尚未运行，WebShop 官方完整环境仍 not ready。** 见 [budget_v1 运行说明](docs/BUDGET_V1.md) 和 [验收报告](docs/validation/budget-v1-report.json)。
 
 ## 方法
 
@@ -32,13 +32,13 @@ schema 2 使用具名控制 ID；例如只关闭 review_v1，保留 recovery_v1 
 src/internalization/
   core/          数据结构、真实任务manifest、四种独立backend接口
   harness/       代码revision、隔离runtime、工具broker与兼容模块
-  evolution/     proposer、候选lineage、archive、配对搜索选择
+  evolution/     API transport、代码proposer、候选lineage、配对搜索与事件归档
   training/      on-policy rollout、同批次策略H+评分、优势、更新、checkpoint
   evaluation/    训练前归因、模型接受/回滚、四格退役、bootstrap与成本
   benchmarks/    ALFWorld、WebShop、AppWorld、TB2、SWE-bench Pro、HotpotQA、LawBench适配
   outer_loop.py  只通过本项目接口编排三个周期
-configs/         保留的实验协议与进程配置
-scripts/         提案、训练、评价、manifest与迁移验证入口
+configs/         budget_v1 权威实验配置、环境与进程配置
+scripts/         提案、训练、阶段/最终评价、manifest与真实smoke入口
 tests/           训练、版本化演化、数据/状态/最终评价接线回归
 docs/            方法、运行、迁移、来源与验证记录
 licenses/        保留的第三方许可证和NOTICE
@@ -46,7 +46,7 @@ licenses/        保留的第三方许可证和NOTICE
 
 ## 快速开始
 
-推荐 Python 3.12。纯兼容模式 demo 无额外依赖；完整测试和版本化 demo 需要安装 torch。代码执行要求 Linux Landlock ABI ≥ 3 和系统 `libseccomp.so.2`，本机验证环境为 ABI 4。
+推荐 Python 3.12。完整 CPU 测试和版本化 demo 需要 torch。代码执行要求 Linux Landlock ABI ≥ 3 和系统 `libseccomp.so.2`，本机验证环境为 ABI 4。
 
 ```bash
 git clone https://github.com/miyapeng/harness-internalization.git
@@ -63,14 +63,7 @@ python3.12 scripts/demo_named_controls.py --output runs/my-named-controls-demo
 
 输出目录必须不存在。版本化 demo 实际执行代码、工具和隔离；模型行为与 trainer checkpoint 转换是 scripted mock，实际 optimizer updates 为 0。另有 CPU 小模型 SGD 测试验证训练桥。运行产物、模型权重、凭据及官方任务数据不随仓库发布；执行上述命令会在 `runs/` 生成完整候选、精简版本、目标和评价记录。
 
-原兼容模式仍可运行：
-
-```bash
-python3.12 -m internalization.cli validate-module harness_modules/recovery.py
-python3.12 -m internalization.cli demo --output runs/my-legacy-demo
-```
-
-真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。新版导入器按 `--cycles` 生成独立 retirement，不再分配 acceptance；三周期通用导入默认需至少180个非测试任务。既有 manifest 的 acceptance 分区保留闲置，不重划 retirement/test。演化恢复使用 `--state`，最终评价必须显式选择 `--state` 或 `--baseline`，不能复用 retirement/test。
+真实训练和环境依赖通过 `.[teacher]`、`.[training]`、`.[alfworld]` 安装；真实运行前必须准备模型、授权资源及独立任务 manifest。正式数据数量、导入命令和来源以 [BUDGET_V1.md](docs/BUDGET_V1.md) 为准，不再分配 acceptance。既有 manifest 的 acceptance 分区保留闲置，不重划 retirement/test。演化恢复使用 `--state`，最终评价必须显式选择 `--state` 或 `--baseline`，不能复用 retirement/test。
 
 ## 文档与实验边界
 
@@ -82,7 +75,7 @@ python3.12 -m internalization.cli demo --output runs/my-legacy-demo
 - [171 项测试与具名控制验收记录](docs/validation/named-controls-report.json)
 - [182 项测试与环境事件回报验收记录](docs/validation/environment-events-report.json)
 
-完整迁移表和验证边界见 [docs/MIGRATION.md](docs/MIGRATION.md)，操作见 [docs/RUNBOOK.md](docs/RUNBOOK.md)，版权见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。源commit记录在 `upstream.lock.json`，仅作来源记录，不用于加载代码。历史flat模块和旧脚本名只是本项目代码的兼容入口。
+完整迁移表和验证边界见 [docs/MIGRATION.md](docs/MIGRATION.md)，操作见 [docs/RUNBOOK.md](docs/RUNBOOK.md)，版权见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。源commit记录在 `upstream.lock.json`，仅作来源记录，不用于加载代码。flat 转发文件和旧脚本入口已删除；必要的历史状态读取与原生评价类型保留。
 
 AppWorld已增加独立环境worker、官方评分接口、manifest和训练/评价入口，真实包与数据尚未运行。见 [AppWorld运行说明](docs/benchmarks/APPWORLD.md)；后续接入顺序见 [Benchmark排期](docs/BENCHMARK_ROADMAP.md)。
 

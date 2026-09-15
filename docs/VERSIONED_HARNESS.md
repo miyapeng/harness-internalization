@@ -69,12 +69,12 @@ PYTHONPATH=src python3.12 -m unittest discover -s tests -v
 
 可用 `--scenario tool_only`、`unsupported`、`rollback`、`attribution_failed` 分别复核其余路径，仍使用原统计阈值。默认 mixed 为三个周期、每轮两个候选、三 seeds、每 cohort 30 个独立 task；300 是 mock 训练预算分配标记，**演示实际 optimizer update 数为 0**。诊断 mock 显式等待 20ms 模拟辅助调用，延迟字段按实际 wall time 记录；模型、token 和任务成功来自脚本 fixture，不能解释为真实部署收益。
 
-已有 ALFWorld 的真实后端配置入口是 `configs/versioned_alfworld_backend.json`，本次**未运行**。准备已有模型/veRL/环境依赖和授权 proposer 环境变量后，可使用：
+已有 ALFWorld 的真实后端配置入口是 `configs/alfworld_backend.json`，本次**未运行**。准备已有模型/veRL/环境依赖和授权 proposer 环境变量后，可使用：
 
 ```bash
 PYTHONPATH=src python -m internalization.cli run \
   --manifest /absolute/path/to/predeclared-manifest.json \
-  --backend configs/versioned_alfworld_backend.json \
+  --backend configs/alfworld_backend.json \
   --checkpoint /absolute/path/to/student-checkpoint \
   --harness-workspace examples/versioned_harness/base \
   --revision-store runs/alfworld-code-revisions \

@@ -1,3 +1,4 @@
+from fixtures.code_training import pair
 """Independent synthetic fixtures: these tests are not official benchmark scores."""
 import asyncio
 import csv
@@ -21,7 +22,7 @@ from internalization.benchmarks.terminalbench import TerminalBench2Environment, 
 from internalization.benchmarks.aggregate import aggregate
 from internalization.core.types import Cost, EpisodeResult
 from internalization.command_backend import serialize_harness
-from internalization.harness.module import Harness, HarnessModule
+from internalization.harness.module import Harness
 from internalization.harness.runtime import Completion
 from internalization.training import entrypoint
 import test_behavior_policy as fixtures
@@ -225,11 +226,11 @@ class AdapterTests(unittest.TestCase):
                     return Completion('{"action":"final","answer":"wrong","supporting_facts":[]}',result.cost,result.response_ids)
                 return result
             policy.generate=generate
-            full=Harness((HarnessModule.from_source(fixtures.SOURCE),))
+            full, target = pair(root/"revisions")
             request=root/"request.json"; response=root/"out/response.json"
             request.write_text(json.dumps({"stage":"train","student_checkpoint":"mock","teacher_checkpoint":"mock",
-                "full_harness":serialize_harness(full),"reduced_harness":serialize_harness(Harness()),
-                "target":"target","task_ids":["q1"],"optimizer_steps":2}))
+                "full_harness":serialize_harness(full),"reduced_harness":serialize_harness(target.reduced_revision),
+                "target":target.to_dict(),"task_ids":["q1"],"optimizer_steps":2}))
             with patch.object(sys,"argv",["worker","--request",str(request),"--response",str(response),
                 "--benchmark","hotpotqa","--env-config",str(path)]), \
                 patch.object(verl_backend,"VerlPolicy",return_value=policy), \

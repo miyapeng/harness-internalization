@@ -1,8 +1,7 @@
-"""Bounded executable Python predicates; candidate source is parsed, never exec'd.
+"""Bounded module types for historical state loading and native evaluation only.
 
-The initial search space changes trigger branches, guidance and persistence.
-The fixed runtime implements planner, draft-review and recovery model calls.
-Arbitrary Python programs are deliberately outside this initial implementation.
+Source is parsed, never exec'd. The versioned evolution/training path does not
+use these fixed control templates; existing historical evaluation semantics stay intact.
 """
 from __future__ import annotations
 
@@ -120,4 +119,3 @@ class Harness:
         return Harness(tuple(m for m in self.modules if m.name != name))
 
 # Compatibility name for the original project API.
-ControlModule = HarnessModule

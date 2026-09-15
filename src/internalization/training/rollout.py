@@ -54,6 +54,8 @@ class InteractionTaskRunner:
         if isinstance(harness,HarnessRevision):
             from .revision_rollout import rollout_revision
             return rollout_revision(self,model,harness,tasks,seeds=seeds,output=output,training=training)
+        if training:
+            raise ValueError("Training requires an executable HarnessRevision; legacy module rollout is evaluation-only")
         if isinstance(model, str):
             if self.model_loader is None: raise ValueError("A model loader is required for checkpoint paths")
             model = self.model_loader(model)
@@ -62,7 +64,7 @@ class InteractionTaskRunner:
         for task in tasks:
             for replica, seed in enumerate(seeds):
                 environment = self.environment_factory()
-                episode = f"{task}:{seed}" + (f":replica:{replica}" if training else "")
+                episode = f"{task}:{seed}"
                 runtime = TeacherHarness(model, harness)
                 steps, cost, success = [], Cost(), 0.0
                 started = time.perf_counter()
@@ -74,18 +76,15 @@ class InteractionTaskRunner:
                     for index in range(self.max_steps):
                         state = State(task, episode, index, observation)
                         advice = runtime.advise(state)
-                        action = model.generate(advice.teacher_prompt, purpose="rollout_action" if training else "action")
+                        action = model.generate(advice.teacher_prompt, purpose="action")
                         ids = tuple(action.response_ids)
                         old_lp, scoring_cost = (), Cost()
-                        if training:
-                            if not ids: raise ValueError("Training rollout must retain exact generated token IDs")
-                            old_lp, scoring_cost = model.score(advice.teacher_prompt, list(ids))
                         outcome = environment.step(action.text)  # the sole environment mutation
                         step_cost = advice.cost + action.cost + scoring_cost + Cost(tool_calls=outcome.tool_calls)
                         cost += step_cost
                         transition = Transition(state, advice.teacher_prompt, action.text, ids, outcome.reward,
                                                 outcome.done, outcome.action_valid, tuple(old_lp), step_cost,
-                                                tuple(model.prompt_ids(advice.teacher_prompt)) if training else ())
+                                                ())
                         steps.append(transition)
                         success = outcome.success
                         observation = (outcome.observation if outcome.observation_kind == "context" else

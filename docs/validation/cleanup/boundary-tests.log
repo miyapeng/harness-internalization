@@ -1,0 +1,11 @@
+test_code_proposer_mock_transport_preserves_request_auth_and_cost (test_source_boundaries.SourceBoundaryTests.test_code_proposer_mock_transport_preserves_request_auth_and_cost) ... ok
+test_configured_python_entrypoints_exist (test_source_boundaries.SourceBoundaryTests.test_configured_python_entrypoints_exist) ... ok
+test_current_modules_import_and_explicit_components_are_supported (test_source_boundaries.SourceBoundaryTests.test_current_modules_import_and_explicit_components_are_supported) ... ok
+test_production_has_no_retired_import_or_upstream_runtime_path (test_source_boundaries.SourceBoundaryTests.test_production_has_no_retired_import_or_upstream_runtime_path) ... ok
+test_retired_cli_rejected_and_current_help (test_source_boundaries.SourceBoundaryTests.test_retired_cli_rejected_and_current_help) ... ok
+test_versioned_archive_preserves_failed_successful_and_filters_private_evidence (test_source_boundaries.SourceBoundaryTests.test_versioned_archive_preserves_failed_successful_and_filters_private_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.548s
+
+OK

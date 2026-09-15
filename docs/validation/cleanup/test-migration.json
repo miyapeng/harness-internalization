@@ -1,0 +1,37 @@
+{
+  "tests/test_attribution.py": [
+    "AttributionTests.test_discard_keeps_residual_state_and_does_not_leak_attribution_to_proposer",
+    "AttributionTests.test_equal_ab_never_trains_and_archives_discard_with_lineage"
+  ],
+  "tests/test_behavior_policy.py": [
+    "BehaviorPolicyTests.test_retained_guidance_is_recomputed_by_the_same_batch_policy"
+  ],
+  "tests/test_core.py": [
+    "CoreTests.test_response_tokens_only"
+  ],
+  "tests/test_migration.py": [
+    "MigrationTests.test_archive_keeps_failed_and_successful_candidates_without_dev_leak",
+    "MigrationTests.test_original_twenty_tests_were_not_edited",
+    "MigrationTests.test_proposer_can_be_mocked_without_any_model_or_upstream"
+  ],
+  "tests/test_model_acceptance.py": [
+    "ModelAcceptanceTests.test_demo_schema_comparison_still_rejects_old_score_or_decision_changes",
+    "ModelAcceptanceTests.test_legacy_or_contradictory_custom_evaluator_cannot_accept_checkpoint",
+    "ModelAcceptanceTests.test_rollback_preserves_rejected_checkpoint_artifact_for_audit"
+  ],
+  "tests/test_opid_bridge.py": [
+    "OPIDBridgeTests.test_input_parity_mismatch_fails_closed",
+    "OPIDBridgeTests.test_nontraining_task_fails_closed",
+    "OPIDBridgeTests.test_only_selected_student_tokens_receive_teacher_scores",
+    "OPIDBridgeTests.test_phase_cannot_change_midbatch",
+    "OPIDBridgeTests.test_student_cannot_omit_shared_raw_history",
+    "OPIDBridgeTests.test_teacher_error_propagates",
+    "OPIDBridgeTests.test_teacher_recomputes_retained_modules_from_shared_raw_history"
+  ],
+  "tests/test_outer_loop.py": [
+    "OuterLoopTests.test_retained_module_survives_and_later_cycles_continue"
+  ],
+  "tests/test_student_harness.py": [
+    "StudentHarnessTests.test_retained_modules_run_without_target_and_keep_public_history"
+  ]
+}

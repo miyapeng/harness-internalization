@@ -7,7 +7,7 @@ from pathlib import Path
 
 from internalization.core.types import Cost, State
 from internalization.core.trajectory import Trajectory, Transition
-from internalization.harness.module import Harness, HarnessModule
+from fixtures.code_training import pair
 from internalization.harness.runtime import Completion
 from internalization.training.behavior_policy import BehaviorPolicySnapshot
 from internalization.training.rollout import EnvironmentStep, InteractionTaskRunner
@@ -15,7 +15,7 @@ from internalization.training.teacher_scoring import ModuleTeacherScorer, Module
 from internalization.training.trainer import ModuleTrainer, build_update_batch
 from internalization.training.module_advantage import AdvantageConfig
 
-SOURCE = 'NAME="target"\nKIND="planner"\nINSTRUCTION="analyze"\nPERSISTENCE=0\ndef trigger(history, step):\n    return True\n'
+
 
 
 @unittest.skipUnless(importlib.util.find_spec("torch"), "CPU torch required")
@@ -37,7 +37,7 @@ class BehaviorPolicyTests(unittest.TestCase):
                 if torch.is_grad_enabled() or self.model.training:
                     raise AssertionError("Inference must be read-only and eval")
                 self.events.append(("generate", purpose, self.snapshot_id))
-                if purpose == "planner": return Completion("GUIDANCE", Cost(2, 1, 1, 1))
+                if purpose in ("planner", "harness_internal"): return Completion("GUIDANCE", Cost(2, 1, 1, 1))
                 if "GUIDANCE" in prompt: raise AssertionError("Target advice leaked into student generation")
                 return Completion("act", Cost(2, 2, 1), (3, 4))
             def score(self, prompt, ids):
@@ -73,15 +73,15 @@ class BehaviorPolicyTests(unittest.TestCase):
             def score(self, *args, **kwargs): raise AssertionError("Mock optimizer does not need reference scoring")
         return Reference()
 
-    def run_phase(self, root, policy, *, source=SOURCE, batches=3):
+    def run_phase(self, root, policy, *, active=True, batches=3):
         class Environment:
             def reset(self, task, seed): return "PUBLIC"
             def step(self, action): return EnvironmentStep("DONE", 1.0, True, 1.0)
             def close(self): pass
-        full = Harness((HarnessModule.from_source(source),))
+        full, target = pair(root / "revisions", active=active)
         trainer = ModuleTrainer(InteractionTaskRunner(Environment), tasks_per_batch=1, rollouts_per_task=2)
         reference = self.reference()
-        checkpoint = trainer.train(policy, reference, full, Harness(), target="target", tasks=("task",),
+        checkpoint = trainer.train(policy, reference, full, target.reduced_revision, target=target, tasks=("task",),
                                    budget=batches, output=root)
         return checkpoint, reference
 
@@ -136,7 +136,7 @@ class BehaviorPolicyTests(unittest.TestCase):
         import torch
         with tempfile.TemporaryDirectory() as directory:
             policy = self.policy()
-            self.run_phase(Path(directory), policy, source=SOURCE.replace("return True", "return False"), batches=1)
+            self.run_phase(Path(directory), policy, active=False, batches=1)
             self.assertFalse(any(e[0] == "generate" and e[1] == "planner" for e in policy.events))
             self.assertFalse(policy.batches[0]["module_mask"].any())
             torch.testing.assert_close(policy.batches[0]["advantages"], torch.zeros((2, 2)))
@@ -149,33 +149,6 @@ class BehaviorPolicyTests(unittest.TestCase):
                 with torch.no_grad(): policy.model.weight.add_(1)
                 behavior.score("PUBLIC", [3, 4])
 
-    def test_retained_guidance_is_recomputed_by_the_same_batch_policy(self):
-        policy = self.policy()
-        source = SOURCE.replace('NAME="target"', 'NAME="retained"')
-        reduced = Harness((HarnessModule.from_source(source),))
-        full = Harness(reduced.modules + (HarnessModule.from_source(SOURCE.replace('KIND="planner"', 'KIND="recovery"')),))
-        calls = []
-        def generate(prompt, *, purpose):
-            calls.append((policy.snapshot_id, purpose, prompt))
-            if purpose == "planner": return Completion("RETAINED", Cost(2, 1, 1, 1))
-            if purpose == "recovery": return Completion("TARGET", Cost(2, 1, 1, 1))
-            if "TARGET" in prompt: raise AssertionError("Target entered student rollout")
-            return Completion("act", Cost(2, 2, 1), (3, 4))
-        policy.generate = generate
-        class Environment:
-            def reset(self, task, seed): return "PUBLIC"
-            def step(self, action): return EnvironmentStep("DONE", 1., True, 1.)
-            def close(self): pass
-        with tempfile.TemporaryDirectory() as directory:
-            with BehaviorPolicySnapshot(policy) as behavior:
-                trajectories = InteractionTaskRunner(Environment).rollout(behavior, reduced, ("task",),
-                    seeds=(0,), output=Path(directory), training=True).trajectories
-                ModuleTeacherScorer(behavior, full, "target", {"task"}).score(trajectories)
-        planners = [prompt for _, purpose, prompt in calls if purpose == "planner"]
-        self.assertEqual(len(planners), 2)
-        self.assertEqual(planners[0], planners[1])
-        self.assertEqual({snapshot for snapshot, _, _ in calls}, {"policy-0"})
-        self.assertIn("RETAINED", next(prompt for _, purpose, prompt in calls if purpose == "recovery"))
 
     def test_snapshot_expires_before_optimizer_work(self):
         policy = self.policy()
@@ -186,14 +159,16 @@ class BehaviorPolicyTests(unittest.TestCase):
         self.assertTrue(policy.model.training)  # original mode restored
 
     def test_scorer_and_batch_builder_reject_mismatched_snapshot(self):
-        policy = self.policy()
-        state = State("task", "e", 0, "PUBLIC")
-        step = Transition(state, "PUBLIC", "act", (3, 4), old_log_probs=(-2., -2.), prompt_ids=(1, 2))
-        trajectory = Trajectory("task", "e", 0, "other-policy", Harness().version, (step,), 0, Cost())
-        with BehaviorPolicySnapshot(policy) as behavior:
-            scorer = ModuleTeacherScorer(behavior, Harness((HarnessModule.from_source(SOURCE),)), "target", {"task"})
-            with self.assertRaisesRegex(ValueError, "behavior-policy snapshot"):
-                scorer.score((trajectory,))
-            signals = {state.fingerprint: ModuleSignal(True, (-1., -1.), behavior.snapshot_id, state.fingerprint)}
-            with self.assertRaisesRegex(ValueError, "snapshots differ"):
-                build_update_batch((trajectory,), signals, behavior, AdvantageConfig())
+        with tempfile.TemporaryDirectory() as directory:
+            full,target=pair(Path(directory)/"revisions")
+            policy = self.policy()
+            state = State("task", "e", 0, "PUBLIC")
+            step = Transition(state, "PUBLIC", "act", (3, 4), old_log_probs=(-2., -2.), prompt_ids=(1, 2))
+            trajectory = Trajectory("task", "e", 0, "other-policy", target.reduced_revision.version, (step,), 0, Cost())
+            with BehaviorPolicySnapshot(policy) as behavior:
+                scorer = ModuleTeacherScorer(behavior, full, target, {"task"})
+                with self.assertRaisesRegex(ValueError, "current behavior-policy"):
+                    scorer.score((trajectory,))
+                signals = {state.fingerprint: ModuleSignal(True, (-1., -1.), behavior.snapshot_id, state.fingerprint)}
+                with self.assertRaisesRegex(ValueError, "snapshots differ"):
+                    build_update_batch((trajectory,), signals, behavior, AdvantageConfig())

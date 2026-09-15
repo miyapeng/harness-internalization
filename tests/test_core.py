@@ -4,12 +4,11 @@ import unittest
 from dataclasses import asdict
 from pathlib import Path
 
-from internalization.harness_modules import ControlModule, Harness
-from internalization.manifest import TaskManifest
-from internalization.opid_adapter import real_task_ids, verify_response_mask
-from internalization.records import Cost, EpisodeResult, State
-from internalization.retirement_eval import RetirementPolicy, evaluate_retirement
-from internalization.teacher_harness import Completion, TeacherHarness, distillation_selected
+from internalization.harness.module import HarnessModule, Harness
+from internalization.core.manifest import TaskManifest
+from internalization.core.types import Cost, EpisodeResult, State
+from internalization.evaluation.retirement import RetirementPolicy, evaluate_retirement
+from internalization.harness.runtime import Completion, TeacherHarness
 
 
 class FakeModel:
@@ -28,7 +27,7 @@ class CoreTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "module.py"
             path.write_text(source)
-            return ControlModule.load(path)
+            return HarnessModule.load(path)
 
     def test_no_teacher_guidance_in_public_state_and_persistence(self):
         model = FakeModel()
@@ -37,14 +36,13 @@ class CoreTests(unittest.TestCase):
         guide = teacher.advise(state)
         self.assertEqual(state.public_history, "PUBLIC")
         self.assertIn("PRIVATE-GUIDANCE", guide.teacher_prompt)
-        self.assertTrue(distillation_selected(guide, "m"))
+        self.assertTrue("m" in guide.active_modules)
         guide1 = teacher.advise(State("real-id", "e", 1, "PUBLIC NEW"))
         self.assertEqual(guide1.triggered_modules, ())
-        self.assertTrue(distillation_selected(guide1, "m"))
+        self.assertTrue("m" in guide1.active_modules)
         self.assertNotIn("PRIVATE-GUIDANCE", model.prompts[-1])
         guide2 = teacher.advise(State("real-id", "e", 2, "PUBLIC NEXT"))
-        self.assertFalse(distillation_selected(guide2, "m"))
-        self.assertTrue(distillation_selected(guide2, "m", "all"))
+        self.assertFalse("m" in guide2.active_modules)
 
     def test_teacher_refresh_rejected(self):
         model = FakeModel()
@@ -58,15 +56,8 @@ class CoreTests(unittest.TestCase):
         source = self.module().source.replace("step == 0", 'True or __import__("os")')
         with self.assertRaises(ValueError): self.module(source)
 
-    def test_response_tokens_only(self):
-        self.assertEqual(verify_response_mask([1, 1, 0, 0]), 2)
-        with self.assertRaises(ValueError): verify_response_mask([1, 0, 1])
-        with self.assertRaises(ValueError): verify_response_mask([1, 2, 0])
 
     def test_no_placeholder_task_ids_or_split_overlap(self):
-        with self.assertRaises(ValueError): real_task_ids([{"uid": "placeholder"}])
-        self.assertEqual(real_task_ids([{"extra.gamefile": "train/task/game.tw-pddl"}]),
-                         ["train/task/game.tw-pddl"])
         with self.assertRaises(ValueError):
             TaskManifest("alfworld", "v1", {"train": ("same",), "dev": ("same",)}).validate()
         with self.assertRaises(ValueError): TaskManifest("x", "v1", {}).partition("test")

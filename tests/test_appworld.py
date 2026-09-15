@@ -1,3 +1,4 @@
+from fixtures.code_training import pair
 import importlib.util
 import json
 import os
@@ -12,7 +13,7 @@ from internalization.benchmarks.appworld_worker import NativeAppWorld, VERSION
 from internalization.benchmarks.appworld_manifest import build_manifest, aggregate_results
 from internalization.core.types import Cost, EpisodeResult
 from internalization.core.trajectory import read_trace_file
-from internalization.harness.module import Harness, HarnessModule
+from internalization.harness.module import Harness
 from internalization.harness.runtime import Completion
 from internalization.training.rollout import InteractionTaskRunner
 from internalization.training.trainer import ModuleTrainer
@@ -191,9 +192,9 @@ class AppWorldTests(unittest.TestCase):
                         return Completion("apis.supervisor.complete_task()", completion.cost, completion.response_ids)
                     return completion
                 policy.generate = python_action
-                harness = Harness((HarnessModule.from_source(behavior_fixtures.SOURCE),))
+                harness, target = pair(root/"revisions")
                 trainer = ModuleTrainer(runner, tasks_per_batch=1, rollouts_per_task=2)
-                checkpoint = trainer.train(policy, fixture.reference(), harness, Harness(), target="target",
+                checkpoint = trainer.train(policy, fixture.reference(), harness, target.reduced_revision, target=target,
                     tasks=("aaaaaaa_1",), budget=2, output=root / "training")
                 self.assertEqual(policy.updates, 2)
                 self.assertTrue((Path(checkpoint) / "weights.pt").is_file())
@@ -255,11 +256,11 @@ class AppWorldTests(unittest.TestCase):
                     return Completion("apis.supervisor.complete_task()", result.cost, result.response_ids) if purpose == "rollout_action" else result
                 policy.generate = generate
                 reference = behavior_fixtures.BehaviorPolicyTests().reference()
-                full = Harness((HarnessModule.from_source(behavior_fixtures.SOURCE),))
+                full, target = pair(root/"revisions")
                 request, response = root / "request.json", root / "training/response.json"
                 request.write_text(json.dumps({"stage":"train", "student_checkpoint":"model", "teacher_checkpoint":"model",
-                    "full_harness":serialize_harness(full), "reduced_harness":serialize_harness(Harness()),
-                    "target":"target", "task_ids":["aaaaaaa_1"], "optimizer_steps":1}))
+                    "full_harness":serialize_harness(full), "reduced_harness":serialize_harness(target.reduced_revision),
+                    "target":target.to_dict(), "task_ids":["aaaaaaa_1"], "optimizer_steps":1}))
                 with patch.object(sys,"argv",["worker","--request",str(request),"--response",str(response),
                         "--benchmark","appworld","--device","cpu"]), \
                      patch.object(entrypoint,"FrozenHFBackend",return_value=reference), \

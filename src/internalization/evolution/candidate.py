@@ -1,23 +1,6 @@
 from dataclasses import dataclass
 from ..core.types import digest
-from ..harness.module import HarnessModule
 from ..harness.revision import HarnessRevision, FileEdit
-
-
-@dataclass(frozen=True)
-class Candidate:
-    source: str
-    parent: str
-    version: int
-    index: int
-
-    @property
-    def content_hash(self): return digest(self.source)
-
-    @property
-    def candidate_id(self): return digest([self.parent, self.version, self.index, self.content_hash])
-
-    def module(self): return HarnessModule.from_source(self.source)
 
 
 @dataclass(frozen=True)

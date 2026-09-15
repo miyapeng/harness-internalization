@@ -14,7 +14,7 @@ from ..harness.revision import HarnessRevision, InternalizationTarget
 @dataclass(frozen=True)
 class ProposalRequest:
     checkpoint: str
-    harness: Harness | HarnessRevision
+    harness: HarnessRevision
     tasks: tuple[str, ...]
     trajectories: tuple[Trajectory, ...]
     scores: tuple[EpisodeResult, ...]
@@ -42,9 +42,9 @@ class InternalizationTargetBackend(Protocol):
 class TrainingBackend(Protocol):
     # The legacy teacher argument specifies a phase-frozen KL reference.
     # Module supervision must use each batch's current behavior policy instead.
-    def train(self, student, teacher, h_plus: Harness | HarnessRevision, h_minus: Harness | HarnessRevision,
+    def train(self, student, teacher, h_plus: HarnessRevision, h_minus: HarnessRevision,
               trajectories: Callable[[], tuple[Trajectory, ...]] | None, *, tasks: tuple[str, ...],
-              target: str | InternalizationTarget, budget: int, output: Path) -> str: ...
+              target: InternalizationTarget, budget: int, output: Path) -> str: ...
 
 
 class RetirementEvaluator(Protocol):

@@ -20,7 +20,6 @@ class CommandBackend:
     def components(self):
         from .core.interfaces import Components
         from .core.trajectory import RolloutResult, read_trace_file
-        from .evolution.candidate import Candidate
         owner = self
         self.sampling_state = getattr(self,"sampling_state",{})
 
@@ -34,8 +33,7 @@ class CommandBackend:
                 if "candidates" in result:
                     from .evolution.candidate import HarnessCandidate
                     return tuple(HarnessCandidate.from_dict(row) if "candidate_id" in row else row for row in result["candidates"])
-                return tuple(Candidate(source, request.harness.version, request.cycle, i)
-                             for i, source in enumerate(result["candidate_sources"]))
+                raise ValueError("Proposer must return versioned candidates; candidate_sources is retired")
 
             def propose_target(self,request):
                 if "target" not in owner.config: return None
@@ -142,25 +140,6 @@ class CommandBackend:
         self.ledger.append("stage_cost", stage=stage, cost=result["cost"], wall_time_s=elapsed)
         return result
 
-    def propose(self, checkpoint, harness, tasks, cycle, count, output):
-        from .core.interfaces import ProposalRequest
-        from .core.trajectory import read_trace_file
-        from .core.types import read_results
-        baseline = output.parent / "baseline_search"
-        scores = read_results(baseline / "episodes.json")
-        request = ProposalRequest(checkpoint, harness, tuple(tasks),
-            read_trace_file(baseline / "trajectories.jsonl"), tuple(scores), (), cycle, count, output)
-        candidates = self.components().proposer.propose(request)
-        paths = []
-        for i, candidate in enumerate(candidates):
-            path = output / f"candidate_{i}.py"
-            if path.exists():
-                if path.read_text() != candidate.source: raise ValueError("Candidate source mismatch")
-            else:
-                with path.open("x") as f: f.write(candidate.source)
-            paths.append(path)
-        return paths
-
     def evaluate(self, checkpoint, harness, tasks, seeds, output):
         result = self._call("evaluate", {"checkpoint": checkpoint, "harness": serialize_harness(harness),
             "task_ids": tasks, "seeds": seeds}, output)
@@ -168,9 +147,11 @@ class CommandBackend:
 
     def train(self, checkpoint, full, reduced, target, tasks, budget, output):
         from .harness.revision import InternalizationTarget
+        if not isinstance(target,InternalizationTarget):
+            raise TypeError("Training requires an executable InternalizationTarget; legacy module names are retired")
         result = self._call("train", {"teacher_checkpoint": checkpoint, "student_checkpoint": checkpoint,
             "full_harness": serialize_harness(full), "reduced_harness": serialize_harness(reduced),
-            "target": target.to_dict() if isinstance(target,InternalizationTarget) else target,
+            "target": target.to_dict(),
             "task_ids": tasks, "planned_update_batches": budget,
             **({"sampling_state":self.sampling_state} if self.execution_config["schedule"]["profile"]=="budget_v1" else {})}, output)
         if self.execution_config["schedule"]["profile"] == "budget_v1":

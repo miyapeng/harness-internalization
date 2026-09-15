@@ -1,0 +1,346 @@
+[
+  {
+    "status": " M",
+    "path": "README.md"
+  },
+  {
+    "status": " D",
+    "path": "configs/experiment_protocol.json"
+  },
+  {
+    "status": " D",
+    "path": "configs/versioned_alfworld_backend.json"
+  },
+  {
+    "status": " M",
+    "path": "docs/EXECUTION_WIRING.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/IMPLEMENTATION_AUDIT.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/METHOD.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/MIGRATION.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/RUNBOOK.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/STATUS.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/VERSIONED_HARNESS.md"
+  },
+  {
+    "status": " M",
+    "path": "docs/WORKLOG.md"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/cli.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/command_backend.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/core/interfaces.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/core/serialization.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/outer_loop.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/training/entrypoint.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/training/rollout.py"
+  },
+  {
+    "status": " D",
+    "path": "docs/history/revision-baseline/src/internalization/training/teacher_scoring.py"
+  },
+  {
+    "status": " D",
+    "path": "harness_modules/planner.py"
+  },
+  {
+    "status": " D",
+    "path": "harness_modules/recovery.py"
+  },
+  {
+    "status": " D",
+    "path": "harness_modules/review.py"
+  },
+  {
+    "status": " M",
+    "path": "scripts/build_alfworld_manifest.py"
+  },
+  {
+    "status": " D",
+    "path": "scripts/launch_opid_alfworld.sh"
+  },
+  {
+    "status": " D",
+    "path": "scripts/meta_proposer.py"
+  },
+  {
+    "status": " D",
+    "path": "scripts/train_opid.py"
+  },
+  {
+    "status": " D",
+    "path": "scripts/verify_migration.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/alfworld_eval.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/backends.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/cli.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/command_backend.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/core/adapters.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/core/interfaces.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/demo.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/evolution/archive.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/evolution/candidate.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/evolution/code_proposer.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/evolution/proposer.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/evolution/search.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/harness/module.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/harness/planner.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/harness/recovery.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/harness/reviewer.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/harness/runtime.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/harness_modules.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/manifest.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/opid_adapter.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/outer_loop.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/records.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/retirement_eval.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/student_harness.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/teacher_harness.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/training/entrypoint.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/training/rollout.py"
+  },
+  {
+    "status": " D",
+    "path": "src/internalization/training/student_context.py"
+  },
+  {
+    "status": " M",
+    "path": "src/internalization/training/teacher_scoring.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_agent_state_pipeline.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_appworld.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_attribution.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_behavior_policy.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_benchmark_adapters.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_budget_v1.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_core.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_execution_wiring.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_migration.py"
+  },
+  {
+    "status": " M",
+    "path": "tests/test_model_acceptance.py"
+  },
+  {
+    "status": " D",
+    "path": "tests/test_opid_bridge.py"
+  },
+  {
+    "status": " D",
+    "path": "tests/test_outer_loop.py"
+  },
+  {
+    "status": " D",
+    "path": "tests/test_student_harness.py"
+  },
+  {
+    "status": "??",
+    "path": "docs/CLEANUP_REPORT.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/history/IMPLEMENTATION_AUDIT-pre-cleanup.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/history/MIGRATION-pre-cleanup.md"
+  },
+  {
+    "status": "??",
+    "path": "docs/history/experiment_protocol.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/before.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/behavior-after.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/behavior-before.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/changes.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/checks.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/dependency-audit.txt"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/test-migration.json"
+  },
+  {
+    "status": "??",
+    "path": "docs/validation/cleanup/working-tree.txt"
+  },
+  {
+    "status": "??",
+    "path": "tests/fixtures/cleanup_probe.py"
+  },
+  {
+    "status": "??",
+    "path": "tests/fixtures/code_training.py"
+  },
+  {
+    "status": "??",
+    "path": "tests/fixtures/historical_recovery.txt"
+  },
+  {
+    "status": "??",
+    "path": "tests/test_revision_scoring_boundary.py"
+  },
+  {
+    "status": "??",
+    "path": "tests/test_source_boundaries.py"
+  }
+]

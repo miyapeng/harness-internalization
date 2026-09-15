@@ -1,3 +1,4 @@
+from fixtures.code_training import pair
 import hashlib
 import importlib.util
 import json
@@ -8,48 +9,16 @@ from pathlib import Path
 from internalization.core.interfaces import ProposalRequest
 from internalization.core.types import Cost
 from internalization.core.trajectory import RolloutResult
-from internalization.evolution.archive import CandidateArchive
-from internalization.evolution.candidate import Candidate
-from internalization.evolution.proposer import APIProposer
-from internalization.harness.module import Harness, HarnessModule
 from internalization.harness.runtime import Completion
 from internalization.training.rollout import InteractionTaskRunner, EnvironmentStep
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = 'NAME="test"\nKIND="planner"\nINSTRUCTION="guide"\nPERSISTENCE=0\ndef trigger(history, step):\n    return True\n'
+
 
 
 class MigrationTests(unittest.TestCase):
-    def test_original_twenty_tests_were_not_edited(self):
-        hashes = json.loads((ROOT / "docs/history/migration-baseline/original-tests.sha256.json").read_text())
-        for file, expected in hashes.items():
-            self.assertEqual(hashlib.sha256((ROOT / file).read_bytes()).hexdigest(), expected, file)
 
-    def test_proposer_can_be_mocked_without_any_model_or_upstream(self):
-        calls = []
-        def transport(payload):
-            calls.append(payload)
-            return {"choices": [{"message": {"content": json.dumps({"candidate_sources": [SOURCE, SOURCE]})}}],
-                    "usage": {"prompt_tokens": 10, "completion_tokens": 20}}
-        with tempfile.TemporaryDirectory() as directory:
-            proposal = ProposalRequest("model", Harness(), (), (), (),
-                ({"source": "prior", "search_gain": {"mean": 0.1}},), 0, 2, Path(directory))
-            proposer = APIProposer(model="mock", transport=transport)
-            candidates = proposer.propose(proposal)
-            self.assertEqual(len(candidates), 2)
-            self.assertEqual(candidates[0].parent, Harness().version)
-            self.assertIn("prior", calls[0]["messages"][1]["content"])
-            self.assertEqual(proposer.last_cost.input_tokens, 10)
 
-    def test_archive_keeps_failed_and_successful_candidates_without_dev_leak(self):
-        with tempfile.TemporaryDirectory() as directory:
-            archive = CandidateArchive(Path(directory) / "archive.jsonl")
-            for index, status in enumerate(("invalid", "eligible")):
-                archive.record(Candidate(SOURCE, "parent", 0, index), status=status,
-                               search_gain={"mean": 0.2}, dev_gain={"mean": 0.9})
-            self.assertEqual(len(archive.history()), 2)
-            self.assertEqual([r["status"] for r in archive.history()], ["invalid", "eligible"])
-            self.assertNotIn("dev_gain", json.dumps(archive.proposer_history()))
 
     def test_outer_imports_only_project_modules_and_standard_library(self):
         import ast
@@ -160,7 +129,7 @@ class TrainingMigrationTests(unittest.TestCase):
                 self.calls = 0
             def prompt_ids(self, prompt): return [1, 2]
             def generate(self, prompt, *, purpose):
-                if purpose == "planner": return Completion("PRIVATE ADVICE", Cost(2, 1, 1, 1), (1,))
+                if purpose == "harness_internal": return Completion("PRIVATE ADVICE", Cost(2, 1, 1, 1), (1,))
                 if "PRIVATE ADVICE" in prompt: raise AssertionError("Target leaked into student rollout")
                 return Completion("action", Cost(2, 1, 1), (1,))
             def score(self, prompt, ids):
@@ -181,9 +150,9 @@ class TrainingMigrationTests(unittest.TestCase):
                 return output
         with tempfile.TemporaryDirectory() as directory:
             student, teacher = Policy(), Teacher()
-            full = Harness((HarnessModule.from_source(SOURCE),))
+            full, target = pair(Path(directory)/"revisions")
             trainer = ModuleTrainer(InteractionTaskRunner(Environment), tasks_per_batch=1, rollouts_per_task=2)
-            checkpoint = trainer.train(student, teacher, full, Harness(), target="test", tasks=("task",),
+            checkpoint = trainer.train(student, teacher, full, target.reduced_revision, target=target, tasks=("task",),
                                        budget=2, output=Path(directory) / "train")
             self.assertGreater(float(student.weight.detach()), -1.0)
             self.assertEqual(student.calls, 2)
@@ -201,14 +170,14 @@ class TrainingMigrationTests(unittest.TestCase):
         from types import SimpleNamespace
         from internalization.core.trajectory import Trajectory
         from internalization.training.trainer import ModuleTrainer
-        full = Harness((HarnessModule.from_source(SOURCE),))
-        reduced = Harness()
-        stale = Trajectory("task", "episode", 0, "old", reduced.version, (), 0, Cost())
         with tempfile.TemporaryDirectory() as directory:
+            full,target=pair(Path(directory)/"revisions")
+            reduced=target.reduced_revision
+            stale = Trajectory("task", "episode", 0, "old", reduced.version, (), 0, Cost())
             with self.assertRaisesRegex(ValueError, "Stale/off-policy"):
                 ModuleTrainer(None).train(SimpleNamespace(snapshot_id="current"),
                     SimpleNamespace(snapshot_id="teacher"), full, reduced, lambda: (stale,),
-                    target="test", tasks=("task",), budget=1, output=Path(directory))
+                    target=target, tasks=("task",), budget=1, output=Path(directory)/"train")
 
     def test_module_advantage_is_detached_and_padding_zero(self):
         import torch

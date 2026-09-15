@@ -12,7 +12,6 @@ from ..core.serialization import harness_from_dict, trajectory_from_dict
 from ..core.types import Cost, EpisodeResult, write_json
 from ..core.interfaces import ProposalRequest
 from ..benchmarks.alfworld import AlfworldEnvironment
-from ..evolution.proposer import APIProposer
 from .rollout import InteractionTaskRunner
 from .teacher_backend import FrozenHFBackend
 
@@ -46,6 +45,8 @@ def main(default_stage=None):
         raise ValueError("--device conflicts with effective configuration")
     if execution is not None and execution["mode"] == "evolution_only" and stage in ("target","check_internalization","train"):
         raise ValueError("evolution_only mode cannot enter internalization stages")
+    if stage == "train" and not isinstance(request["target"],dict):
+        raise ValueError("Training requires an executable InternalizationTarget; legacy module names are retired")
     out = args.response.resolve().parent
     out.mkdir(parents=True, exist_ok=True)
     if args.response.exists(): raise FileExistsError(args.response)
@@ -56,7 +57,6 @@ def main(default_stage=None):
         seed_process(execution["seeds"]["model_sampling_seed"])
         write_json(out/"seed_config.json",execution["seeds"])
     if stage in ("propose","target"):
-        proposer = APIProposer()
         proposal = ProposalRequest(request["checkpoint"], harness_from_dict(request["harness"]),
             tuple(request["task_ids"]), tuple(trajectory_from_dict(t) for t in request["trajectories"]),
             tuple(EpisodeResult(**{**r, "cost": Cost(**r["cost"])}) for r in request["scores"]),
@@ -73,9 +73,7 @@ def main(default_stage=None):
                 candidates=proposer.propose(proposal)
                 result={"candidates":[c.to_dict() if hasattr(c,"to_dict") else c for c in candidates],"cost":asdict(proposer.last_cost)}
         else:
-            if stage=="target": raise ValueError("Code target proposal requires a Harness revision")
-            candidates = proposer.propose(proposal)
-            result = {"candidate_sources": [c.source for c in candidates], "cost": asdict(proposer.last_cost)}
+            raise ValueError("Proposal requires an executable HarnessRevision; legacy templates are retired")
     else:
         model_options, policy_options, max_steps = {}, {}, 30
         if args.benchmark == "appworld":

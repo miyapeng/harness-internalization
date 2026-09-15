@@ -1,3 +1,4 @@
+from fixtures.code_training import pair
 """Budget scheduling/data/worker contracts; synthetic CPU evidence, never a GPU run."""
 import json
 from pathlib import Path
@@ -184,7 +185,6 @@ class BudgetTests(unittest.TestCase):
 
     def test_subprocess_config_and_queue_continue_across_training_phases(self):
         from internalization.command_backend import CommandBackend
-        from internalization.harness.module import Harness,HarnessModule
         from internalization.core.trajectory import read_trace_file
         import test_behavior_policy as fixtures
         argv=['{python}',str(ROOT/'tests/fixtures/execution_worker.py'),'--request','{request}','--response','{response}']
@@ -192,12 +192,12 @@ class BudgetTests(unittest.TestCase):
             'cwd':str(ROOT),'execution':{'schedule':{'profile':'budget_v1'},'device':'cpu','reference_device':'cpu',
                 'rollouts_per_task':4,'max_steps':1,'seeds':{'environment_seed':73,'run_seed':29,'model_sampling_seed':43},
                 'optimizer':{'learning_rate':.002},'advantage':{'module_weight':0}}},self.root/'costs')
-        full=Harness((HarnessModule.from_source(fixtures.SOURCE),))
+        full, target = pair(self.root/"revisions")
         tasks=tuple('task-'+str(i) for i in range(32))
         all_tasks=[]
         for phase in range(2):
             output=self.root/f'phase-{phase}'
-            try: backend.train('initial',full,Harness(),'target',tasks,2,output)
+            try: backend.train('initial',full,target.reduced_revision,target,tasks,2,output)
             except Exception:
                 self.fail((output/'stderr.log').read_text())
             rows=[json.loads(line) for line in (output/'training.jsonl').read_text().splitlines()]
@@ -205,7 +205,7 @@ class BudgetTests(unittest.TestCase):
                 self.assertEqual(len(set(batch['task_ids'])),4);all_tasks.extend(batch['task_ids'])
             samples=read_trace_file(output/'rollout_00000/trajectories.jsonl')
             self.assertEqual(len(samples),16);self.assertTrue(all(t.seed==73 for t in samples))
-            seed_rows=[json.loads(line) for line in (output/'rollout_00000/trajectories.jsonl').read_text().splitlines()]
+            seed_rows=[json.loads(line) for line in (output/'rollout_00000/revision_execution.jsonl').read_text().splitlines()]
             self.assertEqual(len({r['model_sampling_seed'] for r in seed_rows if r['kind']=='episode_seed'}),16)
             summary=json.loads((output/'response.json').read_text())
             self.assertEqual(summary['advantage_config']['module_weight'],0)

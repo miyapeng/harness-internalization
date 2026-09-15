@@ -4,9 +4,9 @@ import argparse
 import random
 from pathlib import Path
 
-from internalization.manifest import TaskManifest
+from internalization.core.manifest import TaskManifest
 from internalization.core.manifest import loop_cohort_names
-from internalization.records import write_json
+from internalization.core.types import write_json
 
 
 def main():

@@ -1,0 +1,21 @@
+.E.........../usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py:824: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 304: OS call failed or operation not supported on this OS (Triggered internally at /opt/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:109.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+.................................................................................
+======================================================================
+ERROR: test_configured_python_entrypoints_exist (test_source_boundaries.SourceBoundaryTests.test_configured_python_entrypoints_exist)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/miyapeng/harness-internalization/tests/test_source_boundaries.py", line 61, in test_configured_python_entrypoints_exist
+    CommandBackend(config,Path(directory)/'cost.jsonl')
+  File "/data/miyapeng/harness-internalization/src/internalization/command_backend.py", line 83, in __init__
+    env = BenchmarkConfig.load(path)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/miyapeng/harness-internalization/src/internalization/benchmarks/common.py", line 73, in load
+    if "${" in raw: raise ValueError("Unset benchmark configuration environment variable")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Unset benchmark configuration environment variable
+
+----------------------------------------------------------------------
+Ran 94 tests in 40.610s
+
+FAILED (errors=1)

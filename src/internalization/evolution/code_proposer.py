@@ -1,7 +1,7 @@
 """Versioned source proposals over the existing configured proposer endpoint."""
 from dataclasses import asdict
 
-from .proposer import APIProposer
+from .proposer import APITransport
 from .candidate import HarnessCandidate
 from ..harness.revision import InternalizationTarget
 from ..core.types import Cost, write_json
@@ -72,7 +72,7 @@ behavior should be tried; a useful candidate need not be internalized.
 '''
 
 
-class CodeProposer(APIProposer):
+class CodeProposer(APITransport):
     def __init__(self,store,**kwargs):
         super().__init__(**kwargs)
         self.store=store

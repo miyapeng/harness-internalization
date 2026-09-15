@@ -1,0 +1,88 @@
+tests/test_migration.py:11:from internalization.evolution.archive import CandidateArchive
+tests/test_migration.py:46:            archive = CandidateArchive(Path(directory) / "archive.jsonl")
+tests/test_attribution.py:13:from internalization.evolution.archive import CandidateArchive
+tests/test_attribution.py:119:            archive = CandidateArchive(output / "candidate_archive.jsonl")
+tests/test_model_acceptance.py:11:from internalization.demo import ToyBackend
+tests/test_model_acceptance.py:15:from internalization.evolution.archive import CandidateArchive
+tests/test_model_acceptance.py:98:                archive = CandidateArchive(output / "candidate_archive.jsonl")
+tests/test_model_acceptance.py:129:        class DegradingBackend(ToyBackend):
+tests/test_model_acceptance.py:164:        script = Path(__file__).resolve().parents[1] / "scripts/verify_migration.py"
+src/internalization/training/teacher_scoring.py:11:from ..harness.runtime import TeacherHarness, distillation_selected
+src/internalization/training/teacher_scoring.py:37:        runtime = TeacherHarness(self.teacher, self.harness)
+src/internalization/training/teacher_scoring.py:90:class TensorTeacherScorer:
+src/internalization/training/teacher_scoring.py:121:        teacher = TeacherHarness(self.backend, self.harness)
+src/internalization/training/student_context.py:4:from ..harness.runtime import TeacherHarness
+src/internalization/training/student_context.py:6:class StudentHarness:
+src/internalization/training/student_context.py:8:        self.runtime = TeacherHarness(model, reduced)
+tests/test_agent_state_pipeline.py:119:        module=HarnessModule.from_source((ROOT/'harness_modules/recovery.py').read_text())
+scripts/build_alfworld_manifest.py:7:from internalization.manifest import TaskManifest
+scripts/build_alfworld_manifest.py:9:from internalization.records import write_json
+tests/test_core.py:7:from internalization.harness_modules import ControlModule, Harness
+tests/test_core.py:8:from internalization.manifest import TaskManifest
+tests/test_core.py:9:from internalization.opid_adapter import real_task_ids, verify_response_mask
+tests/test_core.py:10:from internalization.records import Cost, EpisodeResult, State
+tests/test_core.py:11:from internalization.retirement_eval import RetirementPolicy, evaluate_retirement
+tests/test_core.py:12:from internalization.teacher_harness import Completion, TeacherHarness, distillation_selected
+tests/test_core.py:35:        teacher = TeacherHarness(model, Harness((self.module(),)))
+tests/test_core.py:51:        teacher = TeacherHarness(model, Harness((self.module(),)))
+src/internalization/outer_loop.py:10:from .evolution.archive import CandidateArchive
+src/internalization/outer_loop.py:11:from .evolution.search import evaluate_tasks, search_candidates
+src/internalization/outer_loop.py:52:    candidate_archive = CandidateArchive(output / "candidate_archive.jsonl")
+src/internalization/outer_loop.py:75:        candidate = search_candidates(components.proposer, components.runner, request, dev_tasks=dev,
+tests/test_student_harness.py:5:from internalization.harness_modules import ControlModule, Harness
+tests/test_student_harness.py:6:from internalization.records import Cost, Journal
+tests/test_student_harness.py:7:from internalization.student_harness import StudentHarness
+tests/test_student_harness.py:8:from internalization.teacher_harness import Completion
+tests/test_student_harness.py:11:class StudentHarnessTests(unittest.TestCase):
+tests/test_student_harness.py:28:            student = StudentHarness(actor, Harness(tuple(modules)).without("remove"), Journal(root / "trace.jsonl"))
+src/internalization/training/rollout.py:10:from ..harness.runtime import TeacherHarness
+src/internalization/training/rollout.py:66:                runtime = TeacherHarness(model, harness)
+src/internalization/demo.py:15:from .teacher_harness import Completion, TeacherHarness, distillation_selected
+src/internalization/demo.py:41:class ToyBackend:
+src/internalization/demo.py:63:        teacher = TeacherHarness(model, harness)
+src/internalization/demo.py:81:        teacher = TeacherHarness(frozen, full)
+src/internalization/demo.py:88:            rollout = TeacherHarness(ToyModel(table), reduced)
+src/internalization/demo.py:114:    result = run_outer_loop(ToyBackend(), manifest, "toy:initial", output,
+README.md:69:python3.12 -m internalization.cli validate-module harness_modules/recovery.py
+tests/test_opid_bridge.py:8:from internalization.harness_modules import ControlModule, Harness
+tests/test_opid_bridge.py:9:from internalization.opid_adapter import OPIDProvider
+tests/test_opid_bridge.py:10:from internalization.records import Cost, Journal, digest
+tests/test_opid_bridge.py:11:from internalization.teacher_harness import Completion
+tests/test_opid_bridge.py:36:        provider = object.__new__(OPIDProvider)
+src/internalization/evolution/search.py:17:def search_candidates(proposer, runner, request, *, dev_tasks, baseline_search, baseline_dev,
+tests/test_outer_loop.py:5:from internalization.demo import ToyBackend
+tests/test_outer_loop.py:6:from internalization.manifest import TaskManifest
+tests/test_outer_loop.py:8:from internalization.records import Cost, EpisodeResult
+tests/test_outer_loop.py:9:from internalization.retirement_eval import RetirementPolicy
+tests/test_outer_loop.py:14:        class RetainFirstBackend(ToyBackend):
+src/internalization/cli.py:19:    validate = commands.add_parser("validate-module")
+src/internalization/cli.py:39:    phase = commands.add_parser("prepare-phase")
+src/internalization/cli.py:54:    elif args.command == "validate-module":
+src/internalization/cli.py:55:        from .harness_modules import ControlModule
+src/internalization/cli.py:58:    elif args.command == "prepare-phase":
+src/internalization/cli.py:60:        from .harness_modules import ControlModule, Harness
+src/internalization/evolution/archive.py:7:class CandidateArchive:
+src/internalization/benchmarks/lawbench_final.py:13:from ..harness.runtime import TeacherHarness
+src/internalization/benchmarks/lawbench_final.py:28:            runtime = TeacherHarness(model,harness)
+src/internalization/student_harness.py:2:from .training.student_context import StudentHarness
+docs/VERSIONED_HARNESS.md:72:已有 ALFWorld 的真实后端配置入口是 `configs/versioned_alfworld_backend.json`，本次**未运行**。准备已有模型/veRL/环境依赖和授权 proposer 环境变量后，可使用：
+docs/VERSIONED_HARNESS.md:77:  --backend configs/versioned_alfworld_backend.json \
+docs/IMPLEMENTATION_AUDIT.md:62:| 5 Advantage | snapshot、mask、同token校验；旧teacher/旧rollout不混用 | IMPLEMENTED | [training/trainer.py:47](/data/miyapeng/harness-internalization/src/internalization/training/trainer.py:47)；[training/trainer.py:99](/data/miyapeng/harness-internalization/src/internalization/training/trainer.py:99)；[training/teacher_scoring.py:36](/data/miyapeng/harness-internalization/src/internalization/training/teacher_scoring.py:36) | scorer与batch builder均拒绝不匹配snapshot；生成response外的prompt/tool文本不进入response mask；g=False term为零 | 旧TensorTeacherScorer为兼容测试接口，非本轮生产入口；其调用方仍须自行提供正确snapshot |
+docs/IMPLEMENTATION_AUDIT.md:105:`cycle_XX/attribution.json`保存判定、区间、策略、checkpoint、candidate ID、parent、module版本、H+/H−版本、manifest hash、partition、seeds和A/B证据路径。`CandidateArchive.record_attribution`另存候选源码与content hash；拒绝路径还保存不变的`state.json`及`training_batches_spent=0`。不调用trainer，不生成C/D或retirement结论，不重分配本轮未花费训练预算；下一周期从原模型和原residual Harness继续。归档中的`decision=internalize`只表示准许训练，不是“内化成功”。
+docs/IMPLEMENTATION_AUDIT.md:111:用相同task/seed的A/C，在每个task内先对seed差分取均值，再按task ID做配对bootstrap。模型接受复用运行前已写入`protocol.json.retirement`的固定`RetirementPolicy`：`performance_margin=0.02`、`confidence=0.95`、`bootstrap_samples=2000`、`min_tasks=30`、`seed=42`。CLI外层默认即此策略，Python调用可在运行前传入policy；描述性`experiment_protocol.json`本身不驱动额外配置加载。
+docs/IMPLEMENTATION_AUDIT.md:133:回滚是恢复正式采用的checkpoint引用；本轮新模块和已有模块都保留。被拒绝的checkpoint与训练/评价产物保留供排查，不清除已花费预算。下轮runner/proposer/trainer/KL reference接收正式采用的旧checkpoint，默认trainer由该路径重新加载policy。`CandidateArchive.record_outcome`存完整候选source/parent/hash与结果，outcome事件不传给proposer。自定义RetirementEvaluator必须提供合法双字段，只返回旧decision或rollback+retire会报错，不能默认为接受。
+docs/IMPLEMENTATION_AUDIT.md:144:| `teacher_refresh` | `each_batch_behavior_policy_before_update` | [configs/experiment_protocol.json:11](/data/miyapeng/harness-internalization/configs/experiment_protocol.json:11) |
+docs/IMPLEMENTATION_AUDIT.md:145:| `module_signal` | `same_behavior_policy_H_plus_logprob_minus_cached_H_minus_old_logprob` | [configs/experiment_protocol.json:12](/data/miyapeng/harness-internalization/configs/experiment_protocol.json:12) |
+docs/IMPLEMENTATION_AUDIT.md:146:| `kl_reference_refresh` | `between_cycles_only` | [configs/experiment_protocol.json:13](/data/miyapeng/harness-internalization/configs/experiment_protocol.json:13) |
+docs/IMPLEMENTATION_AUDIT.md:150:`experiment_protocol.json`仍是描述性协议文件，当前CLI未自动读取整份JSON；本次行为由实际trainer调用链保证，同时将描述改到一致。归因策略已单独通过CLI加载并传入outer loop；其余统一配置加载仍是P1，不将修改JSON本身当作实现。lambda=0.001、g=trigger/persistence、outcome/PPO/KL/entropy配置未变。
+docs/BENCHMARK_ROADMAP.md:13:保留ALFWorld已有adapter。WebShop/Search-QA仍只有任务身份/划分约束，本轮未改。历史experiment_protocol.json主实验组合不自动覆盖；新增AppWorld入口是独立可选配置。本表是用户指定的工程排期，不声称这些benchmark全部出现在Meta-Harness原论文中。
+docs/WORKLOG.md:39:新增10项回归；58项测试全部通过，无skip，原20测试文件SHA256不变。A=1/C=0反例回滚、三分支跨周期、D良好但C退化时回滚优先、容差与不确定性、重复seed不足、成本失败不回滚、被拒绝toy checkpoint仍保留均验证。CPU三周期demo保持原轨迹/评分/决策：77文件逐字节一致，8文件仅新增模型接受相关字段；verify_migration新增显式schema选项，默认字节检查未放宽，反例测试确认原评分或decision变化仍被拒绝。持久化mock见runs/acceptance-proof；日志与报告见validation/acceptance-tests.txt和validation/acceptance-report.json。
+docs/WORKLOG.md:76:默认三周期配置为 configs/versioned_demo.json，真实 ALFWorld 进程配置入口为 configs/versioned_alfworld_backend.json；命令和接口迁移详见 VERSIONED_HARNESS.md。演示运行产物保存至 runs/versioned-harness-final，完整代码、精简版本、目标、四格评价和正式部署状态均留档。演示是实际候选代码/工具/隔离 + scripted model/trainer，实际 optimizer update 数为 0；另外的训练单元测试执行了 CPU SGD。没有将脚本 checkpoint 转换解释为学习收益，没有降低 30 task / 95% / 2000 bootstrap / 0.02 非劣门槛。
+docs/MIGRATION.md:13:| Meta-Harness 提案思想；本项目 `meta_proposer.py` | `evolution/proposer.py` | 当前源码、公开 execution traces、search score、历史候选；可注入 mock transport |
+docs/EXECUTION_WIRING.md:7:`configs/alfworld_backend.json`（与 `versioned_alfworld_backend.json` 相同）和 `configs/hotpotqa_backend.json` 均配置 propose、target、check_internalization、evaluate、train。`{python}` 使用主 CLI 的 Python 解释器，不再因子进程 PATH 选到另一个 Python。
+docs/EXECUTION_WIRING.md:19:严格拒绝未知 backend 字段、实验字段（含嵌套字段）、子进程 request 字段，以及非法值或不匹配哈希。`configs/experiment_protocol.json` 是历史研究预注册文档，**不是**本次运行配置 schema，不能直接传给 `--experiment-config`。
+docs/EXECUTION_WIRING.md:72:  --backend configs/versioned_alfworld_backend.json \
+docs/METHOD.md:52:三轮、每轮两个候选、最多退役一个模块，训练总批次平均分配；search/dev/train/每轮retirement/test严格分离。早期预注册组合为ALFWorld＋WebShop＋Search-QA，可扩展AppWorld；本轮运行接线对象为ALFWorld和已存在的HotpotQA，WebShop完整接入留待任务二。历史预注册与待运行baseline保持 [configs/experiment_protocol.json](../configs/experiment_protocol.json) 原内容不变。
+src/internalization/harness/runtime.py:34:class TeacherHarness:
+src/internalization/opid_adapter.py:2:from .training.teacher_scoring import TensorTeacherScorer as OPIDProvider, real_task_ids, verify_response_mask
+docs/RUNBOOK.md:11:python3.12 scripts/verify_migration.py --before runs/migration-before --after runs/new-demo --allow-model-acceptance-fields

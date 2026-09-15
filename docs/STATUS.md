@@ -1,5 +1,14 @@
 # 实现状态
 
+## 2026-09-14：受控代码清理
+
+正式演化收敛到版本化 Harness 和选择性内化，删除旧模板/flat 转发/重复脚本及仅服务旧生产循环的分支。API transport 从模板逻辑分离，保留 CodeProposer 原提示词和请求行为。保留 schema 1 可执行 hook、具名控制、历史状态反序列化、原生基线/LawBench 评价所需最小类型。预算配置和训练/统计代码不变；本轮未提交或推送。
+
+最终全量 210 项通过（244.782 秒，0 skip），17 个入口 help 通过；同 fixture/seed 的配置、任务/候选、评分/优势和退役/回滚对照完全一致。首次新增配置测试缺少环境变量 fixture 的错误已修正并保留原日志。
+
+路径依赖、测试迁移、清理前后对照与最终验证结果见 [CLEANUP_REPORT.md](CLEANUP_REPORT.md)。以下条目为原始历史记录，其中已删除入口与旧参数只描述当时状态，不是当前运行命令。当前操作统一见 [BUDGET_V1.md](BUDGET_V1.md)。
+
+
 ## 2026-09-14：budget_v1 配置、调度与真实 smoke 入口
 
 新增 ALFWorld/WebShop/HotpotQA 三份完整 budget_v1 配置。96题search池每周期8题、三周期不重复；两个候选以配对平均正收益初筛，只让一个进入32题dev，dev沿用原统计接受门槛，无独立acceptance。训练以持久化seed队列每批4题×4次fresh rollout，配置/seed进入实际JSON子进程及训练器；固定PPO参数和完整effective_config/hash留档。

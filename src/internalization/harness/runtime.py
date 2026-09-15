@@ -75,9 +75,3 @@ public input, never carrying a teacher-only memory into the next state.
     def forget_episode(self, episode_id):
         self._last_step.pop(episode_id, None)
         self._until = {k: v for k, v in self._until.items() if k[0] != episode_id}
-
-
-def distillation_selected(guidance: Guidance, target: str, mode: str = "targeted"):
-    if mode not in ("targeted", "all"):
-        raise ValueError("Supervision mode must be targeted or all")
-    return mode == "all" or target in guidance.active_modules

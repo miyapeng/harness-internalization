@@ -1,0 +1,3432 @@
+{
+  "configs": {
+    "configs/alfworld_execution.json": {
+      "advantage": {
+        "clip_module": null,
+        "epsilon": 1e-06,
+        "invalid_action_penalty": 0.1,
+        "mode": "mean_std_norm",
+        "module_weight": 0.001,
+        "normalize_module": false
+      },
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "clip_ratio": 0.2,
+          "clip_ratio_c": 3.0,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_low": 0.2,
+          "entropy_checkpointing": false,
+          "entropy_coeff": 0.001,
+          "entropy_from_logits_with_chunking": false,
+          "grad_clip": 1.0,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "loss_agg_mode": "token-mean",
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "ppo_epochs": 1,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_mini_batch_size": 8,
+          "ulysses_sequence_parallel_size": 1,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_kl_loss": true,
+          "use_remove_padding": false,
+          "use_torch_compile": false
+        }
+      },
+      "device": "cuda:0",
+      "max_steps": 30,
+      "mode": "internalization",
+      "model": {
+        "max_action_tokens": 512,
+        "max_context": 8192,
+        "max_new_tokens": 192,
+        "max_prompt_tokens": 4096
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      },
+      "reference_device": "cpu",
+      "rollouts_per_task": 2,
+      "schedule": {
+        "candidate_count": 2,
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "profile": "legacy",
+        "representative_traces": 4,
+        "search_per_cycle": 8
+      },
+      "seeds": {
+        "environment_seed": 0,
+        "model_sampling_seed": 17,
+        "run_seed": 17,
+        "split_seed": 42
+      },
+      "supervision": "targeted",
+      "tasks_per_batch": 4
+    },
+    "configs/budget_v1/alfworld.json": {
+      "advantage": {
+        "clip_module": null,
+        "epsilon": 1e-06,
+        "invalid_action_penalty": 0.1,
+        "mode": "mean_std_norm",
+        "module_weight": 0.001,
+        "normalize_module": false
+      },
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "clip_ratio": 0.2,
+          "clip_ratio_c": 3.0,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_low": 0.2,
+          "entropy_checkpointing": false,
+          "entropy_coeff": 0.001,
+          "entropy_from_logits_with_chunking": false,
+          "grad_clip": 1.0,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "loss_agg_mode": "token-mean",
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "ppo_epochs": 1,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_mini_batch_size": 8,
+          "ulysses_sequence_parallel_size": 1,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_kl_loss": true,
+          "use_remove_padding": false,
+          "use_torch_compile": false
+        }
+      },
+      "device": "cuda:0",
+      "max_steps": 30,
+      "mode": "internalization",
+      "model": {
+        "max_action_tokens": 512,
+        "max_context": 8192,
+        "max_new_tokens": 256,
+        "max_prompt_tokens": 4096
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      },
+      "reference_device": "cpu",
+      "rollouts_per_task": 4,
+      "schedule": {
+        "candidate_count": 2,
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "profile": "budget_v1",
+        "representative_traces": 4,
+        "search_per_cycle": 8
+      },
+      "seeds": {
+        "environment_seed": 0,
+        "model_sampling_seed": 17,
+        "run_seed": 17,
+        "split_seed": 42
+      },
+      "supervision": "targeted",
+      "tasks_per_batch": 4
+    },
+    "configs/budget_v1/hotpotqa.json": {
+      "advantage": {
+        "clip_module": null,
+        "epsilon": 1e-06,
+        "invalid_action_penalty": 0.1,
+        "mode": "mean_std_norm",
+        "module_weight": 0.001,
+        "normalize_module": false
+      },
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "clip_ratio": 0.2,
+          "clip_ratio_c": 3.0,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_low": 0.2,
+          "entropy_checkpointing": false,
+          "entropy_coeff": 0.001,
+          "entropy_from_logits_with_chunking": false,
+          "grad_clip": 1.0,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "loss_agg_mode": "token-mean",
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "ppo_epochs": 1,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_mini_batch_size": 8,
+          "ulysses_sequence_parallel_size": 1,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_kl_loss": true,
+          "use_remove_padding": false,
+          "use_torch_compile": false
+        }
+      },
+      "device": "cuda:0",
+      "max_steps": 8,
+      "mode": "internalization",
+      "model": {
+        "max_action_tokens": 512,
+        "max_context": 16384,
+        "max_new_tokens": 256,
+        "max_prompt_tokens": 12288
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      },
+      "reference_device": "cpu",
+      "rollouts_per_task": 4,
+      "schedule": {
+        "candidate_count": 2,
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "profile": "budget_v1",
+        "representative_traces": 4,
+        "search_per_cycle": 8
+      },
+      "seeds": {
+        "environment_seed": 0,
+        "model_sampling_seed": 17,
+        "run_seed": 17,
+        "split_seed": 42
+      },
+      "supervision": "targeted",
+      "tasks_per_batch": 4
+    },
+    "configs/budget_v1/webshop.json": {
+      "advantage": {
+        "clip_module": null,
+        "epsilon": 1e-06,
+        "invalid_action_penalty": 0.1,
+        "mode": "mean_std_norm",
+        "module_weight": 0.001,
+        "normalize_module": false
+      },
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "clip_ratio": 0.2,
+          "clip_ratio_c": 3.0,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_low": 0.2,
+          "entropy_checkpointing": false,
+          "entropy_coeff": 0.001,
+          "entropy_from_logits_with_chunking": false,
+          "grad_clip": 1.0,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "loss_agg_mode": "token-mean",
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "ppo_epochs": 1,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_mini_batch_size": 8,
+          "ulysses_sequence_parallel_size": 1,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_kl_loss": true,
+          "use_remove_padding": false,
+          "use_torch_compile": false
+        }
+      },
+      "device": "cuda:0",
+      "max_steps": 15,
+      "mode": "internalization",
+      "model": {
+        "max_action_tokens": 512,
+        "max_context": 8192,
+        "max_new_tokens": 256,
+        "max_prompt_tokens": 4096
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      },
+      "reference_device": "cpu",
+      "rollouts_per_task": 4,
+      "schedule": {
+        "candidate_count": 2,
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "profile": "budget_v1",
+        "representative_traces": 4,
+        "search_per_cycle": 8
+      },
+      "seeds": {
+        "environment_seed": 0,
+        "model_sampling_seed": 17,
+        "run_seed": 17,
+        "split_seed": 42
+      },
+      "supervision": "targeted",
+      "tasks_per_batch": 4
+    },
+    "configs/hotpotqa_execution.json": {
+      "advantage": {
+        "clip_module": null,
+        "epsilon": 1e-06,
+        "invalid_action_penalty": 0.1,
+        "mode": "mean_std_norm",
+        "module_weight": 0.001,
+        "normalize_module": false
+      },
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "clip_ratio": 0.2,
+          "clip_ratio_c": 3.0,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_low": 0.2,
+          "entropy_checkpointing": false,
+          "entropy_coeff": 0.001,
+          "entropy_from_logits_with_chunking": false,
+          "grad_clip": 1.0,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "loss_agg_mode": "token-mean",
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "ppo_epochs": 1,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_mini_batch_size": 8,
+          "ulysses_sequence_parallel_size": 1,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_kl_loss": true,
+          "use_remove_padding": false,
+          "use_torch_compile": false
+        }
+      },
+      "device": "cuda:0",
+      "max_steps": 30,
+      "mode": "internalization",
+      "model": {
+        "max_action_tokens": 2048,
+        "max_context": 32768,
+        "max_new_tokens": 1024,
+        "max_prompt_tokens": 28672
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      },
+      "reference_device": "cpu",
+      "rollouts_per_task": 2,
+      "schedule": {
+        "candidate_count": 2,
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "profile": "legacy",
+        "representative_traces": 4,
+        "search_per_cycle": 8
+      },
+      "seeds": {
+        "environment_seed": 0,
+        "model_sampling_seed": 17,
+        "run_seed": 17,
+        "split_seed": 42
+      },
+      "supervision": "targeted",
+      "tasks_per_batch": 4
+    }
+  },
+  "retirement": {
+    "0,0": {
+      "capability_preserved": false,
+      "checks": {
+        "auxiliary_calls_vs_A": true,
+        "auxiliary_calls_vs_C": true,
+        "enough_independent_tasks": true,
+        "latency_s_vs_A": true,
+        "latency_s_vs_C": true,
+        "model_calls_vs_A": true,
+        "model_calls_vs_C": true,
+        "module_was_useful": true,
+        "preserves_original_capability": false,
+        "small_remaining_dependence": true,
+        "student_improved_without_module": false,
+        "tool_calls_vs_A": true,
+        "tool_calls_vs_C": true,
+        "total_tokens_vs_A": true,
+        "total_tokens_vs_C": true
+      },
+      "cost_improved": true,
+      "decision": "retain",
+      "intervals": {
+        "A-B": {
+          "high": 1,
+          "low": 1,
+          "mean": 1,
+          "tasks": 40
+        },
+        "C-A": {
+          "high": -1,
+          "low": -1,
+          "mean": -1,
+          "tasks": 40
+        },
+        "D-A": {
+          "high": -1,
+          "low": -1,
+          "mean": -1,
+          "tasks": 40
+        },
+        "D-B": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "D-C": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_auxiliary_calls_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_auxiliary_calls_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_latency_s_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_latency_s_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_model_calls_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_model_calls_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_tool_calls_D-A": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_tool_calls_D-C": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_total_tokens_D-A": {
+          "high": -60,
+          "low": -60,
+          "mean": -60,
+          "tasks": 40
+        },
+        "cost_total_tokens_D-C": {
+          "high": -60,
+          "low": -60,
+          "mean": -60,
+          "tasks": 40
+        }
+      },
+      "model_acceptance": {
+        "checks": {
+          "enough_independent_tasks": true,
+          "no_significant_full_degradation": false
+        },
+        "decision": "rollback",
+        "interval": {
+          "high": -1,
+          "low": -1,
+          "mean": -1,
+          "tasks": 40
+        },
+        "policy": {
+          "bootstrap_samples": 200,
+          "confidence": 0.95,
+          "min_tasks": 30,
+          "min_token_saving_fraction": 0.05,
+          "performance_margin": 0.02,
+          "seed": 42
+        },
+        "reason": "full_harness_degraded"
+      },
+      "model_decision": "rollback",
+      "module_decision": "retain",
+      "policy": {
+        "bootstrap_samples": 200,
+        "confidence": 0.95,
+        "min_tasks": 30,
+        "min_token_saving_fraction": 0.05,
+        "performance_margin": 0.02,
+        "seed": 42
+      },
+      "retirement_accepted": false,
+      "retirement_eligible": false,
+      "success": {
+        "A": 1,
+        "B": 0,
+        "C": 0,
+        "D": 0
+      }
+    },
+    "1,0": {
+      "capability_preserved": false,
+      "checks": {
+        "auxiliary_calls_vs_A": true,
+        "auxiliary_calls_vs_C": true,
+        "enough_independent_tasks": true,
+        "latency_s_vs_A": true,
+        "latency_s_vs_C": true,
+        "model_calls_vs_A": true,
+        "model_calls_vs_C": true,
+        "module_was_useful": true,
+        "preserves_original_capability": false,
+        "small_remaining_dependence": false,
+        "student_improved_without_module": false,
+        "tool_calls_vs_A": true,
+        "tool_calls_vs_C": true,
+        "total_tokens_vs_A": true,
+        "total_tokens_vs_C": true
+      },
+      "cost_improved": true,
+      "decision": "retain",
+      "intervals": {
+        "A-B": {
+          "high": 1,
+          "low": 1,
+          "mean": 1,
+          "tasks": 40
+        },
+        "C-A": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "D-A": {
+          "high": -1,
+          "low": -1,
+          "mean": -1,
+          "tasks": 40
+        },
+        "D-B": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "D-C": {
+          "high": -1,
+          "low": -1,
+          "mean": -1,
+          "tasks": 40
+        },
+        "cost_auxiliary_calls_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_auxiliary_calls_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_latency_s_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_latency_s_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_model_calls_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_model_calls_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_tool_calls_D-A": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_tool_calls_D-C": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_total_tokens_D-A": {
+          "high": -60,
+          "low": -60,
+          "mean": -60,
+          "tasks": 40
+        },
+        "cost_total_tokens_D-C": {
+          "high": -60,
+          "low": -60,
+          "mean": -60,
+          "tasks": 40
+        }
+      },
+      "model_acceptance": {
+        "checks": {
+          "enough_independent_tasks": true,
+          "no_significant_full_degradation": true
+        },
+        "decision": "accept",
+        "interval": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "policy": {
+          "bootstrap_samples": 200,
+          "confidence": 0.95,
+          "min_tasks": 30,
+          "min_token_saving_fraction": 0.05,
+          "performance_margin": 0.02,
+          "seed": 42
+        },
+        "reason": "no_significant_full_degradation"
+      },
+      "model_decision": "accept",
+      "module_decision": "retain",
+      "policy": {
+        "bootstrap_samples": 200,
+        "confidence": 0.95,
+        "min_tasks": 30,
+        "min_token_saving_fraction": 0.05,
+        "performance_margin": 0.02,
+        "seed": 42
+      },
+      "retirement_accepted": false,
+      "retirement_eligible": false,
+      "success": {
+        "A": 1,
+        "B": 0,
+        "C": 1,
+        "D": 0
+      }
+    },
+    "1,1": {
+      "capability_preserved": true,
+      "checks": {
+        "auxiliary_calls_vs_A": true,
+        "auxiliary_calls_vs_C": true,
+        "enough_independent_tasks": true,
+        "latency_s_vs_A": true,
+        "latency_s_vs_C": true,
+        "model_calls_vs_A": true,
+        "model_calls_vs_C": true,
+        "module_was_useful": true,
+        "preserves_original_capability": true,
+        "small_remaining_dependence": true,
+        "student_improved_without_module": true,
+        "tool_calls_vs_A": true,
+        "tool_calls_vs_C": true,
+        "total_tokens_vs_A": true,
+        "total_tokens_vs_C": true
+      },
+      "cost_improved": true,
+      "decision": "retire",
+      "intervals": {
+        "A-B": {
+          "high": 1,
+          "low": 1,
+          "mean": 1,
+          "tasks": 40
+        },
+        "C-A": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "D-A": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "D-B": {
+          "high": 1,
+          "low": 1,
+          "mean": 1,
+          "tasks": 40
+        },
+        "D-C": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_auxiliary_calls_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_auxiliary_calls_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_latency_s_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_latency_s_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_model_calls_D-A": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_model_calls_D-C": {
+          "high": -2,
+          "low": -2,
+          "mean": -2,
+          "tasks": 40
+        },
+        "cost_tool_calls_D-A": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_tool_calls_D-C": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "cost_total_tokens_D-A": {
+          "high": -60,
+          "low": -60,
+          "mean": -60,
+          "tasks": 40
+        },
+        "cost_total_tokens_D-C": {
+          "high": -60,
+          "low": -60,
+          "mean": -60,
+          "tasks": 40
+        }
+      },
+      "model_acceptance": {
+        "checks": {
+          "enough_independent_tasks": true,
+          "no_significant_full_degradation": true
+        },
+        "decision": "accept",
+        "interval": {
+          "high": 0,
+          "low": 0,
+          "mean": 0,
+          "tasks": 40
+        },
+        "policy": {
+          "bootstrap_samples": 200,
+          "confidence": 0.95,
+          "min_tasks": 30,
+          "min_token_saving_fraction": 0.05,
+          "performance_margin": 0.02,
+          "seed": 42
+        },
+        "reason": "no_significant_full_degradation"
+      },
+      "model_decision": "accept",
+      "module_decision": "retire",
+      "policy": {
+        "bootstrap_samples": 200,
+        "confidence": 0.95,
+        "min_tasks": 30,
+        "min_token_saving_fraction": 0.05,
+        "performance_margin": 0.02,
+        "seed": 42
+      },
+      "retirement_accepted": true,
+      "retirement_eligible": true,
+      "success": {
+        "A": 1,
+        "B": 0,
+        "C": 1,
+        "D": 1
+      }
+    }
+  },
+  "search": {
+    "decisions": [
+      [
+        "accepted_without_internalization",
+        "unchanged",
+        "retain"
+      ],
+      [
+        "no_useful_candidate",
+        "unchanged",
+        "unchanged"
+      ],
+      [
+        "no_useful_candidate",
+        "unchanged",
+        "unchanged"
+      ]
+    ],
+    "evaluations": [
+      [
+        [
+          "search-87",
+          "search-6",
+          "search-25",
+          "search-64",
+          "search-49",
+          "search-59",
+          "search-27",
+          "search-9"
+        ],
+        "baseline_search",
+        [
+          0
+        ],
+        "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3"
+      ],
+      [
+        [
+          "search-87",
+          "search-6",
+          "search-25",
+          "search-64",
+          "search-49",
+          "search-59",
+          "search-27",
+          "search-9"
+        ],
+        "search",
+        [
+          0
+        ],
+        "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8"
+      ],
+      [
+        [
+          "search-87",
+          "search-6",
+          "search-25",
+          "search-64",
+          "search-49",
+          "search-59",
+          "search-27",
+          "search-9"
+        ],
+        "search",
+        [
+          0
+        ],
+        "9373c7af9d5f878c6310e43dc057911a4f70944d908e2cd46f638f2d16aebaf3"
+      ],
+      [
+        [
+          "dev-0",
+          "dev-1",
+          "dev-2",
+          "dev-3",
+          "dev-4",
+          "dev-5",
+          "dev-6",
+          "dev-7",
+          "dev-8",
+          "dev-9",
+          "dev-10",
+          "dev-11",
+          "dev-12",
+          "dev-13",
+          "dev-14",
+          "dev-15",
+          "dev-16",
+          "dev-17",
+          "dev-18",
+          "dev-19",
+          "dev-20",
+          "dev-21",
+          "dev-22",
+          "dev-23",
+          "dev-24",
+          "dev-25",
+          "dev-26",
+          "dev-27",
+          "dev-28",
+          "dev-29",
+          "dev-30",
+          "dev-31"
+        ],
+        "baseline_dev",
+        [
+          0
+        ],
+        "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3"
+      ],
+      [
+        [
+          "dev-0",
+          "dev-1",
+          "dev-2",
+          "dev-3",
+          "dev-4",
+          "dev-5",
+          "dev-6",
+          "dev-7",
+          "dev-8",
+          "dev-9",
+          "dev-10",
+          "dev-11",
+          "dev-12",
+          "dev-13",
+          "dev-14",
+          "dev-15",
+          "dev-16",
+          "dev-17",
+          "dev-18",
+          "dev-19",
+          "dev-20",
+          "dev-21",
+          "dev-22",
+          "dev-23",
+          "dev-24",
+          "dev-25",
+          "dev-26",
+          "dev-27",
+          "dev-28",
+          "dev-29",
+          "dev-30",
+          "dev-31"
+        ],
+        "dev",
+        [
+          0
+        ],
+        "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8"
+      ],
+      [
+        [
+          "search-2",
+          "search-46",
+          "search-23",
+          "search-58",
+          "search-54",
+          "search-35",
+          "search-83",
+          "search-92"
+        ],
+        "baseline_search",
+        [
+          0
+        ],
+        "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8"
+      ],
+      [
+        [
+          "search-2",
+          "search-46",
+          "search-23",
+          "search-58",
+          "search-54",
+          "search-35",
+          "search-83",
+          "search-92"
+        ],
+        "search",
+        [
+          0
+        ],
+        "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8"
+      ],
+      [
+        [
+          "search-2",
+          "search-46",
+          "search-23",
+          "search-58",
+          "search-54",
+          "search-35",
+          "search-83",
+          "search-92"
+        ],
+        "search",
+        [
+          0
+        ],
+        "9373c7af9d5f878c6310e43dc057911a4f70944d908e2cd46f638f2d16aebaf3"
+      ],
+      [
+        [
+          "search-13",
+          "search-81",
+          "search-19",
+          "search-66",
+          "search-34",
+          "search-12",
+          "search-60",
+          "search-30"
+        ],
+        "baseline_search",
+        [
+          0
+        ],
+        "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8"
+      ],
+      [
+        [
+          "search-13",
+          "search-81",
+          "search-19",
+          "search-66",
+          "search-34",
+          "search-12",
+          "search-60",
+          "search-30"
+        ],
+        "search",
+        [
+          0
+        ],
+        "a04fcb627d57f4334d5ab1f70ff65078c5341ea0de93474b75d8190e4ba253d8"
+      ],
+      [
+        [
+          "search-13",
+          "search-81",
+          "search-19",
+          "search-66",
+          "search-34",
+          "search-12",
+          "search-60",
+          "search-30"
+        ],
+        "search",
+        [
+          0
+        ],
+        "9373c7af9d5f878c6310e43dc057911a4f70944d908e2cd46f638f2d16aebaf3"
+      ]
+    ],
+    "tasks": [
+      [
+        "search-87",
+        "search-6",
+        "search-25",
+        "search-64",
+        "search-49",
+        "search-59",
+        "search-27",
+        "search-9"
+      ],
+      [
+        "search-2",
+        "search-46",
+        "search-23",
+        "search-58",
+        "search-54",
+        "search-35",
+        "search-83",
+        "search-92"
+      ],
+      [
+        "search-13",
+        "search-81",
+        "search-19",
+        "search-66",
+        "search-34",
+        "search-12",
+        "search-60",
+        "search-30"
+      ]
+    ]
+  },
+  "training": {
+    "noop": {
+      "batches": [
+        {
+          "advantages": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "attention_mask": [
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "input_ids": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "module_log_probs": [
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ]
+          ],
+          "module_mask": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "old_log_probs": [
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ]
+          ],
+          "position_ids": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "prompts": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "response_mask": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "responses": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "token_level_rewards": [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        {
+          "advantages": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0
+            ]
+          ],
+          "attention_mask": [
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "input_ids": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "module_log_probs": [
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ]
+          ],
+          "module_mask": [
+            true,
+            true,
+            true,
+            true
+          ],
+          "old_log_probs": [
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            [
+              -1.899999976158142,
+              -1.899999976158142
+            ]
+          ],
+          "position_ids": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "prompts": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "response_mask": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "responses": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "token_level_rewards": [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        }
+      ],
+      "events": [
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "update",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.899999976158142,
+          false
+        ],
+        [
+          "update",
+          "policy-1"
+        ]
+      ],
+      "scores": [
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -2.0,
+              -2.0
+            ],
+            "selected": true,
+            "state_fingerprint": "64723b52ed8c2136318688500f604a6212c8e321c23d4c01e46c708f51c01c77",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -2.0,
+              -2.0
+            ],
+            "selected": true,
+            "state_fingerprint": "39c95ba115432fce6abe9e618eb02c94a6b6d3dc2c39253b004f216600e5d22a",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -2.0,
+              -2.0
+            ],
+            "selected": true,
+            "state_fingerprint": "cbcf86b9e4e22e0c689196cfd225ba2933d487695e6685b303f0850f95d96150",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -2.0,
+              -2.0
+            ],
+            "selected": true,
+            "state_fingerprint": "641f9bae64861a7bcbd619c4d1ca79d2a8b7c1399f13c2a94559f5d9127d0ff5",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            "selected": true,
+            "state_fingerprint": "64723b52ed8c2136318688500f604a6212c8e321c23d4c01e46c708f51c01c77",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            "selected": true,
+            "state_fingerprint": "39c95ba115432fce6abe9e618eb02c94a6b6d3dc2c39253b004f216600e5d22a",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            "selected": true,
+            "state_fingerprint": "cbcf86b9e4e22e0c689196cfd225ba2933d487695e6685b303f0850f95d96150",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.899999976158142,
+              -1.899999976158142
+            ],
+            "selected": true,
+            "state_fingerprint": "641f9bae64861a7bcbd619c4d1ca79d2a8b7c1399f13c2a94559f5d9127d0ff5",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        }
+      ]
+    },
+    "normal": {
+      "batches": [
+        {
+          "advantages": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ]
+          ],
+          "attention_mask": [
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "input_ids": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "module_log_probs": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.5,
+              -1.5
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.5,
+              -1.5
+            ]
+          ],
+          "module_mask": [
+            false,
+            true,
+            false,
+            true
+          ],
+          "old_log_probs": [
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ]
+          ],
+          "position_ids": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "prompts": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "response_mask": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "responses": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "token_level_rewards": [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        {
+          "advantages": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ]
+          ],
+          "attention_mask": [
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "input_ids": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "module_log_probs": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ]
+          ],
+          "module_mask": [
+            false,
+            true,
+            false,
+            true
+          ],
+          "old_log_probs": [
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ],
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ],
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ],
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ]
+          ],
+          "position_ids": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "prompts": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "response_mask": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "responses": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "token_level_rewards": [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        }
+      ],
+      "events": [
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -1.5,
+          true
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -1.5,
+          true
+        ],
+        [
+          "update",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.3999749422073364,
+          true
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.3999749422073364,
+          true
+        ],
+        [
+          "update",
+          "policy-1"
+        ]
+      ],
+      "scores": [
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "64723b52ed8c2136318688500f604a6212c8e321c23d4c01e46c708f51c01c77",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.5,
+              -1.5
+            ],
+            "selected": true,
+            "state_fingerprint": "39c95ba115432fce6abe9e618eb02c94a6b6d3dc2c39253b004f216600e5d22a",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "cbcf86b9e4e22e0c689196cfd225ba2933d487695e6685b303f0850f95d96150",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.5,
+              -1.5
+            ],
+            "selected": true,
+            "state_fingerprint": "641f9bae64861a7bcbd619c4d1ca79d2a8b7c1399f13c2a94559f5d9127d0ff5",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "64723b52ed8c2136318688500f604a6212c8e321c23d4c01e46c708f51c01c77",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ],
+            "selected": true,
+            "state_fingerprint": "39c95ba115432fce6abe9e618eb02c94a6b6d3dc2c39253b004f216600e5d22a",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "cbcf86b9e4e22e0c689196cfd225ba2933d487695e6685b303f0850f95d96150",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ],
+            "selected": true,
+            "state_fingerprint": "641f9bae64861a7bcbd619c4d1ca79d2a8b7c1399f13c2a94559f5d9127d0ff5",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finish\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        }
+      ]
+    },
+    "shared": {
+      "batches": [
+        {
+          "advantages": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ]
+          ],
+          "attention_mask": [
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "input_ids": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "module_log_probs": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.5,
+              -1.5
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.5,
+              -1.5
+            ]
+          ],
+          "module_mask": [
+            false,
+            true,
+            false,
+            true
+          ],
+          "old_log_probs": [
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ],
+            [
+              -2.0,
+              -2.0
+            ]
+          ],
+          "position_ids": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "prompts": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "response_mask": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "responses": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "token_level_rewards": [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        },
+        {
+          "advantages": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              0.0005000000237487257,
+              0.0005000000237487257
+            ]
+          ],
+          "attention_mask": [
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ],
+            [
+              1,
+              1,
+              1,
+              1
+            ]
+          ],
+          "input_ids": [
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ],
+            [
+              1,
+              2,
+              3,
+              4
+            ]
+          ],
+          "module_log_probs": [
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ],
+            [
+              0.0,
+              0.0
+            ],
+            [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ]
+          ],
+          "module_mask": [
+            false,
+            true,
+            false,
+            true
+          ],
+          "old_log_probs": [
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ],
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ],
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ],
+            [
+              -1.8999749422073364,
+              -1.8999749422073364
+            ]
+          ],
+          "position_ids": [
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ],
+            [
+              0,
+              1,
+              2,
+              3
+            ]
+          ],
+          "prompts": [
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "response_mask": [
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              1,
+              1
+            ]
+          ],
+          "responses": [
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              3,
+              4
+            ]
+          ],
+          "token_level_rewards": [
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ],
+            [
+              0.0,
+              1.0
+            ]
+          ]
+        }
+      ],
+      "events": [
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -2.0,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -1.5,
+          true
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-0"
+        ],
+        [
+          "score",
+          "policy-0",
+          [
+            3,
+            4
+          ],
+          -1.5,
+          true
+        ],
+        [
+          "update",
+          "policy-0"
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "generate",
+          "rollout_action",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.8999749422073364,
+          false
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.3999749422073364,
+          true
+        ],
+        [
+          "generate",
+          "planner",
+          "policy-1"
+        ],
+        [
+          "score",
+          "policy-1",
+          [
+            3,
+            4
+          ],
+          -1.3999749422073364,
+          true
+        ],
+        [
+          "update",
+          "policy-1"
+        ]
+      ],
+      "scores": [
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "df60d94e03df1cbaf827c3a4742a458f66e3173129307e782ae0737ed00ff7b2",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.5,
+              -1.5
+            ],
+            "selected": true,
+            "state_fingerprint": "d43395e546366d7410d26d1aa7eeb4b8814bd6fbd9f226de163b5f7f11b5f537",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "ab917938591c27c24799a3f1d5883d4d1ab9127ea021b933d92124c8999ef86a",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.5,
+              -1.5
+            ],
+            "selected": true,
+            "state_fingerprint": "88cb22744fe7b7f8ad42e2ee67b0a827be15f40c2d109ae08ec92f2a81213980",
+            "teacher_snapshot": "policy-0"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "df60d94e03df1cbaf827c3a4742a458f66e3173129307e782ae0737ed00ff7b2",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ],
+            "selected": true,
+            "state_fingerprint": "d43395e546366d7410d26d1aa7eeb4b8814bd6fbd9f226de163b5f7f11b5f537",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [],
+            "selected": false,
+            "state_fingerprint": "ab917938591c27c24799a3f1d5883d4d1ab9127ea021b933d92124c8999ef86a",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        },
+        {
+          "enhanced_context": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}\n[Target diagnosis]\nGUIDANCE",
+          "response_ids": [
+            3,
+            4
+          ],
+          "signal": {
+            "log_probs": [
+              -1.3999749422073364,
+              -1.3999749422073364
+            ],
+            "selected": true,
+            "state_fingerprint": "88cb22744fe7b7f8ad42e2ee67b0a827be15f40c2d109ae08ec92f2a81213980",
+            "teacher_snapshot": "policy-1"
+          },
+          "student_prompt": "Synthetic task: finish after consulting the log.\nlog: action=finish\n[Student action]\n{\"tool\":\"log_query\",\"arguments\":{\"needle\":\"action=\"}}\n[Harness tool result]\nLOG_QUERY_RESULT\nlog: action=finishSHARED_CONTEXT\nUse the available task interface. Registered local tools use JSON {\"tool\":\"name\",\"arguments\":{...}}. Other actions are sent to the environment.\n\n[Registered tools]\n{\"log_query\": {\"description\": \"Search log lines in the public history; argument needle:string\", \"entry\": \"tools.log_query:run\"}}"
+        }
+      ]
+    }
+  }
+}
