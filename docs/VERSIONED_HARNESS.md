@@ -27,7 +27,7 @@
 
 ## 可执行工作区与权限
 
-起始实例在 `examples/versioned_harness/base/`。可编辑前缀默认是 `agent/`、`prompts/`、`tools/`、`controls/`、`config/`；可多文件修改，支持 Python、JSON、文本与 Markdown，总计最多 64 文件、256 KiB。补丁是 `FileEdit(path, before_hash, content)` 列表：原文件 UTF-8 文本 SHA256 防止套错父版本，新增文件 before_hash=null，content=null 只从新快照排除文件。不会原地删除父快照文件。
+通用演示实例在 `examples/versioned_harness/base/`；三个正式 benchmark 的 H0 在 `seed_harnesses/{alfworld,webshop,hotpotqa}/`，见 [SEED_HARNESSES.md](SEED_HARNESSES.md)。可编辑前缀默认是 `agent/`、`prompts/`、`tools/`、`controls/`、`config/`；可多文件修改，支持 Python、JSON、文本与 Markdown，总计最多 64 文件、256 KiB。补丁是 `FileEdit(path, before_hash, content)` 列表：原文件 UTF-8 文本 SHA256 防止套错父版本，新增文件 before_hash=null，content=null 只从新快照排除文件。不会原地删除父快照文件。
 
 API proposer 只输出 `{"path":"tools/example.py","content":"完整的新文件内容"}`；不再要求或接受模型提供 `before_hash`。`RevisionStore.bind_patch(parent, changes)` 在宿主验证锁定父版本后计算文件 hash，再交给原 `apply()` 独立复核。归档的 `HarnessCandidate.patch` 仍含宿主填入的 `before_hash`，已有使用 `FileEdit` 的 Python/归档接口不变。API mock 或外部生成器需将响应更新为仅 path/content；新增文件 hash 为 null，删除文件仍用 content=null。父版本被篡改、重复路径、越权路径或错误基准仍拒绝。
 
@@ -76,12 +76,12 @@ PYTHONPATH=src python -m internalization.cli run \
   --manifest /absolute/path/to/predeclared-manifest.json \
   --backend configs/alfworld_backend.json \
   --checkpoint /absolute/path/to/student-checkpoint \
-  --harness-workspace examples/versioned_harness/base \
+  --harness-workspace seed_harnesses/alfworld \
   --revision-store runs/alfworld-code-revisions \
   --output runs/alfworld-code-experiment --train-steps 300
 ```
 
-此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2；不再要求 acceptance_0..2。旧文件中多出的 acceptance 分区保留不用，不自动重新划分既有数据或借用 retirement/test。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。最终评价必须显式选择 `--state` 或 `--baseline`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
+此命令的路径占位必须换成实际资源。真实 manifest 需预先含不重叠的 train/search/dev/test、retirement_0..2；不再要求 acceptance_0..2。旧文件中多出的 acceptance 分区保留不用，不自动重新划分既有数据或借用 retirement/test。`HI_PROPOSER_MODEL`、`HI_PROPOSER_BASE_URL`、`HI_PROPOSER_API_KEY` 由既有受保护配置提供。新版导入器按 `--cycles` 生成完整分区。周期级恢复使用 `--state .../cycle_XX/state.json`，保持原 manifest/protocol，跳过已完成周期；完成的 deployment 用于最终评价。三个正式 benchmark 的初始/最终评价都必须使用实际 `--state`。详见 [数据到最终评价接线](ACCEPTED_AGENT_PIPELINE.md)。
 
 ## 产物与验收证据
 

@@ -84,11 +84,31 @@ smoke 验证更新前同 batch 缓存 logprob、进入 actor 的 advantage/mask�
   --manifest data/budget_v1/alfworld/manifest.json \
   --backend configs/budget_v1/alfworld_backend.json \
   --experiment-config configs/budget_v1/alfworld.json --run-seed 17 \
-  --checkpoint "$HI_CHECKPOINT" --harness-workspace examples/versioned_harness/base \
+  --checkpoint "$HI_CHECKPOINT" --harness-workspace seed_harnesses/alfworld \
   --output runs/budget-v1-alfworld-seed17
 ```
 
-WebShop/HotpotQA 将上述三个文件路径及输出名称的 alfworld 替换为对应 benchmark，配置其环境变量即可。另提供 `--run-seed 29` 和 `--run-seed 43`，使用各自新输出；不能改变已记录实验的 seed 来续跑。继续未完成周期用 `--state runs/.../cycle_00/state.json` 代替 checkpoint/workspace，输出仍用新目录。
+三个正式 fresh run 分别绑定同名 H0；来源、解析及保护边界见 [SEED_HARNESSES.md](SEED_HARNESSES.md)。不要用通用示例或 smoke 的 Harness 代替基线。WebShop/HotpotQA 先配置前文所列环境变量，再使用各自命令：
+
+```bash
+export HI_BENCHMARK_CATALOG="$PWD/data/budget_v1/webshop/catalog.json"
+"$HI_TRAIN_PYTHON" -m internalization.cli run \
+  --manifest data/budget_v1/webshop/manifest.json \
+  --backend configs/budget_v1/webshop_backend.json \
+  --experiment-config configs/budget_v1/webshop.json --run-seed 17 \
+  --checkpoint "$HI_CHECKPOINT" --harness-workspace seed_harnesses/webshop \
+  --output runs/budget-v1-webshop-seed17
+
+export HI_BENCHMARK_CATALOG="$PWD/data/budget_v1/hotpotqa/catalog.json"
+"$HI_TRAIN_PYTHON" -m internalization.cli run \
+  --manifest data/budget_v1/hotpotqa/manifest.json \
+  --backend configs/budget_v1/hotpotqa_backend.json \
+  --experiment-config configs/budget_v1/hotpotqa.json --run-seed 17 \
+  --checkpoint "$HI_CHECKPOINT" --harness-workspace seed_harnesses/hotpotqa \
+  --output runs/budget-v1-hotpotqa-seed17
+```
+
+每次只选上面一个命令，不批量执行。另提供 `--run-seed 29` 和 `--run-seed 43`，使用各自新输出；不能改变已记录实验的 seed 来续跑。继续未完成周期用 `--state runs/.../cycle_00/state.json` 代替 checkpoint/workspace，输出仍用新目录。
 
 ```bash
 "$HI_TRAIN_PYTHON" scripts/evaluate_benchmark.py \
@@ -98,7 +118,17 @@ WebShop/HotpotQA 将上述三个文件路径及输出名称的 alfworld 替换�
   --partition test_valid_seen --output runs/budget-v1-alfworld-final-seen
 ```
 
-valid_unseen 单独用 test_valid_unseen；HotpotQA/WebShop 用 test。最终脚本从接受状态读取实际 checkpoint、revision 和 effective_config，budget_v1 默认每题一次，不退回空 Harness。只有显式 `--baseline --checkpoint ...` 才评价初始基线。
+valid_unseen 单独用 test_valid_unseen；HotpotQA/WebShop 用 test。最终脚本从接受状态读取实际 checkpoint、revision 和 effective_config，budget_v1 默认每题一次，不退回空 Harness。三个 benchmark 的初始基线必须使用同一 run 的 `--state .../initial_agent.json`；`--baseline` 的空 Harness 不再是它们的 H0，显式报错。例：
+
+```bash
+"$HI_TRAIN_PYTHON" scripts/evaluate_benchmark.py \
+  --manifest data/budget_v1/alfworld/manifest.json \
+  --backend configs/budget_v1/alfworld_backend.json \
+  --state runs/budget-v1-alfworld-seed17/initial_agent.json \
+  --partition test_valid_seen --output runs/budget-v1-alfworld-h0-seen
+```
+
+初始和最终评价均不得把测试轨迹反馈给 proposer；两者读取同一原始 manifest 和状态内的 effective_config。
 
 ## 接口修改位置
 

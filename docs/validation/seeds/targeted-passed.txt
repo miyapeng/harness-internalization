@@ -1,0 +1,12 @@
+test_alfworld_seed_preserves_golden_public_prompt_history_and_raw_tokens (test_seed_harnesses.SeedHarnessTests.test_alfworld_seed_preserves_golden_public_prompt_history_and_raw_tokens) ... ok
+test_cli_requires_matching_seed_before_backend_execution (test_seed_harnesses.SeedHarnessTests.test_cli_requires_matching_seed_before_backend_execution) ... ok
+test_fresh_initial_and_final_state_bind_same_h0_and_resume_does_not_reset (test_seed_harnesses.SeedHarnessTests.test_fresh_initial_and_final_state_bind_same_h0_and_resume_does_not_reset) ... ok
+test_hotpot_seed_executes_three_json_actions_in_worker (test_seed_harnesses.SeedHarnessTests.test_hotpot_seed_executes_three_json_actions_in_worker) ... ok
+test_provenance_is_protected_and_adapter_drift_fails_before_run (test_seed_harnesses.SeedHarnessTests.test_provenance_is_protected_and_adapter_drift_fails_before_run) ... ok
+test_registered_seed_identity_and_foreign_generic_smoke_rejection (test_seed_harnesses.SeedHarnessTests.test_registered_seed_identity_and_foreign_generic_smoke_rejection) ... ok
+test_webshop_seed_public_actions_tag_parser_history_and_official_reward (test_seed_harnesses.SeedHarnessTests.test_webshop_seed_public_actions_tag_parser_history_and_official_reward) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.363s
+
+OK

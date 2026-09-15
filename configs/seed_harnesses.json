@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "purpose": "protected provenance only; not candidate permissions or environment data",
+  "seeds": {
+    "alfworld": {
+      "seed_name": "alfworld_h0_v1",
+      "benchmark": "alfworld",
+      "workspace": "seed_harnesses/alfworld",
+      "revision_hash": "383e8ac9b0aeccc1e5773fd7865c416e011f5116d890b01c6021e5b8859f556b",
+      "schema": 2,
+      "controls": [],
+      "entrypoint_origin": "project-owned passthrough; no copied upstream runner",
+      "prompt_parser_contract": "Adapter-rendered OPID/verl-agent template, last 5 observations/actions, public admissible actions excluding help; unchanged alfworld_projection handles raw response before native env.step. Seed is exact public-context passthrough.",
+      "fixed_adapter_sha256": {
+        "src/internalization/benchmarks/alfworld.py": "1863143e4b8bd7fb31579c8877dc431d857b9f2b47dc4fe0f7d24ae30d568f2d",
+        "src/internalization/benchmarks/alfworld_prompts.py": "fb89f5e3144a52c1f210662fb29ecf2e22243b3854d92f5522a1385019480aa4",
+        "src/internalization/benchmarks/alfworld_projection.py": "e794d1217d613ef4b550cfe4bfd0b39b4deb10d47493f31f78aef7b5ebf6dd98"
+      },
+      "sources": [
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/environments/prompts/alfworld.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/environments/prompts/alfworld.py",
+          "sha256": "fb89f5e3144a52c1f210662fb29ecf2e22243b3854d92f5522a1385019480aa4",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        },
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/environments/env_package/alfworld/projection.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/environments/env_package/alfworld/projection.py",
+          "sha256": "e794d1217d613ef4b550cfe4bfd0b39b4deb10d47493f31f78aef7b5ebf6dd98",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        },
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/environments/env_manager.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/environments/env_manager.py",
+          "sha256": "60e55cba071cb6a84eab5d57fbc1b68dc06994808fb6027f5fbdaa72d2abc49a",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        },
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/memory/memory.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/memory/memory.py",
+          "sha256": "d9940bf9d49442f76667b80aff7e80b7c93f37bef015b06641e60229bb3f0d9c",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        }
+      ]
+    },
+    "webshop": {
+      "seed_name": "webshop_h0_v1",
+      "benchmark": "webshop",
+      "workspace": "seed_harnesses/webshop",
+      "revision_hash": "3b3ba1f00b8e2ca8ad1c472ce483c6920f47bfde32259c12dd8499d8c64c74d2",
+      "schema": 2,
+      "controls": [],
+      "entrypoint_origin": "project-owned passthrough; no copied upstream runner",
+      "prompt_parser_contract": "Pinned OPID WEBSHOP_TEMPLATE_NO_HIS rendered once over all existing raw public page/action history plus only public available actions. Tagged search/click extracted and lowercased; bare commands retained. No OPID think/language penalties or tail fallback. Original response remains in trajectory.",
+      "fixed_adapter_sha256": {
+        "src/internalization/benchmarks/webshop.py": "3652e91ccd5d67337ffb63cf8a9cc6b0186419266ed3470eed4f8a6055222071",
+        "src/internalization/benchmarks/webshop_prompts.py": "849da2f6ddf4e94db24ff646935457bf6e48975ba0d318bb13d2ec7d1a454894",
+        "src/internalization/benchmarks/webshop_projection.py": "9168d925de64984fd2d4b568a93b8d540ee379c550e8768efdfcd38ccf38e493"
+      },
+      "sources": [
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/environments/prompts/webshop.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/environments/prompts/webshop.py",
+          "sha256": "7596045fffae98768229d369bbed975d819772cddfb8081cab6b5105bf696ee4",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        },
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/environments/env_package/webshop/projection.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/environments/env_package/webshop/projection.py",
+          "sha256": "0808d4643459acf2a4c496eab3fc8735025c440f28cc517066355a1f5fbc048f",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        },
+        {
+          "repository": "https://github.com/jinyangwu/OPID",
+          "commit": "37a15a5f3c0f1ecc651e4be4a0c257b313fa0756",
+          "file": "agent_system/environments/env_manager.py",
+          "url": "https://github.com/jinyangwu/OPID/blob/37a15a5f3c0f1ecc651e4be4a0c257b313fa0756/agent_system/environments/env_manager.py",
+          "sha256": "60e55cba071cb6a84eab5d57fbc1b68dc06994808fb6027f5fbdaa72d2abc49a",
+          "license": "Apache-2.0 (NTU / verl-agent headers)"
+        }
+      ]
+    },
+    "hotpotqa": {
+      "seed_name": "hotpotqa_h0_v1",
+      "benchmark": "hotpotqa",
+      "workspace": "seed_harnesses/hotpotqa",
+      "revision_hash": "ad3b0b79ba797d30f16f1cac2e067fdb9087647435fbdefb18e682b90d9d643a",
+      "schema": 2,
+      "controls": [],
+      "entrypoint_origin": "project-owned passthrough; no copied upstream runner",
+      "prompt_parser_contract": "Project distractor-agent wrapper, not official HotpotQA or original ReAct Harness. Adapter renders existing question/titles and strict JSON search(query)/lookup(title)/final(answer,supporting_facts); indices zero-based. Existing top_k/ranking/history/metrics unchanged. Seed is exact public-context passthrough.",
+      "fixed_adapter_sha256": {
+        "src/internalization/benchmarks/hotpotqa.py": "860638e41d0aefec8eb8a908bf370dc826d2803d243f4c29d838c359da3a4e0e",
+        "src/internalization/benchmarks/common.py": "ea2a00a0a2219193e96b48b3a842633883424f5a35ad8157e428492ac4f7447e"
+      },
+      "sources": [
+        {
+          "repository": "https://github.com/miyapeng/harness-internalization",
+          "commit": "80e985af4429061417a4979d13daa5998afb0b34",
+          "file": "src/internalization/benchmarks/hotpotqa.py",
+          "sha256": "860638e41d0aefec8eb8a908bf370dc826d2803d243f4c29d838c359da3a4e0e",
+          "license": "MIT; project-written distractor wrapper"
+        },
+        {
+          "repository": "https://github.com/miyapeng/harness-internalization",
+          "commit": "80e985af4429061417a4979d13daa5998afb0b34",
+          "file": "src/internalization/benchmarks/common.py",
+          "sha256": "ea2a00a0a2219193e96b48b3a842633883424f5a35ad8157e428492ac4f7447e",
+          "license": "MIT; project-written distractor wrapper"
+        }
+      ]
+    }
+  }
+}

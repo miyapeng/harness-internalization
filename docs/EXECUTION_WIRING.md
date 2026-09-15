@@ -72,7 +72,7 @@ PYTHONPATH=src python3.12 -m internalization.cli run \
   --backend configs/alfworld_backend.json \
   --experiment-config configs/alfworld_execution.json \
   --checkpoint /absolute/path/to/local-hf-checkpoint \
-  --harness-workspace examples/versioned_harness/base \
+  --harness-workspace seed_harnesses/alfworld \
   --revision-store runs/alfworld-revisions \
   --cycles 3 --planned-update-batches 300 --output runs/alfworld-task1
 
@@ -83,7 +83,7 @@ PYTHONPATH=src python3.12 -m internalization.cli run \
   --manifest data/hotpotqa/manifest.json --backend configs/hotpotqa_backend.json \
   --experiment-config configs/hotpotqa_execution.json \
   --checkpoint /absolute/path/to/local-hf-checkpoint \
-  --harness-workspace examples/versioned_harness/base \
+  --harness-workspace seed_harnesses/hotpotqa \
   --revision-store runs/hotpotqa-revisions \
   --cycles 3 --planned-update-batches 300 --output runs/hotpotqa-task1
 ```

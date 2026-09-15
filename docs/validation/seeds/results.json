@@ -1,0 +1,62 @@
+{
+  "scope": "explicit schema-2 benchmark seed H0; CPU/scripted fixtures only",
+  "head_before": "80e985af4429061417a4979d13daa5998afb0b34",
+  "head_after": "80e985af4429061417a4979d13daa5998afb0b34",
+  "initial_worktree": "clean",
+  "committed_or_pushed": false,
+  "full_suite": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "status": "passed",
+    "tests": 217,
+    "seconds": 245.584,
+    "skipped": 0,
+    "evidence": "suite-passed.txt"
+  },
+  "seed_tests": {
+    "command": "PYTHONPATH=src:tests python3.12 -m unittest test_seed_harnesses -v",
+    "status": "passed",
+    "tests": 7,
+    "evidence": "targeted-passed.txt"
+  },
+  "corrected_fixture_failures": [
+    {
+      "evidence": "first-targeted.txt",
+      "reason": "HotpotQA final submission is not a retrieval tool call; production counting unchanged"
+    },
+    {
+      "evidence": "top-k-fixture-correction.txt",
+      "reason": "Create a separate synthetic top-k catalog instead of writing over an exclusive JSON artifact"
+    }
+  ],
+  "unchanged_boundaries": {
+    "protected_file_count": 45,
+    "changed_protected_files": [],
+    "budget_v1_configs_byte_identical": true
+  },
+  "source_check": {
+    "status": "passed",
+    "evidence": "provenance.json"
+  },
+  "help": {
+    "status": "passed",
+    "commands": 4,
+    "evidence": "help.json"
+  },
+  "actual_execution": [
+    "all 3 seed revisions in existing SandboxedCode/CodeRuntime",
+    "HotpotQA subprocess worker with synthetic distractor catalog",
+    "ALFWorld/WebShop adapters with public native-environment contract fixtures",
+    "initial/final state loading and sandbox rollout; resumed accepted-revision selection with mock evaluator"
+  ],
+  "not_executed": [
+    "real-model generations",
+    "GPU training or updates",
+    "official ALFWorld task population",
+    "official full WebShop simulator/assets",
+    "official HotpotQA evaluation",
+    "formal baseline/final large-scale evaluation"
+  ],
+  "webshop_readiness": "not_ready_real_official_assets_and_gpu_not_verified",
+  "diff_check": "passed",
+  "edited_document_relative_links": "passed"
+}

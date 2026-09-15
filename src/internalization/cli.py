@@ -53,6 +53,8 @@ def main():
         backend = CommandBackend(config, args.output.parent / f"{args.output.name}.costs.jsonl")
         if args.output.exists(): raise FileExistsError(args.output)
         manifest=TaskManifest.load(args.manifest)
+        if config.get("benchmark") is not None and config["benchmark"] != manifest.benchmark:
+            raise ValueError("Backend/manifest benchmark mismatch")
         accepted=None
         raw_revision=None
         state_path=args.state
@@ -102,6 +104,9 @@ def main():
             from .harness.revision import RevisionStore
             initial_harness=RevisionStore(args.revision_store).import_directory(args.harness_workspace)
         elif raw_revision and not state_path: initial_harness=HarnessRevision.from_dict(raw_revision)
+        if accepted is None:
+            from .core.seed_harnesses import bind_initial_seed
+            bind_initial_seed(manifest.benchmark,initial_harness)
         result = run_outer_loop(backend,manifest,checkpoint,args.output,loop,policy,
                   attribution_policy=attribution_policy,initial_harness=initial_harness,accepted_state=accepted)
     print(json.dumps(result, ensure_ascii=False, indent=2))

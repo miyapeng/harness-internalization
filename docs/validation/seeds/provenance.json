@@ -1,0 +1,10 @@
+{
+  "alfworld_template_literals_equal": true,
+  "alfworld_projection_byte_equal": true,
+  "webshop_base_template_literal_equal": true,
+  "seed_hashes": {
+    "alfworld": "383e8ac9b0aeccc1e5773fd7865c416e011f5116d890b01c6021e5b8859f556b",
+    "webshop": "3b3ba1f00b8e2ca8ad1c472ce483c6920f47bfde32259c12dd8499d8c64c74d2",
+    "hotpotqa": "ad3b0b79ba797d30f16f1cac2e067fdb9087647435fbdefb18e682b90d9d643a"
+  }
+}

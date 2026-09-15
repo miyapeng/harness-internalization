@@ -1,0 +1,38 @@
+[
+  {
+    "argv": [
+      "/usr/bin/python3.12",
+      "-m",
+      "internalization.cli",
+      "--help"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/usr/bin/python3.12",
+      "-m",
+      "internalization.cli",
+      "run",
+      "--help"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/usr/bin/python3.12",
+      "scripts/evaluate_benchmark.py",
+      "--help"
+    ],
+    "exit_code": 0
+  },
+  {
+    "argv": [
+      "/usr/bin/python3.12",
+      "-m",
+      "internalization.training.smoke",
+      "--help"
+    ],
+    "exit_code": 0
+  }
+]

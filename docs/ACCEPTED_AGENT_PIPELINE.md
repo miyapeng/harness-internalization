@@ -45,7 +45,7 @@ python scripts/build_benchmark_manifest.py --benchmark hotpotqa \
 # configs/hotpotqa.json 的 catalog 必须指向此次导入的 catalog.json。
 python -m internalization.cli run --manifest data/hotpot-versioned/manifest.json \
   --backend configs/hotpotqa_backend.json --checkpoint /absolute/model \
-  --harness-workspace examples/versioned_harness/base \
+  --harness-workspace seed_harnesses/hotpotqa \
   --cycles 3 --train-steps 300 --output runs/hotpot-versioned
 
 python scripts/evaluate_benchmark.py --manifest data/hotpot-versioned/manifest.json \
@@ -60,11 +60,11 @@ ALFWorld/HotpotQA 的 internalization 后端已配齐五入口，缺入口会启
 
 ```bash
 python scripts/evaluate_benchmark.py --manifest data/hotpot-versioned/manifest.json \
-  --backend configs/hotpotqa_backend.json --baseline --checkpoint /absolute/model \
+  --backend configs/hotpotqa_backend.json --state runs/hotpot-versioned/initial_agent.json \
   --partition test --output runs/hotpot-baseline
 ```
 
-不能仅传 checkpoint 而省略 `--state` / `--baseline`。最终评价使用**原完整 manifest**，通过 partition 选测试集；不能另建一个只有 test 的不同 manifest 绕过配对身份。
+三个正式 benchmark 不接受空 Harness 的 `--baseline`；必须使用 `initial_agent.json` 评价 H0。不能仅传 checkpoint 而省略 `--state`。最终评价使用**原完整 manifest**，通过 partition 选测试集；不能另建一个只有 test 的不同 manifest 绕过配对身份。
 
 ## 周期级恢复
 

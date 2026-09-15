@@ -10,6 +10,8 @@ import re
 import sys
 
 from .common import Catalog, checked_repo, sha256, tree_hash, score01
+from .webshop_prompts import render_public_history
+from .webshop_projection import webshop_action
 from ..core.types import digest, write_json
 from ..core.sampling import seed_process
 from ..training.rollout import EnvironmentStep
@@ -80,17 +82,27 @@ class WebShopEnvironment:
         seed_process(seed)
         observation,_=self.env.reset(session=index)  # integer selects exact official goal, never random reset
         self.task_id,self.seed,self.steps,self.done=task_id,seed,0,False
-        self.history=['Use search[keywords] or click[value] from the current page.',str(observation)]
+        self.history=[str(observation)]
         write_json(self.output/'identity.json',{'task_id':task_id,'seed':seed,'catalog_hash':self.catalog.fingerprint,
             'source_hash':row['source_hash'],'num_products':None,'human_goals':True})
-        return {'observation':'\n'.join(self.history)}
+        return {'observation':render_public_history(self.history,self.public_actions())}
+
+    def public_actions(self):
+        # Whitelist only fields derived from the publicly visible page controls.
+        available=self.env.get_available_actions()
+        if type(available.get('has_search_bar')) is not bool or not isinstance(available.get('clickables'),list):
+            raise ValueError('Expected public WebShop action fields')
+        if any(not isinstance(item,str) for item in available['clickables']):
+            raise ValueError('Expected public clickable strings')
+        return {'has_search_bar':available['has_search_bar'],'clickables':list(available['clickables'])}
 
     def step(self,action):
         if self.done: raise RuntimeError('Episode already finished')
         legal=self.env.get_available_actions()
-        match=re.fullmatch(r'(search|click)\[(.+)\]',action.strip(),re.DOTALL)
+        command=webshop_action(action)
+        match=re.fullmatch(r'(search|click)\[(.+)\]',command,re.DOTALL)
         valid=bool(match and (match[1]=='search' or match[2].lower() in legal['clickables'] and match[2].lower()!='search'))
-        observation,reward,terminal,_=self.env.step(action.strip())
+        observation,reward,terminal,_=self.env.step(command)
         reward=score01(reward)
         self.steps+=1
         self.done=bool(terminal or self.steps>=self.config.max_steps)
@@ -101,7 +113,9 @@ class WebShopEnvironment:
             write_json(self.output/'grade.json',{'task_id':self.task_id,'seed':self.seed,
                 'metrics':{'reward':reward,'success':float(reward==1)},'reward_metric':'official_webshop_reward',
                 'termination':'purchase' if terminal else 'step_limit'})
-        return asdict(EnvironmentStep('\n'.join(self.history),reward,self.done,reward,valid,1,observation_kind='context'))
+        # Do not inspect terminal controls/HTML: the existing submission receipt remains public.
+        actions={'has_search_bar':False,'clickables':[]} if terminal else self.public_actions()
+        return asdict(EnvironmentStep(render_public_history(self.history,actions),reward,self.done,reward,valid,1,observation_kind='context'))
 
     def close(self):
         if self.env is not None: self.env.close()

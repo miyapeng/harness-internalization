@@ -29,6 +29,8 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
     manifest.validate_loop(config.cycles, versioned=True,
         cohort_minimum=max(policy.min_tasks,attribution_policy.min_tasks))
     if accepted_state is not None: accepted_state.check_resume(manifest,config,policy,attribution_policy)
+    from .core.seed_harnesses import bind_initial_seed
+    initial_seed = bind_initial_seed(manifest.benchmark,initial_harness) if accepted_state is None else None
     start_cycle=accepted_state.next_cycle if accepted_state is not None else 0
     train,search,dev=(manifest.partition(p) for p in ("train","search","dev"))
     cohorts=[manifest.partition(f"retirement_{i}") for i in range(config.cycles)]
@@ -38,7 +40,8 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
     evaluator=components.retirement or PairedRetirementEvaluator(components.runner,policy)
     protocol=accepted_state.protocol if accepted_state is not None else {"mode":"versioned_code_selective_internalization","loop":asdict(config),
         "retirement":asdict(policy),"attribution":asdict(attribution_policy),"harness_acceptance":acceptance_policy,
-        "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint,"initial_harness":harness.to_dict()}
+        "manifest_hash":manifest.fingerprint,"initial_checkpoint":checkpoint,"initial_harness":harness.to_dict(),
+        **({"initial_seed":initial_seed} if initial_seed is not None else {})}
     if protocol["harness_acceptance"] != acceptance_policy:
         # The user-authorized acceptance change applies only to future cycles;
         # retain the original snapshot and never rewrite any historical artifact.

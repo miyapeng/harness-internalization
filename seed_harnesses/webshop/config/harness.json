@@ -1,0 +1,6 @@
+{
+  "schema": 2,
+  "entrypoint": "agent/main.py:run",
+  "composition": "independent_suffix",
+  "controls": []
+}

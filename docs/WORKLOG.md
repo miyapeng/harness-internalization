@@ -173,3 +173,14 @@ prepare 直接完成环境时不再执行无用控制/学生生成。trainer 对
 配置/准确命令/接口清单见 [BUDGET_V1.md](BUDGET_V1.md)，[数据分布状态](BUDGET_V1_DATA.md)，[验证报告](validation/budget-v1-report.json)。以下条目为历史验证记录；旧search双显著性规则仅保留在legacy调度。
 
 本轮从干净工作区开始；先读取实际runner/search/importer/trainer及旧测试，再分层增量实现。首轮回归的兼容日志/CLI替身问题和新增采样游标写入问题已修复；未改旧测试断言来规避失败。没有迁移训练框架、引入upstream、扩大benchmark范围或放宽统计阈值。资源检查发现的其他项目HotpotQA simplified数据没有用于凑齐官方分区。
+
+
+## 2026-09-15：三个 benchmark 显式 H0
+
+新增 `seed_harnesses/{alfworld,webshop,hotpotqa}`，均采用现有 schema 2、controls=[] 和隔离 CodeRuntime。ALFWorld 原模板/历史/解析、HotpotQA distractor/top-k/JSON/评分不变；WebShop 使用固定 OPID 基础提示并解析完整响应中的 search/click，保留公开历史和原始响应 token，不复制额外惩罚或辅助控制。
+
+fresh CLI/循环要求 benchmark 对应注册 seed，启动记录 revision/hash、受保护来源和 initial_agent.json；续跑继续接受状态，不重新导入 H0。初始与最终评价分别读取 initial_agent.json/deployment.json，三个正式 benchmark 拒绝空 Harness baseline。准确命令见 [BUDGET_V1.md](BUDGET_V1.md)，来源/接口差异/验收见 [SEED_HARNESSES.md](SEED_HARNESSES.md)。
+
+45 个受保护文件哈希一致（包括全部 budget_v1 配置、训练/统计/采样及 ALFWorld/HotpotQA 实现）；没有数据划分或 A/B/C/D/退役规则变更。全量 **217 项测试通过**（245.584 秒，0 skip），新增 7 项 seed 回归及 4 个 CLI help 通过。测试与实际执行记录见 [validation/seeds/results.json](validation/seeds/results.json)。真实模型、GPU 更新、完整官方环境与大规模评价未执行，WebShop 官方资源状态仍为 not ready。
+
+本次从 commit `80e985af4429061417a4979d13daa5998afb0b34` 的干净工作区开始，先检查实际 adapter/runtime/state 入口及测试，然后核验固定上游小型源码。测试中的通用候选恢复链显式标为历史接受状态，未删除行为断言；新增 fixture 的 HotpotQA final 工具计数与 catalog 独占写入问题只修正测试，失败日志保留。本轮未提交或推送。

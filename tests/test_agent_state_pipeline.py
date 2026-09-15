@@ -166,7 +166,7 @@ class AcceptedStatePipelineTests(unittest.TestCase):
                 return super().propose(request)
         first=self.root/'first';seen=[]
         with self.assertRaises(KeyboardInterrupt):
-            run_outer_loop(self.components(InterruptAfterFirst(self.store,'tool_only'),seen),manifest,str(self.checkpoint),first,config,initial_harness=self.parent)
+            run_outer_loop(self.components(InterruptAfterFirst(self.store,'tool_only'),seen),manifest,str(self.checkpoint),first,config,accepted_state=self.agent(harness=self.parent,manifest=manifest,config=config,next_cycle=0))
         agent=load_accepted_state(first/'cycle_00/state.json',manifest)
         proposer=DemoProposer(self.store,'tool_only');seen=[]
         result=run_outer_loop(self.components(proposer,seen),manifest,agent.checkpoint,self.root/'resumed',config,accepted_state=agent)
@@ -177,11 +177,11 @@ class AcceptedStatePipelineTests(unittest.TestCase):
         consumed=set(manifest.partitions['retirement_0']+manifest.partitions['test'])
         self.assertFalse(any(consumed.intersection(tasks) for _,_,tasks in seen))
 
-    def test_import_evolve_state_final_evaluation_executes_the_accepted_tool(self):
+    def test_historical_state_evolve_final_evaluation_executes_the_accepted_tool(self):
         manifest_path=self.root/'manifest.json';write_json(manifest_path,asdict(self.manifest))
         backend_path=self.root/'backend.json';write_json(backend_path,{'benchmark':'hotpotqa','evaluate':['fixture']})
         evolution=self.root/'evolution'
-        result=run_outer_loop(self.components(DemoProposer(self.store,'tool_only'),[]),self.manifest,str(self.checkpoint),evolution,self.config,initial_harness=self.parent)
+        result=run_outer_loop(self.components(DemoProposer(self.store,'tool_only'),[]),self.manifest,str(self.checkpoint),evolution,self.config,accepted_state=self.agent(harness=self.parent,next_cycle=0))
         module=script('evaluate_benchmark');observed=[]
         class Backend:
             def __init__(_,config,ledger):self.assertIn('--final-evaluation',config['evaluate'])
@@ -210,7 +210,9 @@ class AcceptedStatePipelineTests(unittest.TestCase):
         from argparse import Namespace
         from internalization.core.accepted_state import evaluation_agent
         args=Namespace(state=None,baseline=True,checkpoint=self.checkpoint,protocol=None)
-        agent=evaluation_agent(args,self.manifest)
+        with self.assertRaisesRegex(ValueError,"initial_agent.json"):
+            evaluation_agent(args,self.manifest)
+        agent=evaluation_agent(args,replace(self.manifest,benchmark="lawbench"))
         self.assertEqual(agent.harness.version,Harness().version)
         self.assertEqual(agent.protocol['mode'],'explicit_baseline')
         args.state=self.state({'checkpoint':str(self.checkpoint),'harness_revision':{'bad':'data'}})

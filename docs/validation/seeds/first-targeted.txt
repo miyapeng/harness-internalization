@@ -1,0 +1,39 @@
+test_alfworld_seed_preserves_golden_public_prompt_history_and_raw_tokens (test_seed_harnesses.SeedHarnessTests.test_alfworld_seed_preserves_golden_public_prompt_history_and_raw_tokens) ... ok
+test_fresh_initial_and_final_state_bind_same_h0_and_resume_does_not_reset (test_seed_harnesses.SeedHarnessTests.test_fresh_initial_and_final_state_bind_same_h0_and_resume_does_not_reset) ... ok
+test_hotpot_seed_executes_three_json_actions_in_worker (test_seed_harnesses.SeedHarnessTests.test_hotpot_seed_executes_three_json_actions_in_worker) ... FAIL
+test_provenance_is_protected_and_adapter_drift_fails_before_run (test_seed_harnesses.SeedHarnessTests.test_provenance_is_protected_and_adapter_drift_fails_before_run) ... ok
+test_registered_seed_identity_and_foreign_generic_smoke_rejection (test_seed_harnesses.SeedHarnessTests.test_registered_seed_identity_and_foreign_generic_smoke_rejection) ... ok
+test_webshop_seed_public_actions_tag_parser_history_and_official_reward (test_seed_harnesses.SeedHarnessTests.test_webshop_seed_public_actions_tag_parser_history_and_official_reward) ... ok
+test_appworld_allocates_disjoint_scenario_families_without_acceptance (test_agent_state_pipeline.AcceptedStatePipelineTests.test_appworld_allocates_disjoint_scenario_families_without_acceptance) ... ok
+test_appworld_final_uses_same_state_loader (test_agent_state_pipeline.AcceptedStatePipelineTests.test_appworld_final_uses_same_state_loader) ... ok
+test_canonical_state_roundtrip_checks_checkpoint_revision_and_identity (test_agent_state_pipeline.AcceptedStatePipelineTests.test_canonical_state_roundtrip_checks_checkpoint_revision_and_identity) ... ok
+test_cli_resumes_state_without_a_separate_checkpoint_or_budget_override (test_agent_state_pipeline.AcceptedStatePipelineTests.test_cli_resumes_state_without_a_separate_checkpoint_or_budget_override) ... ok
+test_completed_or_changed_protocol_cannot_reuse_cohorts (test_agent_state_pipeline.AcceptedStatePipelineTests.test_completed_or_changed_protocol_cannot_reuse_cohorts) ... ok
+test_corrupted_protocol_and_revision_never_fall_back (test_agent_state_pipeline.AcceptedStatePipelineTests.test_corrupted_protocol_and_revision_never_fall_back) ... ok
+test_explicit_baseline_is_the_only_way_to_load_an_empty_harness (test_agent_state_pipeline.AcceptedStatePipelineTests.test_explicit_baseline_is_the_only_way_to_load_an_empty_harness) ... ok
+test_final_evaluator_requires_state_or_explicit_baseline (test_agent_state_pipeline.AcceptedStatePipelineTests.test_final_evaluator_requires_state_or_explicit_baseline) ... ok
+test_historical_code_state_uses_sidecar_and_old_module_state_keeps_source (test_agent_state_pipeline.AcceptedStatePipelineTests.test_historical_code_state_uses_sidecar_and_old_module_state_keeps_source) ... ok
+test_historical_module_resume_preserves_recorded_attribution_policy (test_agent_state_pipeline.AcceptedStatePipelineTests.test_historical_module_resume_preserves_recorded_attribution_policy) ... ok
+test_historical_state_evolve_final_evaluation_executes_the_accepted_tool (test_agent_state_pipeline.AcceptedStatePipelineTests.test_historical_state_evolve_final_evaluation_executes_the_accepted_tool) ... ok
+test_import_allocates_actual_cycle_count_without_borrowing_test (test_agent_state_pipeline.AcceptedStatePipelineTests.test_import_allocates_actual_cycle_count_without_borrowing_test) ... ok
+test_import_cli_generates_complete_two_cycle_manifest (test_agent_state_pipeline.AcceptedStatePipelineTests.test_import_cli_generates_complete_two_cycle_manifest) ... ok
+test_missing_identity_and_unknown_state_are_rejected (test_agent_state_pipeline.AcceptedStatePipelineTests.test_missing_identity_and_unknown_state_are_rejected) ... ok
+test_native_lawbench_final_rejects_unsupported_code_before_loading_model (test_agent_state_pipeline.AcceptedStatePipelineTests.test_native_lawbench_final_rejects_unsupported_code_before_loading_model) ... ok
+test_preflight_reports_all_missing_cohorts_before_any_backend_call (test_agent_state_pipeline.AcceptedStatePipelineTests.test_preflight_reports_all_missing_cohorts_before_any_backend_call) ... ok
+test_resume_uses_accepted_pair_and_only_unconsumed_cohorts (test_agent_state_pipeline.AcceptedStatePipelineTests.test_resume_uses_accepted_pair_and_only_unconsumed_cohorts) ... ok
+
+======================================================================
+FAIL: test_hotpot_seed_executes_three_json_actions_in_worker (test_seed_harnesses.SeedHarnessTests.test_hotpot_seed_executes_three_json_actions_in_worker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/miyapeng/harness-internalization/tests/test_seed_harnesses.py", line 193, in test_hotpot_seed_executes_three_json_actions_in_worker
+    result, model = self.run_fixture('hotpotqa', environment_factory(config, self.root / 'worker', training=True),
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/miyapeng/harness-internalization/tests/test_seed_harnesses.py", line 81, in run_fixture
+    self.assertEqual(trajectory.cost.tool_calls, len(responses))
+AssertionError: 2 != 3
+
+----------------------------------------------------------------------
+Ran 23 tests in 2.079s
+
+FAILED (failures=1)

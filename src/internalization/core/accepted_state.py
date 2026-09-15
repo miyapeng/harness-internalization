@@ -139,7 +139,7 @@ def load_accepted_state(path, manifest, *, checkpoint=None, protocol_path=None):
 def add_evaluation_agent_arguments(parser):
     selection = parser.add_mutually_exclusive_group(required=True)
     selection.add_argument("--state", type=Path, help="Accepted state/deployment with checkpoint, Harness and protocol identity")
-    selection.add_argument("--baseline", action="store_true", help="Explicitly evaluate an initial empty Harness")
+    selection.add_argument("--baseline", action="store_true", help="Legacy unseeded benchmarks only; for seeded H0 use --state initial_agent.json")
     parser.add_argument("--checkpoint", type=Path, help="Required for baseline; optional consistency check for --state")
     parser.add_argument("--protocol", type=Path, help="Protocol sidecar for a relocated historical state")
 
@@ -148,6 +148,9 @@ def evaluation_agent(args, manifest):
     if args.state: return load_accepted_state(args.state, manifest, checkpoint=args.checkpoint, protocol_path=args.protocol)
     if not args.baseline or args.checkpoint is None: raise ValueError("Explicit baseline requires --checkpoint")
     if args.protocol: raise ValueError("--protocol is only for an accepted state")
+    from .seed_harnesses import SEEDED_BENCHMARKS
+    if manifest.benchmark in SEEDED_BENCHMARKS:
+        raise ValueError("Seeded benchmark baseline requires --state initial_agent.json; an empty Harness is not H0")
     checkpoint = args.checkpoint.resolve(strict=True)
     if not checkpoint.is_dir(): raise ValueError("Checkpoint must be a directory")
     return AcceptedAgentState(str(checkpoint), Harness(), manifest.fingerprint,

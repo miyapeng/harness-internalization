@@ -97,3 +97,26 @@ plus product/attribute/index hashes recorded in configuration. Reference API rev
 used the public source; no resolved runtime commit or official execution is claimed.
 The module-level data locations are configured only inside the isolated worker.
 Existing WebShop task identity helpers are preserved.
+
+## Benchmark seed Harnesses (2026-09-15)
+
+`seed_harnesses/{alfworld,webshop,hotpotqa}/agent/main.py` are project-written
+passthrough entrypoints using the existing isolated runtime. No upstream runner,
+environment, evaluator, model, or dataset has been bundled with these seeds.
+
+The following Apache-2.0 sources retain their original NTU / verl-agent headers;
+the repository-level OPID MIT license does not replace these file-level notices.
+Reference: [jinyangwu/OPID](https://github.com/jinyangwu/OPID), commit
+`37a15a5f3c0f1ecc651e4be4a0c257b313fa0756`.
+
+| Local file | Upstream file | Reuse / adaptation |
+| --- | --- | --- |
+| `src/internalization/benchmarks/webshop_prompts.py` | `agent_system/environments/prompts/webshop.py` | Exact runtime `WEBSHOP_TEMPLATE_NO_HIS` literal; project-owned rendering of existing full public history and public action fields |
+| `src/internalization/benchmarks/webshop_projection.py` | `agent_system/environments/env_package/webshop/projection.py` | Adapted tagged action extraction/lowercasing; retains bare commands; excludes language/think penalties and tail fallback |
+| `src/internalization/benchmarks/alfworld_prompts.py`, `alfworld_projection.py`, `alfworld.py` | Existing ALFWorld prompts/projection, `env_manager.py`, `memory/memory.py` | Existing attributed implementation unchanged, source rechecked for H0 |
+
+Protected source URLs, commits, hashes and adapter contracts are recorded in
+`configs/seed_harnesses.json`; public explanation is in `docs/SEED_HARNESSES.md`.
+HotpotQA uses the unchanged project-written distractor wrapper from commit
+`80e985af4429061417a4979d13daa5998afb0b34`, not an official or original ReAct Harness.
+The existing Apache-2.0 and MIT texts under `licenses/` remain applicable.

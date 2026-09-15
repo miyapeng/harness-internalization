@@ -1,5 +1,13 @@
 # 实现状态
 
+## 2026-09-15：三个 benchmark 显式 H0
+
+新增 `seed_harnesses/{alfworld,webshop,hotpotqa}`，均采用现有 schema 2、controls=[] 和隔离 CodeRuntime。ALFWorld 原模板/历史/解析、HotpotQA distractor/top-k/JSON/评分不变；WebShop 使用固定 OPID 基础提示并解析完整响应中的 search/click，保留公开历史和原始响应 token，不复制额外惩罚或辅助控制。
+
+fresh CLI/循环要求 benchmark 对应注册 seed，启动记录 revision/hash、受保护来源和 initial_agent.json；续跑继续接受状态，不重新导入 H0。初始与最终评价分别读取 initial_agent.json/deployment.json，三个正式 benchmark 拒绝空 Harness baseline。准确命令见 [BUDGET_V1.md](BUDGET_V1.md)，来源/接口差异/验收见 [SEED_HARNESSES.md](SEED_HARNESSES.md)。
+
+45 个受保护文件哈希一致（包括全部 budget_v1 配置、训练/统计/采样及 ALFWorld/HotpotQA 实现）；没有数据划分或 A/B/C/D/退役规则变更。全量 **217 项测试通过**（245.584 秒，0 skip），新增 7 项 seed 回归及 4 个 CLI help 通过。测试与实际执行记录见 [validation/seeds/results.json](validation/seeds/results.json)。真实模型、GPU 更新、完整官方环境与大规模评价未执行，WebShop 官方资源状态仍为 not ready。
+
 ## 2026-09-14：受控代码清理
 
 正式演化收敛到版本化 Harness 和选择性内化，删除旧模板/flat 转发/重复脚本及仅服务旧生产循环的分支。API transport 从模板逻辑分离，保留 CodeProposer 原提示词和请求行为。保留 schema 1 可执行 hook、具名控制、历史状态反序列化、原生基线/LawBench 评价所需最小类型。预算配置和训练/统计代码不变；本轮未提交或推送。
