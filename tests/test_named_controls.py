@@ -158,10 +158,6 @@ class NamedControlTests(unittest.TestCase):
         self.assertIn('<recovery_v1>\n<review_v1>',trajectory.transitions[0].student_prompt)
         with self.assertRaisesRegex(ValueError,'dependent control composition'):
             InternalizationTarget.from_control(self.store,full,'review_v1','review')
-        proposer=CodeProposer(self.store,transport=lambda _:self.fail('Must not call API'))
-        request=ProposalRequest('old',full,('search',),(),(),(),0,1,self.root/'target')
-        with self.assertRaisesRegex(ValueError,'unsupported'):proposer.propose_target(request)
-        self.assertEqual(proposer.last_cost.model_calls,0)
 
     def test_independent_control_cannot_read_switches_or_request_environment(self):
         for i,source in enumerate(('def run(api,payload):\n    open("config/harness.json").read()\n',
@@ -175,28 +171,6 @@ class NamedControlTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError,'PermissionError'):
             self.rollout(self.store.snapshot(files),name='forbidden_prepare')
 
-    def test_named_proposer_selects_only_id_and_host_derives_adapter(self):
-        full=named_revision(self.store,self.parent)
-        captured=[]
-        def transport(payload):
-            captured.append(payload)
-            return {'choices':[{'message':{'content':json.dumps({'target':{'target_control_id':'review_v1','removed_behavior':'review'}})}}],
-                'usage':{'prompt_tokens':10,'completion_tokens':10}}
-        proposer=CodeProposer(self.store,model='mock',transport=transport)
-        request=ProposalRequest('old',full,('search',),(),(),(),0,1,self.root/'target')
-        target=proposer.propose_target(request)
-        self.assertEqual(target.target_control_id,'review_v1')
-        self.assertEqual(target.supervision_adapter,'controls/review_v1.py:run')
-        self.assertEqual(len(captured),1)
-        self.assertEqual(json.loads((self.root/'target/internalization_target.json').read_text())['target_control_id'],'review_v1')
-
-    def test_empty_named_registry_skips_api(self):
-        full=named_revision(self.store,self.parent,())
-        proposer=CodeProposer(self.store,transport=lambda _:self.fail('No controls, no API'))
-        request=ProposalRequest('old',full,('search',),(),(),(),0,1,self.root/'target')
-        self.assertIsNone(proposer.propose_target(request))
-        self.assertEqual(proposer.last_cost.model_calls,0)
-
     def run_cycles(self,mode='retire'):
         initial=named_revision(self.store,self.tool_parent,(),
             composition='sequential_suffix' if mode=='unsupported' else 'independent_suffix')
@@ -208,10 +182,14 @@ class NamedControlTests(unittest.TestCase):
                 config['controls'].append({'id':cid,'entrypoint':f'controls/{cid}.py:run','enabled':True})
                 changes=[{'path':'config/harness.json','content':json.dumps(config)},
                     {'path':f'controls/{cid}.py','content':'def run(api,payload): return {"suffix":'+repr('\n<'+cid+'>')+',"selected":True}\n'}]
-                return tuple(HarnessCandidate.create(store,request.harness,store.bind_patch(request.harness,changes),cid+str(i)) for i in range(2))
-            def propose_target(_,request):
-                cid=request.harness.config['controls'][-1]['id']
-                return InternalizationTarget.from_control(store,request.harness,cid,cid)
+                result=[]
+                for i in range(2):
+                    edits=changes+[{'path':'prompts/variant.txt','content':str(i)}]
+                    candidate=HarnessCandidate.create(store,request.harness,store.bind_patch(request.harness,edits),cid+str(i))
+                    if mode!='unsupported':
+                        candidate=candidate.with_internalization(InternalizationTarget.from_control(store,candidate.full_revision,cid,cid))
+                    result.append(candidate)
+                return tuple(result)
         class Runner:
             def rollout(_,model,harness,tasks,*,seeds,output,training=False):
                 active={c['id'] for c in harness.config['controls'] if c['enabled']}
@@ -259,7 +237,7 @@ class NamedControlTests(unittest.TestCase):
         self.assertEqual(result['checkpoint'],'old')
         for state in result['archive']:
             self.assertEqual(state['reason'],'accepted_without_internalization')
-            self.assertIn('unsupported',state['detail'])
+            self.assertEqual(state['detail'],'no_embedded_internalization_target')
         full=HarnessRevision.from_dict(result['harness_revision'])
         self.assertEqual(len(full.config['controls']),2)
         self.assertTrue(all(c['enabled'] for c in full.config['controls']))

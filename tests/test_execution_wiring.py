@@ -29,24 +29,24 @@ class ExecutionWiringTests(unittest.TestCase):
 
     def backend_config(self,**execution):
         argv=['{python}',str(ROOT/'tests/fixtures/execution_worker.py'),'--request','{request}','--response','{response}']
-        return {**{stage:argv for stage in ('propose','target','check_internalization','evaluate','train')},
+        return {**{stage:argv for stage in ('propose','check_internalization','evaluate','train')},
                 'execution':execution,'cwd':str(ROOT)}
 
-    def test_internalization_requires_all_five_entrypoints_at_start(self):
-        for missing in ('propose','target','check_internalization','evaluate','train'):
+    def test_internalization_requires_all_four_entrypoints_at_start(self):
+        for missing in ('propose','check_internalization','evaluate','train'):
             config=self.backend_config();del config[missing]
             with self.subTest(missing=missing),self.assertRaisesRegex(ValueError,missing):
                 CommandBackend(config,self.root/'ledger')
         config=self.backend_config(mode='evolution_only')
-        for key in ('target','check_internalization','train'):del config[key]
+        for key in ('check_internalization','train'):del config[key]
         self.assertEqual(CommandBackend(config,self.root/'ledger').execution_config['mode'],'evolution_only')
 
     def test_cli_rejects_missing_entrypoint_before_manifest_or_model_loading(self):
         from internalization import cli
-        config=self.backend_config();del config['target']
+        config=self.backend_config();del config['check_internalization']
         path=self.root/'backend.json';path.write_text(json.dumps(config))
         with patch.object(sys,'argv',['hi','run','--manifest','MISSING','--backend',str(path),'--output',str(self.root/'out')]):
-            with self.assertRaisesRegex(ValueError,'target'):cli.main()
+            with self.assertRaisesRegex(ValueError,'check_internalization'):cli.main()
         self.assertFalse((self.root/'out').exists())
 
     def test_unknown_fields_values_and_hash_mismatch_fail(self):
@@ -175,7 +175,7 @@ class ExecutionWiringTests(unittest.TestCase):
         original=run_outer_loop
         def run(components,*args,**kwargs):
             components.execution_config=resolve_execution({'mode':'evolution_only'})
-            components.proposer.propose_target=lambda *a,**kw: self.fail('target requested in evolution_only')
+            components.runner.check_internalization=lambda *a,**kw: self.fail('preflight requested in evolution_only')
             return original(components,*args,**kwargs)
         with patch('test_revision_decisions.run_outer_loop',run):
             result,_,_=case.run_loop('tool_only')

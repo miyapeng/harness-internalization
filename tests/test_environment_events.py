@@ -152,11 +152,14 @@ class EnvironmentEventTests(unittest.TestCase):
         captured=[]
         def transport(payload):
             captured.append(payload)
-            return {'choices':[{'message':{'content':json.dumps({'candidates':[{'patch':[],'rationale':'inspect public evidence'}]})}}],
+            return {'choices':[{'message':{'content':json.dumps({'candidates':[{
+                'patch':[{'path':'prompts/event_note.txt','content':'Use public tool results.'}],
+                'rationale':'inspect public evidence','evidence_refs':[],'internalization':None}]})}}],
                 'usage':{'prompt_tokens':10,'completion_tokens':10}}
         proposer=CodeProposer(self.store,model='mock',transport=transport)
         request=ProposalRequest('old',self.base,('search',),(trajectory,),(trajectory.outcome,),(),0,1,self.root/'proposal')
-        proposer.propose(request)
+        candidate,=proposer.propose(request)
+        candidate.validate(self.base)
         trace=json.loads(captured[0]['messages'][1]['content'])['traces'][0]
         self.assertEqual(trace['steps'],[])
         self.assertEqual(trace['total_reward'],3.)

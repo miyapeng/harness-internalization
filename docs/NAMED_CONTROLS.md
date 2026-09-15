@@ -18,13 +18,13 @@
 
 列表顺序就是部署时的组合顺序。ID 必须唯一；控制只返回 `suffix: str`、`selected: bool`，未触发时 suffix 必须为空。不同版本修改了同一 ID 的源码仍是不同 revision，不应只凭相同 ID 宣称行为没有变化。
 
-LLM 的目标选择响应为：
+同一次候选响应的 internalization 字段为（完整响应见 [结构化提案协议](STRUCTURED_PROPOSALS.md)）：
 
 ```json
-{"target":{"target_control_id":"review_v1","removed_behavior":"旁路额外 review，保留 recovery 和日志工具"}}
+{"internalization":{"target_control_id":"review_v1","removed_behavior":"旁路额外 review，保留 recovery 和日志工具"}}
 ```
 
-也可以返回 `{"target":null}`。宿主 `InternalizationTarget.from_control()` 从 full revision 查找实际入口，只将该 ID 的 enabled 改为 false。其他控制、顺序、入口、工具、prompt 和源码不变。产物仍保存 full/reduced revision、hash、target_control_id、removed_behavior、宿主解析的 supervision_adapter。禁止选择不存在或已经关闭的 ID。
+也可以填入 `"internalization":null`，与可内化候选同等有效；没有第二次目标 API。宿主 `InternalizationTarget.from_control()` 从 full revision 查找实际入口，只将该 ID 的 enabled 改为 false。其他控制、顺序、入口、工具、prompt 和源码不变。产物仍保存 full/reduced revision、hash、target_control_id、removed_behavior、宿主解析的 supervision_adapter。不存在、已关闭或非独立组合的声明不能获得内化资格；合法 H+ 降为 harness-only 并保留声明错误记录。
 
 此例 H+ 开启 recovery/review，H− 只开启 recovery。A−B 测量的是已有 recovery 条件下 review 的增量贡献，允许两种能力有协同作用；不把它描述为脱离其他控制的独立因果效应。
 
@@ -42,7 +42,7 @@ LLM 的目标选择响应为：
 
 独立控制仅允许内部模型计算，不能调用环境；真实工具仍由正常 prepare/execute 路径经 broker 执行。schema 2 的候选入口和控制不能读取 `config/harness.json`，由 Landlock 文件读权限隔离，避免根据开关配置重建不同基础上下文或非目标指导。工具注册配置、源码和其他共享文件继续可读；未放宽原进程、网络或文件写入限制。
 
-依赖前面控制输出的 `sequential_suffix` 仍可作为完整 Harness 运行，后续控制获得累积上下文。它不能进入当前训练桥：目标选择/结构检查记录 unsupported，保留已验证的 H+ 和旧模型，不训练。需要任意环境交互的控制可以使用该运行路径；不将其自动转成独立指导。
+依赖前面控制输出的 `sequential_suffix` 仍可作为完整 Harness 运行，后续控制获得累积上下文。它不能进入当前训练桥：候选构造时记录 internalization_declaration_error，保留已验证的 H+ 和旧模型，不训练。需要任意环境交互的控制可以使用该运行路径；不将其自动转成独立指导。
 
 这些是受保护接口、组合协议和实际运行检查，不是任意 Python 程序等价性证明。不要通过路径/时钟等环境细节推断启用状态，或在控制内部隐藏跨控制依赖后声称支持独立内化。检查覆盖真实访问的状态，不能保证所有未来状态；运行异常仍按既有流程保留 H+、停止内化。没有自动依赖分析器或可内化性分类器。
 
@@ -55,14 +55,14 @@ LLM 的目标选择响应为：
 | 位置 | 变化 |
 | --- | --- |
 | `harness/revision.py` | 增加 schema 2、具名目标与确定性单 ID 关闭；保留 schema 1/旧目标序列化 |
-| `evolution/code_proposer.py` | 新控制注册协议、仅 ID 的目标选择；hash 仍由宿主计算 |
+| `evolution/code_proposer.py` | 一次提案内置可选具名目标；hash 与 H− 仍由宿主计算 |
 | `harness/control_runtime.py` | 独立/顺序组合、目标执行、非目标输出复用和位置校验 |
 | `harness/code_runtime.py` | 根据 schema 选择旧单 hook 或具名控制路径 |
 | `harness/sandbox.py`、`sandbox_worker.py` | schema 2 文件读权限收紧，屏蔽开关配置 |
 | `core/trajectory.py`、`serialization.py` | 新 `RevisionTransition/ControlContext/ControlOutput`；旧 Transition JSON 不添加字段 |
 | `training/revision_rollout.py`、`revision_scoring.py` | 保存实际组合，按部署顺序增强评分；旧桥保留 |
 
-原 schema 1 的 `supervision` string/null、planning/review/recovery 模块模式继续工作，旧 revision hash 和归档不重写。没有自动把旧总 hook 拆成多个 ID；可以由后续候选显式升级配置，通过原 search/dev 收益规则并复用 dev 正式接受后生效。状态加载、实验隔离、归因门槛和 accept/retain/rollback 规则均沿用现有实现。
+原 schema 1 的可执行 `supervision` string/null 在状态加载、运行和合成演示中继续支持；旧三类模板生产入口已删除，旧 revision hash 和归档不重写。没有自动把旧总 hook 拆成多个 ID；可以由后续候选显式升级配置，通过原 search/dev 收益规则并复用 dev 正式接受后生效。状态加载、实验隔离、归因门槛和 accept/retain/rollback 规则均沿用现有实现。
 
 ## 运行与证据
 

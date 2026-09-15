@@ -39,20 +39,6 @@
   "execution": {
     "mode": "internalization"
   },
-  "target": [
-    "{python}",
-    "-m",
-    "internalization.training.entrypoint",
-    "target",
-    "--benchmark",
-    "hotpotqa",
-    "--env-config",
-    "configs/hotpotqa.json",
-    "--request",
-    "{request}",
-    "--response",
-    "{response}"
-  ],
   "check_internalization": [
     "{python}",
     "-m",

@@ -1,5 +1,15 @@
 # 实现状态
 
+## 2026-09-15：一次结构化 proposer 调用
+
+CodeProposer 一次 API 返回两个独立候选，包含完整 patch、rationale、精确 search evidence_refs 和可选 removable-control 声明；宿主在同一子进程构造并返回 H+/H− 快照。删除独立 target contract、propose_target、Components.targets 与 target stage；internalization 后端只要求 propose/check_internalization/evaluate/train。
+
+合法 H+ 的可撤除声明错误时降为 harness-only、保存错误、不请求 LLM 修复。无目标不惩罚；完整 H+ 通过 dev 后仍可部署。拒绝伪造引用、本轮精确 task ID 硬编码及重复 full revision。preflight、A/B、同 batch old-policy 训练、退役与 rollback 保持原规则。下一轮 proposer 只读 dev 前产生的 search 反馈，不经 eligible/no_gain 状态泄露 dev 结果。
+
+全部 budget_v1 执行参数、训练/评分/采样/统计实现、benchmark 与 seed 未改；五份 backend 仅删 target 命令。入口迁移、产物、测试调整与验证边界见 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md)。没有运行真实 proposer API、官方任务或 GPU 训练。
+
+全量 **224 项 CPU 回归通过**（250.012 秒，0 skip）；其中 19 项单次 proposer 测试及 4 个 CLI help 通过。沙箱执行和 JSON 子进程为实际运行，API/任务模型使用 scripted fixture，既有小模型 CPU 更新测试保留。`git diff --check` 与当前文档链接检查通过。完整结果、首轮失败日志和不变性检查见 [validation/structured-proposals/results.json](validation/structured-proposals/results.json)。真实 API、官方 benchmark 与 GPU 训练未执行。
+
 ## 2026-09-15：三个 benchmark 显式 H0
 
 新增 `seed_harnesses/{alfworld,webshop,hotpotqa}`，均采用现有 schema 2、controls=[] 和隔离 CodeRuntime。ALFWorld 原模板/历史/解析、HotpotQA distractor/top-k/JSON/评分不变；WebShop 使用固定 OPID 基础提示并解析完整响应中的 search/click，保留公开历史和原始响应 token，不复制额外惩罚或辅助控制。

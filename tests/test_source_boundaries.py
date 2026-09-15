@@ -15,7 +15,7 @@ from internalization.core.interfaces import Components, ProposalRequest
 from internalization.core.types import Journal
 from internalization.evolution.code_proposer import CodeProposer, CONTRACT
 from internalization.evolution.proposer import APITransport
-from internalization.evolution.revision_search import public_history
+from internalization.evolution.revision_search import public_history, search_feedback
 from internalization.harness.revision import RevisionStore
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -65,7 +65,7 @@ class SourceBoundaryTests(unittest.TestCase):
                     for name in re.findall(r'\$\{([^}]+)\}',file.read_text())}
                 with patch.dict(os.environ,variables):
                     CommandBackend(config,Path(directory)/'cost.jsonl')
-                for stage in ('propose','target','check_internalization','evaluate','train'):
+                for stage in ('propose','check_internalization','evaluate','train'):
                     for part in config.get(stage,[]):
                         if part.startswith('scripts/') and part.endswith('.py'):self.assertTrue((ROOT/part).is_file(),part)
                         if part.startswith('internalization.'):importlib.import_module(part)
@@ -87,11 +87,11 @@ class SourceBoundaryTests(unittest.TestCase):
             def transport(payload):
                 captured.append(payload)
                 return {'choices':[{'message':{'content':json.dumps({'candidates':[
-                    {'patch':[{'path':'prompts/system.txt','content':'new prompt'}],'rationale':'one'},
-                    {'patch':[{'path':'prompts/system.txt','content':'other prompt'}],'rationale':'two'}]})}}],
+                    {'patch':[{'path':'prompts/system.txt','content':'new prompt'}],'rationale':'one','evidence_refs':[],'internalization':None},
+                    {'patch':[{'path':'prompts/system.txt','content':'other prompt'}],'rationale':'two','evidence_refs':[],'internalization':None}]})}}],
                     'usage':{'prompt_tokens':10,'completion_tokens':20}}
             proposer=CodeProposer(store,model='mock',transport=transport,max_tokens=123,temperature=.3)
-            request=ProposalRequest('model',parent,(),(),(),({'source':'prior'},),0,2,root/'proposal')
+            request=ProposalRequest('model',parent,(),(),(),({'feedback_source':'search','candidate':{'id':'prior'},'search_gain':None,'status':'search_failed'},),0,2,root/'proposal')
             with patch('internalization.evolution.proposer.time.monotonic',side_effect=[10.,12.]):
                 candidates=proposer.propose(request)
             self.assertEqual(len(candidates),2)
@@ -118,9 +118,11 @@ class SourceBoundaryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             journal=Journal(Path(directory)/'events.jsonl')
             journal.append('candidate_failed',candidate={'id':'bad'},reason='retirement SECRET')
+            search_feedback(journal,{'id':'bad'},None,False)
+            search_feedback(journal,{'id':'good'},{'mean':.2},True)
             journal.append('code_candidate',candidate={'id':'good'},status='eligible',search_gain={'mean':.2},dev_gain={'mean':.9})
             journal.append('cycle_complete',reason='rollback',task='retirement_0')
             rows=public_history(journal)
-            self.assertEqual([r['status'] for r in rows],['failed','eligible'])
+            self.assertEqual([r['status'] for r in rows],['search_failed','search_positive'])
             for hidden in ('SECRET','retirement','dev_gain','rollback'):self.assertNotIn(hidden,json.dumps(rows))
             self.assertIn('SECRET',journal.path.read_text())

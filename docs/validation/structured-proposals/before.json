@@ -1,0 +1,286 @@
+{
+  "head": "e5ec547def70d765daab30cb3ea2734bcebc6ca9",
+  "preexisting_changes": [
+    "README.md",
+    "requirement.txt"
+  ],
+  "sha256": {
+    "src/internalization/training/rollout.py": "15e55dff04a68ec4e54136eac159e3216da171c92308233fbbf8994d963dcfe2",
+    "src/internalization/training/revision_rollout.py": "4ffb723a12ef7f2b4396b36ee290629ee5f58f191eeb967dabfb36d4cac7d1bc",
+    "src/internalization/training/verl_backend.py": "7a6be70f0eb56ba96cc1c2c26728720e828c3548d22de6cd1c74902cfbc91686",
+    "src/internalization/training/module_advantage.py": "7487f77bd2291bcb1a18b20b3385f65288ef74a46f888585ecd7002850c43923",
+    "src/internalization/training/smoke.py": "fc078c2be238a4bd4b52d503690310cad2842c27baad562f33ace9a5fc063fe8",
+    "src/internalization/training/trainer.py": "9c5980ef9557dba80ef223e3bca0cd04cc30816a3ab0834b3a7173afc744ed6f",
+    "src/internalization/training/__init__.py": "049174ba2ac33f1e48281be0195eb6e89e55cfbd84dd18b4f8411d396587505d",
+    "src/internalization/training/checkpoint.py": "dff35df9ce065a1f451279b08a2a8604727ecec600268bd8f411e137a5ff88b5",
+    "src/internalization/training/revision_scoring.py": "b5a51617ae0237b6a13f5dacab258afcdb2060d0d5e46647f1d2e774a29ed696",
+    "src/internalization/training/behavior_policy.py": "86252e96c88770d8325a52f18d3d9fe52bf73e086834ac411b137b75a6c44344",
+    "src/internalization/training/teacher_scoring.py": "6eb4d1fd3bcf663853e0f74b636f7b5182aad7167bb7d16d815d1b8fa8c1342f",
+    "src/internalization/training/entrypoint.py": "33f2ff1f8362b34ed653f8a3c9874d8f711eb0bdeb2c6b9238ea344e0fd1f9f2",
+    "src/internalization/training/teacher_backend.py": "e12c7eee01f31fc4c46fa70f5cca60df49e56f6fb8f1bb726581ca8acdc7ea5e",
+    "src/internalization/evaluation/__init__.py": "63e695d0670c426fd978e760a28be46ca780bf6e566317bffa9e8cd385159bc4",
+    "src/internalization/evaluation/attribution.py": "d5859e3a6d512732268891fdc6769b6cefa6a4019beaa7e978074281f386c134",
+    "src/internalization/evaluation/cost.py": "85f4a6d012329d65a52eaecf1b2e793a70de1dff54bd42733b22d12d8c18f11a",
+    "src/internalization/evaluation/retirement.py": "d4335baf558b9ffb55a44a5e65a444aa7c8acd7562dc9123cc39062f149e6971",
+    "src/internalization/harness/runtime.py": "f8112cbbcaf675d75a53829861a4ce51238eb21b82c7bd320df55fd95890a4c4",
+    "src/internalization/harness/revision.py": "adbb661f1f149f656be490507c2e27d57b2ada479e3fd400c1529025f1ab6a26",
+    "src/internalization/harness/control_runtime.py": "5889074a8bf07ffd46728da93067ddf7af161ab1389bef4b20b57633d9b746dd",
+    "src/internalization/harness/code_runtime.py": "0a395d1ff323735a7ad7867e3051f5acbec9c0436446bfc811e3e904fff7a34a",
+    "src/internalization/harness/module.py": "9652c7b607a9f4f0ab57afe1345a1bbad35a88c601623d64d198b79fbfbcc87f",
+    "src/internalization/harness/__init__.py": "f305366ebacdf5295ddedd748bed070f11828a97d1bd276e4c974eca8ed00980",
+    "src/internalization/harness/sandbox_worker.py": "55114c07c84a8e9756bae5975b9214843cd0da374c8604a890c4032953e5b1db",
+    "src/internalization/harness/sandbox.py": "35332e0cd1e479801afb3c7bba7fa043d819d6508434dc1a0afc392319891dde",
+    "src/internalization/core/sampling.py": "59b81f2fb9f5bf0b79153d6f999081c8a5944f81901ab968208df9f002c263ea",
+    "src/internalization/core/execution_config.py": "1297c4c03ceaedf260e881d72f7953e0e0640e1adf3741df9602b7740d957015",
+    "configs/budget_v1/alfworld.json": "10bce9639dfe25aab5bd4fee248c7c5525fb37fb55487b1155452e712b16ef3c",
+    "configs/budget_v1/webshop_backend.json": "c38d7c97a17388d0b1dd889570e8e80d29eaac8e6d90ae714e087d01418b31fd",
+    "configs/budget_v1/hotpotqa_environment.json": "ed7f2db3eabb66b93c79a41935c68aec9d90fdc66408854d707dc1bfd785f956",
+    "configs/budget_v1/alfworld_backend.json": "4cc6618610e87092de594c4b10e6a2ce46f8fcc5898422468cfac1c3fd15191a",
+    "configs/budget_v1/hotpotqa.json": "99474d63defe232c6fa6e160d4cbafe55af8055d6b3cf3410225100f87b7e686",
+    "configs/budget_v1/webshop_environment.json": "bdb94e779de66c301ce7be639e8ddd9c17c9dbb1af96424414ca4bea65070617",
+    "configs/budget_v1/webshop.json": "5abfe05b8cf642f4bd4146c4a52a4a3e479ee9c1132aaaaae10d0d89c14d5437",
+    "configs/budget_v1/hotpotqa_backend.json": "754ecc62ce662c8c42c7a43e413fc7febba08220251ccefd0e1a7e3edd5a8c1d"
+  },
+  "backend_execution": {
+    "configs/terminalbench2_backend.json": {
+      "mode": "evolution_only"
+    },
+    "configs/appworld_backend.json": {
+      "mode": "evolution_only"
+    },
+    "configs/alfworld_backend.json": {
+      "mode": "internalization"
+    },
+    "configs/swebench_pro_backend.json": {
+      "mode": "evolution_only"
+    },
+    "configs/hotpotqa_backend.json": {
+      "mode": "internalization"
+    },
+    "configs/lawbench_backend.json": {
+      "mode": "evolution_only"
+    },
+    "configs/budget_v1/webshop_backend.json": {
+      "mode": "internalization",
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "ppo_mini_batch_size": 8,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_epochs": 1,
+          "clip_ratio": 0.2,
+          "clip_ratio_low": 0.2,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_c": 3.0,
+          "loss_agg_mode": "token-mean",
+          "use_kl_loss": true,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "entropy_coeff": 0.001,
+          "grad_clip": 1.0,
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "use_remove_padding": false,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_torch_compile": false,
+          "ulysses_sequence_parallel_size": 1,
+          "entropy_from_logits_with_chunking": false,
+          "entropy_checkpointing": false
+        }
+      },
+      "schedule": {
+        "profile": "budget_v1",
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "search_per_cycle": 8,
+        "candidate_count": 2,
+        "representative_traces": 4
+      },
+      "seeds": {
+        "split_seed": 42,
+        "run_seed": 17,
+        "environment_seed": 0,
+        "model_sampling_seed": 17
+      },
+      "max_steps": 15,
+      "supervision": "targeted",
+      "tasks_per_batch": 4,
+      "rollouts_per_task": 4,
+      "device": "cuda:0",
+      "reference_device": "cpu",
+      "model": {
+        "max_context": 8192,
+        "max_prompt_tokens": 4096,
+        "max_action_tokens": 512,
+        "max_new_tokens": 256
+      },
+      "advantage": {
+        "module_weight": 0.001,
+        "mode": "mean_std_norm",
+        "normalize_module": false,
+        "clip_module": null,
+        "invalid_action_penalty": 0.1,
+        "epsilon": 1e-06
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      }
+    },
+    "configs/budget_v1/alfworld_backend.json": {
+      "mode": "internalization",
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "ppo_mini_batch_size": 8,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_epochs": 1,
+          "clip_ratio": 0.2,
+          "clip_ratio_low": 0.2,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_c": 3.0,
+          "loss_agg_mode": "token-mean",
+          "use_kl_loss": true,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "entropy_coeff": 0.001,
+          "grad_clip": 1.0,
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "use_remove_padding": false,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_torch_compile": false,
+          "ulysses_sequence_parallel_size": 1,
+          "entropy_from_logits_with_chunking": false,
+          "entropy_checkpointing": false
+        }
+      },
+      "schedule": {
+        "profile": "budget_v1",
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "search_per_cycle": 8,
+        "candidate_count": 2,
+        "representative_traces": 4
+      },
+      "seeds": {
+        "split_seed": 42,
+        "run_seed": 17,
+        "environment_seed": 0,
+        "model_sampling_seed": 17
+      },
+      "max_steps": 30,
+      "supervision": "targeted",
+      "tasks_per_batch": 4,
+      "rollouts_per_task": 4,
+      "device": "cuda:0",
+      "reference_device": "cpu",
+      "model": {
+        "max_context": 8192,
+        "max_prompt_tokens": 4096,
+        "max_action_tokens": 512,
+        "max_new_tokens": 256
+      },
+      "advantage": {
+        "module_weight": 0.001,
+        "mode": "mean_std_norm",
+        "normalize_module": false,
+        "clip_module": null,
+        "invalid_action_penalty": 0.1,
+        "epsilon": 1e-06
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      }
+    },
+    "configs/budget_v1/hotpotqa_backend.json": {
+      "mode": "internalization",
+      "algorithm": {
+        "actor": "verl_0.5.0_vanilla_PPO",
+        "outcome": "step_weighted_within_task_episode_outcome",
+        "ppo": {
+          "ppo_mini_batch_size": 8,
+          "ppo_micro_batch_size_per_gpu": 1,
+          "ppo_epochs": 1,
+          "clip_ratio": 0.2,
+          "clip_ratio_low": 0.2,
+          "clip_ratio_high": 0.2,
+          "clip_ratio_c": 3.0,
+          "loss_agg_mode": "token-mean",
+          "use_kl_loss": true,
+          "kl_loss_coef": 0.01,
+          "kl_loss_type": "low_var_kl",
+          "entropy_coeff": 0.001,
+          "grad_clip": 1.0,
+          "policy_loss": {
+            "loss_mode": "vanilla"
+          },
+          "use_remove_padding": false,
+          "use_dynamic_bsz": false,
+          "use_fused_kernels": false,
+          "use_torch_compile": false,
+          "ulysses_sequence_parallel_size": 1,
+          "entropy_from_logits_with_chunking": false,
+          "entropy_checkpointing": false
+        }
+      },
+      "schedule": {
+        "profile": "budget_v1",
+        "cycles": 3,
+        "planned_update_batches": 300,
+        "search_per_cycle": 8,
+        "candidate_count": 2,
+        "representative_traces": 4
+      },
+      "seeds": {
+        "split_seed": 42,
+        "run_seed": 17,
+        "environment_seed": 0,
+        "model_sampling_seed": 17
+      },
+      "max_steps": 8,
+      "supervision": "targeted",
+      "tasks_per_batch": 4,
+      "rollouts_per_task": 4,
+      "device": "cuda:0",
+      "reference_device": "cpu",
+      "model": {
+        "max_context": 16384,
+        "max_prompt_tokens": 12288,
+        "max_action_tokens": 512,
+        "max_new_tokens": 256
+      },
+      "advantage": {
+        "module_weight": 0.001,
+        "mode": "mean_std_norm",
+        "normalize_module": false,
+        "clip_module": null,
+        "invalid_action_penalty": 0.1,
+        "epsilon": 1e-06
+      },
+      "optimizer": {
+        "learning_rate": 1e-06,
+        "weight_decay": 0.01
+      },
+      "proposer": {
+        "max_tokens": 8192,
+        "temperature": 0.0
+      }
+    }
+  }
+}

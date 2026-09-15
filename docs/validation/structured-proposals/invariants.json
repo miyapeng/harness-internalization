@@ -1,0 +1,18 @@
+{
+  "protected_files_checked": 35,
+  "expected_only_changes": [
+    "src/internalization/training/entrypoint.py",
+    "configs/budget_v1/webshop_backend.json",
+    "configs/budget_v1/alfworld_backend.json",
+    "configs/budget_v1/hotpotqa_backend.json"
+  ],
+  "backend_execution_unchanged": true,
+  "only_removed_target_stage_from": [
+    "configs/alfworld_backend.json",
+    "configs/hotpotqa_backend.json",
+    "configs/budget_v1/webshop_backend.json",
+    "configs/budget_v1/alfworld_backend.json",
+    "configs/budget_v1/hotpotqa_backend.json"
+  ],
+  "seed_benchmark_evaluation_attribution_sources_unchanged": true
+}

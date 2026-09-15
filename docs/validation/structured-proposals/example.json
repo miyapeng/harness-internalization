@@ -1,0 +1,124 @@
+{
+  "artifact_directory": "runs/structured-proposals-20260915T071432",
+  "parent": "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3",
+  "candidate": {
+    "candidate_id": "c5fb5e987f04c925a4e8c6970f5674c8720af87f68311a36516a52c54f7827df",
+    "parent_revision": "39b1a8383753a3a53c0f9ef963dfaffa30ac9163a482f0d03e440e73918d18e3",
+    "patch": [
+      {
+        "path": "config/harness.json",
+        "before_hash": "fa49b00898fc344c1d5bdefbef26155202fd6fe051072891590aaf4b6938cd87",
+        "content": "{\"schema\": 2, \"entrypoint\": \"agent/main.py:run\", \"composition\": \"independent_suffix\", \"controls\": [{\"id\": \"recovery_v1\", \"entrypoint\": \"controls/recovery_v1.py:run\", \"enabled\": true}, {\"id\": \"review_v1\", \"entrypoint\": \"controls/review_v1.py:run\", \"enabled\": true}]}"
+      },
+      {
+        "path": "config/tools.json",
+        "before_hash": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+        "content": "{\"log_query\": {\"entry\": \"tools.log_query:run\", \"description\": \"Search log lines in the public history; argument needle:string\"}}"
+      },
+      {
+        "path": "controls/recovery_v1.py",
+        "before_hash": null,
+        "content": "def run(api,payload):\n    return {\"suffix\":'\\n<recovery_v1>',\"selected\":True}\n"
+      },
+      {
+        "path": "controls/review_v1.py",
+        "before_hash": null,
+        "content": "def run(api,payload):\n    return {\"suffix\":'\\n<review_v1>',\"selected\":True}\n"
+      },
+      {
+        "path": "tools/log_query.py",
+        "before_hash": null,
+        "content": "def run(api, payload):\n    needle=payload[\"arguments\"].get(\"needle\",\"\")\n    return \"LOG_QUERY_RESULT\\n\"+\"\\n\".join(line for line in payload[\"history\"].splitlines()\n        if line.startswith(\"log:\") and needle in line)\n"
+      }
+    ],
+    "full_revision": {
+      "format": "code_revision_v1",
+      "version": "97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf",
+      "path": "/data/miyapeng/harness-internalization/runs/structured-proposals-20260915T071432/revisions/97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf-2607e931b749",
+      "policy": {
+        "editable_prefixes": [
+          "agent/",
+          "prompts/",
+          "tools/",
+          "controls/",
+          "config/"
+        ],
+        "capabilities": [
+          "model",
+          "environment"
+        ],
+        "max_files": 64,
+        "max_bytes": 262144
+      }
+    },
+    "rationale": "Repeated failures -> clearer public context -> more appropriate actions",
+    "evidence_refs": [
+      {
+        "task_id": "search-instance-000",
+        "step": 0
+      }
+    ],
+    "internalization_target": {
+      "full_revision": {
+        "format": "code_revision_v1",
+        "version": "97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf",
+        "path": "/data/miyapeng/harness-internalization/runs/structured-proposals-20260915T071432/revisions/97b3e00eff78b9220ff15dc9ac4382643044fdf9ca8e84bc33a38c1a2f4f4aaf-2607e931b749",
+        "policy": {
+          "editable_prefixes": [
+            "agent/",
+            "prompts/",
+            "tools/",
+            "controls/",
+            "config/"
+          ],
+          "capabilities": [
+            "model",
+            "environment"
+          ],
+          "max_files": 64,
+          "max_bytes": 262144
+        }
+      },
+      "reduced_revision": {
+        "format": "code_revision_v1",
+        "version": "6c9b78933a6040a3be1062c7d94f1edd1c93d4674fd978960e5f8c3d3c33619e",
+        "path": "/data/miyapeng/harness-internalization/runs/structured-proposals-20260915T071432/revisions/6c9b78933a6040a3be1062c7d94f1edd1c93d4674fd978960e5f8c3d3c33619e-510fbbaee05c",
+        "policy": {
+          "editable_prefixes": [
+            "agent/",
+            "prompts/",
+            "tools/",
+            "controls/",
+            "config/"
+          ],
+          "capabilities": [
+            "model",
+            "environment"
+          ],
+          "max_files": 64,
+          "max_bytes": 262144
+        }
+      },
+      "removed_behavior": "Independent public-context review",
+      "supervision_adapter": "controls/review_v1.py:run",
+      "target_control_id": "review_v1"
+    }
+  },
+  "proposer_cost": {
+    "input_tokens": 100,
+    "output_tokens": 20,
+    "model_calls": 1,
+    "auxiliary_calls": 1,
+    "tool_calls": 0,
+    "latency_s": 0.0003972817212343216
+  },
+  "validation": "scripted API and model; actual sandbox tool execution; no optimizer updates",
+  "assertions": [
+    "one transport request",
+    "two distinct candidates",
+    "only review_v1 disabled",
+    "log_query tool executed",
+    "recovery suffix retained",
+    "review suffix absent"
+  ]
+}

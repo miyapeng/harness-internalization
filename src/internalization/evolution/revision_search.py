@@ -57,16 +57,21 @@ def search_revisions(components,request,*,baseline_search,baseline_dev,dev_tasks
             dev_tasks=dev_tasks,seeds=seeds,policy=policy,journal=journal)
     candidates=components.proposer.propose(request)
     if len(candidates)!=request.count: raise ValueError("Proposer returned wrong code candidate count")
-    evaluated=[]
+    evaluated=[];seen=set()
     for index,candidate in enumerate(candidates):
         folder=request.output.parent/f"candidate_{index}"
+        feedback_written=False
         try:
             if not isinstance(candidate,HarnessCandidate): raise ValueError(str(candidate))
             candidate.validate(request.harness)
+            if candidate.full_revision.version in seen: raise ValueError("duplicate full_revision")
+            seen.add(candidate.full_revision.version)
             write_json(folder/"candidate.json",candidate.to_dict())
             search=evaluate_tasks(components.runner,request.checkpoint,candidate.full_revision,request.tasks,seeds,folder/"search")
-            dev=evaluate_tasks(components.runner,request.checkpoint,candidate.full_revision,dev_tasks,seeds,folder/"dev")
             sg=paired_interval(search.evaluations,baseline_search.evaluations,lambda r:r.success,policy)
+            search_feedback(journal,candidate,sg,sg["low"]>0)
+            feedback_written=True
+            dev=evaluate_tasks(components.runner,request.checkpoint,candidate.full_revision,dev_tasks,seeds,folder/"dev")
             dg=paired_interval(dev.evaluations,baseline_dev.evaluations,lambda r:r.success,policy)
             versions={t.model_version for result in (baseline_search,baseline_dev,search,dev) for t in result.trajectories}
             if len(versions)>1: raise ValueError("Search/dev evaluations used different model snapshots")
@@ -79,6 +84,7 @@ def search_revisions(components,request,*,baseline_search,baseline_dev,dev_tasks
                            status="eligible" if useful else "no_gain")
             evaluated.append(selection)
         except Exception as exc:
+            if not feedback_written: search_feedback(journal,candidate,None,False)
             write_json(folder/"rejection.json",{"reason":str(exc),"index":index})
             journal.append("candidate_failed",index=index,reason=str(exc),
                            candidate=candidate.to_dict() if isinstance(candidate,HarnessCandidate) else candidate)
@@ -91,26 +97,35 @@ def search_revisions(components,request,*,baseline_search,baseline_dev,dev_tasks
         -sum(row.cost.total_tokens for row in item.candidate_dev))) if pool else None
 
 
+def search_feedback(journal,candidate,gain,positive):
+    # This record is emitted before dev. No dev outcome can affect its status.
+    journal.append("proposer_search_feedback",feedback_source="search",
+        candidate=candidate.to_dict() if isinstance(candidate,HarnessCandidate) else candidate,
+        search_gain=gain,status=("search_positive" if positive else "no_search_gain") if gain is not None else "search_failed")
+
+
 def public_history(journal):
     import json
     if not journal.path.exists(): return ()
     rows=(json.loads(line) for line in journal.path.read_text().splitlines())
-    return tuple(({"candidate":row["candidate"],"search_gain":row["search_gain"],"status":row["status"]}
-        if row["kind"]=="code_candidate" else {"candidate":row["candidate"],"status":"failed",
-            "reason":"candidate_execution_or_evaluation_failed"})
-        for row in rows if row["kind"] in ("code_candidate","candidate_failed"))
+    # Old mixed search/dev events remain archived but are not optimization feedback.
+    return tuple({key:row[key] for key in ("feedback_source","candidate","search_gain","status")}
+        for row in rows if row["kind"]=="proposer_search_feedback")
 
 
 def budget_search_revisions(components, request, *, baseline_search, baseline_dev, dev_tasks, seeds, policy, journal):
     """Two common-task evaluations; positive paired mean only; a single dev finalist."""
     candidates = components.proposer.propose(request)
     if len(candidates) != request.count: raise ValueError("Wrong candidate count")
-    eligible = []
+    eligible = [];seen=set()
     for index, candidate in enumerate(candidates):
         folder = request.output.parent/f"candidate_{index}"
+        feedback_written=False
         try:
             if not isinstance(candidate, HarnessCandidate): raise ValueError(str(candidate))
             candidate.validate(request.harness)
+            if candidate.full_revision.version in seen: raise ValueError("duplicate full_revision")
+            seen.add(candidate.full_revision.version)
             write_json(folder/"candidate.json", candidate.to_dict())
             result = evaluate_tasks(components.runner, request.checkpoint, candidate.full_revision,
                                     request.tasks, seeds, folder/"search")
@@ -124,12 +139,15 @@ def budget_search_revisions(components, request, *, baseline_search, baseline_de
             gain = {"mean":sum(gains)/len(gains), "paired_gains":gains,
                     "rule":"paired_mean > 0", "significance_test":False,
                     "task_ids":list(request.tasks)}
+            search_feedback(journal,candidate,gain,gain["mean"]>0)
+            feedback_written=True
             journal.append("code_candidate", candidate=candidate.to_dict(), search_gain=gain,
                            status="search_positive" if gain["mean"]>0 else "no_gain")
             write_json(folder/"search_screen.json",gain)
             if gain["mean"]>0: eligible.append((gain["mean"], -sum(r.cost.total_tokens for r in result.evaluations),
                                                -index, candidate, gain, versions))
         except Exception as exc:
+            if not feedback_written: search_feedback(journal,candidate,None,False)
             write_json(folder/"rejection.json", {"reason":str(exc),"index":index})
             journal.append("candidate_failed",index=index,reason=str(exc),
                            candidate=candidate.to_dict() if isinstance(candidate,HarnessCandidate) else candidate)

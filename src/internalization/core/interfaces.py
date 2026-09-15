@@ -35,10 +35,6 @@ class TaskRunner(Protocol):
     def check_internalization(self, model, target: InternalizationTarget, tasks: tuple[str, ...], *, output: Path): ...
 
 
-class InternalizationTargetBackend(Protocol):
-    def propose_target(self, request: ProposalRequest) -> InternalizationTarget | None: ...
-
-
 class TrainingBackend(Protocol):
     # The legacy teacher argument specifies a phase-frozen KL reference.
     # Module supervision must use each batch's current behavior policy instead.
@@ -61,7 +57,6 @@ class Components:
     runner: TaskRunner
     trainer: TrainingBackend
     retirement: RetirementEvaluator | None = None
-    targets: InternalizationTargetBackend | None = None
 
     execution_config: dict | None = None
     sampling_state: dict | None = None

@@ -2,24 +2,24 @@
 
 当前新增 schema 2 具名控制：只撤除 target_control_id，保留其他控制；训练复用非目标输出并按部署位置插入目标。完整新协议见 [NAMED_CONTROLS.md](NAMED_CONTROLS.md)。下文单 supervision hook 的描述对应仍保留的 schema 1 兼容模式。
 
-本次是已有工程的增量扩展，没有迁移训练框架、加入上游目录或新增 benchmark。修改前文件哈希、100 项测试日志和关键文件副本位于 `docs/history/revision-baseline/`。已有测试断言未改；旧接口默认仍走原模块路径。
+本文保留初次版本化扩展的运行边界与历史证据；当前提案接口以 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md) 为准。旧三类模板生产入口已清理，不再默认回退。历史报告不改写。
 
 ## 接口迁移
 
 | 文件 | 新接口或变化 | 原接口兼容性 |
 | --- | --- | --- |
 | `harness/revision.py` | `WorkspacePolicy`、`FileEdit`、`RevisionStore`、`HarnessRevision`、`InternalizationTarget` | 不改变原 `Harness` / `HarnessModule` |
-| `evolution/candidate.py` | 新增 `HarnessCandidate`，记录 parent/patch/runnable full revision/rationale/hash | 原 `Candidate` 保留 |
-| `evolution/code_proposer.py` | `CodeProposer.propose`、`propose_target`；独立 mock 或既有 API transport | 不再用三种 kind 验证代码候选 |
-| `evolution/proposer.py` | 增加可复用 `request_json` transport | 原模块 proposer 方法保留 |
+| `evolution/candidate.py` | `HarnessCandidate` 记录 parent/patch/full revision/rationale/hash/evidence_refs/可选目标 | 旧 `Candidate` 已删除 |
+| `evolution/code_proposer.py` | `CodeProposer.propose`；一次 transport 返回两个结构化候选和可选目标 | 不再用三种 kind 验证代码候选 |
+| `evolution/proposer.py` | 公共 `APITransport.request_json` | 旧模板 proposer 已删除 |
 | `evolution/revision_search.py` | 实际 search/dev 运行与选择；候选失败独立归档；公开历史过滤 | 复用原 paired interval 和评分规则 |
 | `harness/code_runtime.py` | `CodeRuntime.prepare/execute`、受保护 `CapabilityBroker`、`augment_context` | 实际使用 revision 的代码、prompt 和工具注册 |
 | `harness/sandbox.py`、`sandbox_worker.py` | 每次入口调用独立进程、Landlock、seccomp、资源限额 | 不把原 AST 模板限制当作任意代码沙箱 |
 | `training/rollout.py`、`revision_rollout.py` | `rollout(..., harness=HarnessRevision, ...)`；显式 path/hash、独立 memory/tool registry | 旧 Harness 分支保留 |
 | `training/teacher_scoring.py`、`revision_scoring.py` | `InternalizationTarget` 分派；可执行兼容性检查和同状态增强评分 | 原旧策略同步、token mask、优势构造均保留 |
-| `core/interfaces.py`、`serialization.py` | 类型联合、可选 `Components.targets` 和版本格式 `code_revision_v1` | 旧调用签名及模块序列化仍接受 |
-| `outer_loop.py`、`revision_loop.py` | `initial_harness=revision` 启用新循环，先接受改进再尝试内化 | 未提供 revision 时保持旧三周期逻辑 |
-| `command_backend.py`、`training/entrypoint.py` | JSON 传输 revision/target；增加 `target` / `check_internalization` stage | 训练器仍由原外部 veRL adapter 提供 |
+| `core/interfaces.py`、`serialization.py` | 候选内置目标序列化、版本格式 `code_revision_v1` | `Components.targets` 和独立目标后端已删除 |
+| `outer_loop.py`、`revision_loop.py` | `initial_harness=revision` 启用新循环，先接受改进再尝试内化 | 正式循环要求可执行 revision；保留必要历史状态读取 |
+| `command_backend.py`、`training/entrypoint.py` | JSON 传输 revision/target；仅保留 `check_internalization` 可执行预检；移除独立 `target` stage | 训练器仍由原外部 veRL adapter 提供 |
 | `cli.py` | 工作区/revision 初始化，`--state` 恢复已接受配对 | 状态加载与最终评价统一，见 [接线说明](ACCEPTED_AGENT_PIPELINE.md) |
 | `revision_demo.py`、`scripts/demo_versioned_harness.py` | 新增明确标注 mock 的 CPU 生命周期演示 | 不作为真实 benchmark 或学习效果证据 |
 
@@ -47,9 +47,9 @@ API proposer 只输出 `{"path":"tools/example.py","content":"完整的新文件
 
 当前桥只支持旁路 `config.supervision` 指定的一个内部控制 hook。H_plus 与 H_minus 的其他文件、注册、prompt、配置保持一致，hook 源码保留归档但 H_minus 不调用。它可以多次调用当前 policy 做内部计算，但在 teacher scoring 中不能接触环境；要求新观察的候选可用于正常任务运行，同时被判为不支持当前训练桥。
 
-目标提案接口现在只选择行为，返回 `{"target":null}` 或 `{"target":{"removed_behavior":"旁路诊断控制，保留日志工具","supervision_adapter":"controls/diagnosis.py:augment"}}`。模型不输出精简 patch、配置或 hash；宿主 `InternalizationTarget.from_supervision()` 验证所选 hook 与已接受版本注册项相同，确定性生成仅将 supervision 置空的新快照，然后执行原结构与运行兼容性检查。无注册 hook 时不调用目标 API，记录 `no_supervision_hook` 和零模型调用成本；有 hook 时仍有一次可选择拒绝的目标选择调用，不声称全部消除了第二次 API 请求。
+正式 proposer 不再单独选择目标或发现 schema-1 总 hook。一次候选响应包含 `evidence_refs` 和可选 `internalization={target_control_id, removed_behavior}`；宿主在同一 proposer 子进程调用 `InternalizationTarget.from_control()`，确定性生成只禁用一个 schema-2 independent_suffix 控制的新快照。旧 schema-1 运行/状态/合成演示的 `from_supervision()` 支持仍保留，没有第二次 API 的兼容入口。
 
-产物中 `target_selection.json` 保存模型选择或跳过原因；`internalization_target.json` 保存实际 full/reduced 路径、hash 与监督入口；`cost.json` 记录调用成本。新回归 `tests/test_code_proposer_binding.py` 覆盖无需模型算 hash、父版本修改拒绝、确定性减法、保留新工具的真实隔离执行、无 hook 零 API 调用、独立 target 子进程及不兼容监督拒绝。
+候选 JSON 内置 full/reduced 快照和目标；声明无效时写 `proposals/candidate_i/internalization_declaration_error.json`，目标为 null，完整合法 H+ 继续 search/dev。接受后才执行预检，或无目标时保留 H+、不训练。完整输出协议、错误分类和测试迁移见 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md)。
 
 兼容性检查使用 search 任务的一条真实 H_minus rollout 和同 token 评分；实际训练继续逐状态检查。预检查不等于穷尽所有状态。如果随后遇到不兼容、timeout 或训练/评价异常，保留旧模型和已接受的 H_plus，并记录失败；不部署部分训练 checkpoint。
 
@@ -90,7 +90,7 @@ PYTHONPATH=src python -m internalization.cli run \
 | 产物 | 内容 |
 | --- | --- |
 | `revisions/` | 父版本、完整候选和精简版本的可执行全文件快照 |
-| `experiment/cycle_00/candidate_0/candidate.json` | candidate_id、parent_revision、完整 patch、full_revision、rationale |
+| `experiment/cycle_00/candidate_0/candidate.json` | candidate_id、parent_revision、完整 patch、full_revision、rationale、evidence_refs、internalization_target |
 | `experiment/cycle_00/internalization_target.json` | full/reduced 路径和 hash、待撤除行为、可执行 hook |
 | `experiment/cycle_00/harness_acceptance.json` | 复用 dev 逐题结果与配对区间的 Harness 接受记录（decision_source=dev，无额外评价） |
 | `experiment/cycle_00/compatibility/` | 实际 H_minus action IDs、同状态 hook 执行检查 |
@@ -101,6 +101,6 @@ PYTHONPATH=src python -m internalization.cli run \
 
 混合例首轮 A=1/B=0/C=1/D=1，accept/retire 后日志工具仍在；第二、三轮从该 checkpoint + reduced revision 搜索，没有进一步收益则不训练。这些数值是合成生命周期证据。源代码演化、实际工具调用、内核隔离是真实执行；学习结论、真实 API proposer、HF/veRL/GPU、官方任务均未验证。
 
-`tests/test_versioned_harness.py` 验证实际工具、混合四格版本、unsupported 保留、失败隔离、回滚及门槛；`test_revision_decisions.py` 验证 dev 接受、无收益、无目标跨周期、非法目标和独立 proposer mock；`test_revision_training.py` 用 CPU 小模型真实 SGD 更新验证两批同步、零效应、inactive mask、非目标上下文只生成一次。原 100 项测试保留，旧三周期 90 文件逐字节一致。最终机器记录见 `docs/validation/versioned-harness-report.json`。
+`tests/test_versioned_harness.py` 验证实际工具、混合四格版本、unsupported 保留、失败隔离、回滚及门槛；`test_revision_decisions.py` 验证 dev 接受、无收益、无目标跨周期、非法目标和独立 proposer mock；`test_revision_training.py` 用 CPU 小模型真实 SGD 更新验证两批同步、零效应、inactive mask、非目标上下文只生成一次。以下是当时的历史验证结果，不是新候选序列化的字节一致性承诺：原 100 项测试保留，旧三周期 90 文件逐字节一致。历史机器记录见 `docs/validation/versioned-harness-report.json`。
 
 保留的范围限制：没有自动模块分解、DAG 搜索、可内化性分类器、任意代码差异编译器或旧 retained 目标的自动再审计调度；当前版本只支持上述可执行 hook 桥。没有降低统计阈值来让演示退役。

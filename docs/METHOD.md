@@ -1,6 +1,6 @@
 # 方法与保持不变的协议
 
-目标是在能力保留时，把外部 Harness 控制计算带来的决策能力转移进学生模型，并减少部署调用成本。现在支持版本化代码演化；原 planning/review/recovery 模块模式仍保留兼容入口。
+目标是在能力保留时，把外部 Harness 控制计算带来的决策能力转移进学生模型，并减少部署调用成本。主路径为版本化代码演化与选择性内化；旧三类模板生产入口已经退役。
 
 ## budget_v1 调度（2026-09-14）
 
@@ -10,7 +10,7 @@
 
 ## 运行接线与计数约束（2026-09-14）
 
-ALFWorld/HotpotQA 的版本化生产后端提供五个入口，明确 internalization/evolution_only；前者缺少入口即启动失败，后者接受改进后不训练。运行参数经严格校验，完整解析为 effective_config 并连同 hash 传给各子进程；同批 H+/H− 评分、具名目标和统计规则不变。λ 对应 advantage.module_weight，0 是有效值；all/targeted 进入实际 scorer。
+ALFWorld/WebShop/HotpotQA 的 budget_v1 版本化生产后端提供 propose/check_internalization/evaluate/train 四个入口，明确 internalization/evolution_only；前者缺少入口即启动失败，后者接受改进后不训练。运行参数经严格校验，完整解析为 effective_config 并连同 hash 传给各子进程；同批 H+/H− 评分、具名目标和统计规则不变。λ 对应 advantage.module_weight，0 是有效值；all/targeted 进入实际 scorer。
 
 公开观察区分完整 context 和增量 delta；CodeRuntime 按事件发生顺序更新模型视图，同一次环境返回不再同时原样显示为 Harness tool result。重复事件不去重；完整环境事件账本仍独立累计回报。
 
@@ -18,13 +18,17 @@ ALFWorld/HotpotQA 的版本化生产后端提供五个入口，明确 internaliz
 
 ## 版本化代码演化与选择性内化
 
-`HarnessCandidate` 是完整改进，记录 candidate_id、parent_revision、带文件基准哈希的 patch、可实际执行的 full_revision 和 rationale。`InternalizationTarget` 是可选撤除目标，记录 full_revision、reduced_revision、removed_behavior 和可执行 supervision_adapter。H_parent 是接受修改前版本；H_plus 是完整改进；H_minus 是只旁路目标控制后的版本，**不要求等于 H_parent**。例如新增日志查询工具和诊断控制后，精简版本仍保留工具。
+`HarnessCandidate` 是完整改进，记录 candidate_id、parent_revision、带文件基准哈希的 patch、可实际执行的 full_revision、rationale、evidence_refs 和可选 internalization_target。`InternalizationTarget` 是可选撤除目标，记录 full_revision、reduced_revision、removed_behavior 和可执行 supervision_adapter。H_parent 是接受修改前版本；H_plus 是完整改进；H_minus 是只旁路目标控制后的版本，**不要求等于 H_parent**。例如新增日志查询工具和诊断控制后，精简版本仍保留工具。
 
-模型只提出 path/content 修改，文件基准 hash 由宿主从已验证的 parent revision 计算；应用时仍严格校验父版本。schema 2 将控制注册为有顺序的具名入口，目标只选择 target_control_id/removed_behavior，宿主只关闭该 ID，保留其他控制和工具。旧 schema 1 单 hook 桥继续兼容。不提供可用目标则跳过目标 API；模型选择仍需通过原可执行监督检查，不能凭声明获得训练资格。
+每轮只有一次 proposer API 调用，一次返回两个 internalization-aware structured candidates：完整 patch、因果假设 rationale、来自代表 search 轨迹的精确 task_id/step 引用，以及可选的 internalization 声明。首要目标始终是完整 Harness 的泛化改进；internalization=null 同样有效，不奖励可内化性，不为满足声明字段而制造额外辅助调用。它是本项目的候选协议设计，不把相关论文描述为已经采用了这一机制。
 
-每轮从正式接受的 checkpoint 和代码 revision 出发，固定模型生成两个候选。候选在独立代码目录构造，实际加载其入口、prompt、工具注册、实现和配置；search/dev 使用既有配对收益选择规则。无收益则保留父版本，不训练。budget_v1 的小 search 以配对平均正收益预筛，最多一个候选进入 dev；非 budget 版本化配置保留两个配对收益区间下界均严格大于 0 的规则。外层直接复用已执行的 dev 逐题结果正式接受 H_plus，记录 decision_source=dev，不再分配 acceptance_i 或重跑 acceptance_plus/acceptance_parent。bootstrap 置信度、次数、任务聚类及选择排序规则保持不变；接受后再最多提出一个精简版本。
+模型只提出 path/content 修改和可选 target_control_id/removed_behavior；宿主从锁定父版本计算 before_hash，严格应用补丁。在 proposer 子进程中，宿主从每个完整候选的 schema-2 independent_suffix 注册项确定性构造 H−，只关闭声明的一个已开启 ID；随后把可执行 full/reduced 快照与目标一起序列化返回。模型不生成 H−、teacher/student prompt、预测分数或训练/退役决定。不再有第二次目标发现请求、target stage 或兼容转发接口。
 
-未提供目标、精简版本不可执行或监督接口不支持时，接受 old_model + H_plus，记录 `accepted_without_internalization`。有合法目标时在原 `retirement_i` cohort 计算 A/B 并复用 contribution gate。未通过则记录 `attribution_failed`，不训练，但保留已独立接受的 H_plus。这与 search/dev 无收益、整个改进被丢弃的分支不同。
+目标声明错误时保留合法完整候选，目标降为 null，写 internalization_declaration_error.json；不请求模型修复。错误补丁、伪造 evidence_refs、包含本轮精确 search task ID 的补丁和重复 full_revision 会拒绝，合法兄弟候选继续。精确 ID 扫描不能证明无实例过拟合；源码的泛化仍需真实执行评价。proposer 只接收 search 反馈，不接收 dev 的分数、轨迹或包含其判定的状态。完整原始记录仍归档。协议和验收见 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md)。
+
+每轮从正式接受的 checkpoint 和代码 revision 出发，固定模型生成两个候选。候选在独立代码目录构造，实际加载其入口、prompt、工具注册、实现和配置；search/dev 使用既有配对收益选择规则。无收益则保留父版本，不训练。budget_v1 的小 search 以配对平均正收益预筛，最多一个候选进入 dev；非 budget 版本化配置保留两个配对收益区间下界均严格大于 0 的规则。外层直接复用已执行的 dev 逐题结果正式接受 H_plus，记录 decision_source=dev，不再分配 acceptance_i 或重跑 acceptance_plus/acceptance_parent。bootstrap 置信度、次数、任务聚类及选择排序规则保持不变；接受后直接读取候选内置的可选目标，不再调用提案模型。
+
+未提供目标、精简版本不可执行或监督接口不支持时，接受 old_model + H_plus，记录 `accepted_without_internalization`。有目标时先执行 search-only executable preflight，验证 H− 实际 rollout、同状态控制和同 response 评分；通过后在原 `retirement_i` cohort 计算 A/B 并复用 contribution gate。未通过则记录 `attribution_failed`，不训练，但保留已独立接受的 H_plus。这与 search/dev 无收益、整个改进被丢弃的分支不同。
 
 通过 contribution gate 后沿用原训练器、优势公式、optimizer 和四格审计。accept/retire 部署 new_model + H_minus；accept/retain 部署 new_model + H_plus；rollback/retain 部署 old_model + H_plus。后续周期不会重置为 H0。退役 hook 的源码仍留档，但 reduced 配置不再调用它。未消耗预算不重分配。
 

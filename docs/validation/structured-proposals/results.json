@@ -1,0 +1,33 @@
+{
+  "baseline_commit": "e5ec547def70d765daab30cb3ea2734bcebc6ca9",
+  "full_suite": {
+    "command": "PYTHONPATH=src python3.12 -m unittest discover -s tests -v",
+    "tests": 224,
+    "seconds": 250.012,
+    "result": "passed",
+    "skips": 0,
+    "log": "full-final.txt"
+  },
+  "proposer_tests": {
+    "tests": 19,
+    "result": "passed",
+    "log": "proposer-final.txt"
+  },
+  "cli_help": {
+    "commands": 4,
+    "result": "passed",
+    "log": "cli-help.json"
+  },
+  "invariants": "invariants.json",
+  "scripted_executable_example": "example.json",
+  "diff_check": "passed",
+  "current_doc_links": "passed",
+  "real_api": "not_run",
+  "official_benchmarks": "not_run",
+  "gpu_training": "not_run",
+  "validation_boundary": "CPU/scripted API and model; actual child processes, sandbox, and existing small CPU optimizer tests",
+  "preserved_uncommitted": [
+    "README.md",
+    "requirement.txt"
+  ]
+}

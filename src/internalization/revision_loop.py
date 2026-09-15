@@ -1,5 +1,5 @@
 """Accept a runnable improvement first; internalization of a selected difference is optional."""
-from dataclasses import asdict, replace
+from dataclasses import asdict
 
 from .core.interfaces import ProposalRequest
 from .core.types import Journal, write_json, digest
@@ -107,17 +107,15 @@ def run_revision_loop(components,manifest,checkpoint,initial_harness,output,conf
             save(folder,"no_useful_candidate",candidate=candidate,module_decision="unchanged")
             continue
         full=candidate.full_revision
-        harness=full  # Durable acceptance precedes any attempt to construct H-minus.
+        harness=full  # Acceptance precedes preflight or training of the embedded target.
         write_json(folder/"accepted_harness.json",AcceptedAgentState(checkpoint,harness,manifest.fingerprint,protocol).to_dict())
         if execution is not None and execution["mode"] == "evolution_only":
             save(folder,"accepted_without_internalization",candidate=candidate,detail="evolution_only");continue
         target=None
         try:
-            provider=components.targets or (components.proposer if hasattr(components.proposer,"propose_target") else None)
-            if provider is not None:
-                target=provider.propose_target(replace(request,harness=full,output=folder/"target_proposal",count=1))
+            target=candidate.internalization_target
             if target is None:
-                save(folder,"accepted_without_internalization",candidate=candidate,detail="no_reduction_proposed");continue
+                save(folder,"accepted_without_internalization",candidate=candidate,detail="no_embedded_internalization_target");continue
             if not isinstance(target,InternalizationTarget):
                 target=None
                 raise ValueError("unsupported: expected at most one executable InternalizationTarget")

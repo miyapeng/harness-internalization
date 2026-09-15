@@ -80,11 +80,11 @@ class DemoProposer:
                 alternative=FileEdit(path,text_hash(files[path]),files[path]+"\nConsult the registered log lookup tool before acting.\n")
                 candidate=HarnessCandidate.create(self.store,request.harness,(*candidate.patch,alternative),
                     "Add public-log lookup with explicit tool-use prompting and optional diagnostic control")
+            if self.scenario!="tool_only":
+                candidate=candidate.with_internalization(reduction(self.store,candidate.full_revision))
             write_json(request.output/f"candidate_{i}.json",candidate.to_dict())
             result.append(candidate)
         return tuple(result)
-    def propose_target(self,request):
-        return None if self.scenario=="tool_only" else reduction(self.store,request.harness)
 
 
 class DemoTrainer:

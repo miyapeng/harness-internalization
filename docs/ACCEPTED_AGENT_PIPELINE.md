@@ -54,7 +54,7 @@ python scripts/evaluate_benchmark.py --manifest data/hotpot-versioned/manifest.j
   --partition test --output runs/hotpot-final
 ```
 
-ALFWorld/HotpotQA 的 internalization 后端已配齐五入口，缺入口会启动失败；其他未配齐的后端采用显式 evolution_only。配置与命令细节见 [运行接线](EXECUTION_WIRING.md)。
+ALFWorld/HotpotQA 的 internalization 后端已配齐四入口，缺入口会启动失败；其他未配齐的后端采用显式 evolution_only。配置与命令细节见 [运行接线](EXECUTION_WIRING.md)。
 
 初始基线必须显式选择：
 

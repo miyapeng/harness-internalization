@@ -110,20 +110,6 @@
       "temperature": 0.0
     }
   },
-  "target": [
-    "{python}",
-    "-m",
-    "internalization.training.entrypoint",
-    "target",
-    "--benchmark",
-    "webshop",
-    "--env-config",
-    "configs/budget_v1/webshop_environment.json",
-    "--request",
-    "{request}",
-    "--response",
-    "{response}"
-  ],
   "check_internalization": [
     "{python}",
     "-m",

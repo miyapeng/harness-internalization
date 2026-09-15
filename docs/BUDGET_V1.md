@@ -4,7 +4,7 @@
 
 ## 配置和调度
 
-三个完整 execution 配置为 `configs/budget_v1/{alfworld,webshop,hotpotqa}.json`；对应 `_backend.json` 配齐 propose/target/check_internalization/evaluate/train。非 ALFWorld 的 `_environment.json` 配置隔离 worker。budget_v1 主CLI必须显式给出可执行Harness工作区/revision或接受状态，缺少时拒绝进入旧模块循环。所有 execution 字段严格校验并记录 effective_config.json/SHA256；固定的 veRL PPO 参数也记录在 algorithm.ppo 中，不能通过本配置修改。
+三个完整 execution 配置为 `configs/budget_v1/{alfworld,webshop,hotpotqa}.json`；对应 `_backend.json` 配齐 propose/check_internalization/evaluate/train。非 ALFWorld 的 `_environment.json` 配置隔离 worker。budget_v1 主CLI必须显式给出可执行Harness工作区/revision或接受状态，缺少时拒绝进入旧模块循环。所有 execution 字段严格校验并记录 effective_config.json/SHA256；固定的 veRL PPO 参数也记录在 algorithm.ppo 中，不能通过本配置修改。
 
 | 参数 | ALFWorld | WebShop | HotpotQA |
 |---|---:|---:|---:|

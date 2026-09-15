@@ -78,7 +78,6 @@ class BudgetTests(unittest.TestCase):
             def propose(_,request):
                 requests.append(request)
                 return base_proposer.propose(request)
-            def propose_target(_,request):return None
         class Runner:
             def rollout(_,model,harness,tasks,*,seeds,output,training=False):
                 seen.append((tasks,output,seeds,harness.version))
@@ -188,7 +187,7 @@ class BudgetTests(unittest.TestCase):
         from internalization.core.trajectory import read_trace_file
         import test_behavior_policy as fixtures
         argv=['{python}',str(ROOT/'tests/fixtures/execution_worker.py'),'--request','{request}','--response','{response}']
-        backend=CommandBackend({**{s:argv for s in ('propose','target','check_internalization','evaluate','train')},
+        backend=CommandBackend({**{s:argv for s in ('propose','check_internalization','evaluate','train')},
             'cwd':str(ROOT),'execution':{'schedule':{'profile':'budget_v1'},'device':'cpu','reference_device':'cpu',
                 'rollouts_per_task':4,'max_steps':1,'seeds':{'environment_seed':73,'run_seed':29,'model_sampling_seed':43},
                 'optimizer':{'learning_rate':.002},'advantage':{'module_weight':0}}},self.root/'costs')

@@ -4,10 +4,10 @@
 
 ## 入口与模式
 
-`configs/alfworld_backend.json`和 `configs/hotpotqa_backend.json` 均配置 propose、target、check_internalization、evaluate、train。`{python}` 使用主 CLI 的 Python 解释器，不再因子进程 PATH 选到另一个 Python。
+`configs/alfworld_backend.json`和 `configs/hotpotqa_backend.json` 均配置 propose、check_internalization、evaluate、train。`{python}` 使用主 CLI 的 Python 解释器，不再因子进程 PATH 选到另一个 Python。
 
 - `execution.mode=internalization`：启动时缺少任一入口就报错。候选没有可撤除控制、监督不兼容、接受/归因 gate 不通过，仍按原选择性内化规则跳过；这是候选级结果，不是配置缺失的静默降级。
-- `execution.mode=evolution_only`：只要求 propose/evaluate；版本化循环接受 H+ 后不请求 target/check/train，记录 `accepted_without_internalization` / `detail=evolution_only`。其他尚未配置完整入口的后端明确采用此模式。
+- `execution.mode=evolution_only`：只要求 propose/evaluate；版本化循环接受 H+ 后不请求 check/train，记录 `accepted_without_internalization` / `detail=evolution_only`。其他尚未配置完整入口的后端明确采用此模式。
 - WebShop 本轮没有扩展。
 
 ## 配置流
@@ -95,7 +95,7 @@ PYTHONPATH=src python3.12 -m internalization.cli run \
 | 文件 / 边界 | 本轮修改 |
 | --- | --- |
 | `core/execution_config.py` | 严格 schema、唯一默认解析、配置 hash、不可覆盖的有效配置产物、NoActorUpdates |
-| `cli.py`, `command_backend.py`, `core/interfaces.py` | CLI 配置输入、五入口 gate、跨进程完整配置、明确批次预算和响应校验 |
+| `cli.py`, `command_backend.py`, `core/interfaces.py` | CLI 配置输入、四入口 gate、跨进程完整配置、明确批次预算和响应校验 |
 | `training/entrypoint.py` | 参数真实传给 runner/ModuleTrainer/HF/VerlPolicy，HotpotQA 环境上限同步、返回实际计数 |
 | `training/trainer.py`, `revision_scoring.py` | 监督选择模式、批次/actor 计数、失败 summary、零更新不保存模型 |
 | `training/teacher_backend.py`, `verl_backend.py` | 公共 prompt 上限、AdamW 学习率/权重衰减入参、实际 step hook |
@@ -103,7 +103,7 @@ PYTHONPATH=src python3.12 -m internalization.cli run \
 | `benchmarks/{alfworld,hotpotqa,appworld,terminalbench,swebench,lawbench}.py` | 仅标注已有完整上下文返回；未新增环境功能 |
 | `outer_loop.py`, `revision_loop.py` | 显式模式、配置身份与续跑校验、零更新保留旧模型和已接受 Harness |
 | `scripts/evaluate_benchmark.py` | 最终评价使用 accepted state 中的执行配置 |
-| `configs/*_backend.json`, `{alfworld,hotpotqa}_execution.json` | ALFWorld/HotpotQA 五入口、其他后端显式 evolution_only、完整运行配置示例 |
+| `configs/*_backend.json`, `{alfworld,hotpotqa}_execution.json` | ALFWorld/HotpotQA 四入口、其他后端显式 evolution_only、完整运行配置示例 |
 | `tests/test_execution_wiring.py`, `tests/fixtures/execution_worker.py` | 13 项新回归及真实子进程/CPU 测试 worker |
 | `tests/test_environment_events.py`, `tests/test_appworld.py` | 仅调整零更新检查点和旧计数名的必要断言 |
 

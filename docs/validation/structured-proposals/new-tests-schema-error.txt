@@ -1,0 +1,57 @@
+test_accepted_embedded_target_preflight_then_contribution_no_second_call (test_code_proposer_binding.CodeProposerBindingTests.test_accepted_embedded_target_preflight_then_contribution_no_second_call) ... ok
+test_declaration_does_not_certify_environment_access (test_code_proposer_binding.CodeProposerBindingTests.test_declaration_does_not_certify_environment_access) ... ok
+test_dev_rejection_does_not_execute_preflight_or_train (test_code_proposer_binding.CodeProposerBindingTests.test_dev_rejection_does_not_execute_preflight_or_train) ... ok
+test_disabled_or_dependent_control_gets_no_target (test_code_proposer_binding.CodeProposerBindingTests.test_disabled_or_dependent_control_gets_no_target) ... ok
+test_duplicate_candidate_not_evaluated_and_dev_result_not_in_search_feedback (test_code_proposer_binding.CodeProposerBindingTests.test_duplicate_candidate_not_evaluated_and_dev_result_not_in_search_feedback) ... ok
+test_duplicate_second_full_revision_invalid_even_with_different_rationale (test_code_proposer_binding.CodeProposerBindingTests.test_duplicate_second_full_revision_invalid_even_with_different_rationale) ... ok
+test_host_hashes_add_update_delete_and_rejects_other_parent (test_code_proposer_binding.CodeProposerBindingTests.test_host_hashes_add_update_delete_and_rejects_other_parent) ... ok
+test_input_and_history_do_not_include_dev_retirement_or_final_feedback (test_code_proposer_binding.CodeProposerBindingTests.test_input_and_history_do_not_include_dev_retirement_or_final_feedback) ... ok
+test_malformed_optional_declarations_fail_soft_without_repair_calls (test_code_proposer_binding.CodeProposerBindingTests.test_malformed_optional_declarations_fail_soft_without_repair_calls) ... ok
+test_null_target_accepts_complete_harness_without_preflight_or_training (test_code_proposer_binding.CodeProposerBindingTests.test_null_target_accepts_complete_harness_without_preflight_or_training) ... ok
+test_old_target_stage_and_backend_field_rejected (test_code_proposer_binding.CodeProposerBindingTests.test_old_target_stage_and_backend_field_rejected) ... ok
+test_one_transport_two_independent_parent_bound_candidates_and_cost (test_code_proposer_binding.CodeProposerBindingTests.test_one_transport_two_independent_parent_bound_candidates_and_cost) ... ok
+test_parent_tampering_during_request_invalidates_patch (test_code_proposer_binding.CodeProposerBindingTests.test_parent_tampering_during_request_invalidates_patch) ... ok
+test_patch_cannot_memorize_any_search_task_id (test_code_proposer_binding.CodeProposerBindingTests.test_patch_cannot_memorize_any_search_task_id) ... ok
+test_preflight_failure_keeps_full_candidate_without_training (test_code_proposer_binding.CodeProposerBindingTests.test_preflight_failure_keeps_full_candidate_without_training) ... ok
+test_real_proposer_subprocess_returns_embedded_snapshot_and_one_call_cost (test_code_proposer_binding.CodeProposerBindingTests.test_real_proposer_subprocess_returns_embedded_snapshot_and_one_call_cost) ... ERROR
+test_strict_fields_and_invalid_patch_preserve_parent_and_sibling (test_code_proposer_binding.CodeProposerBindingTests.test_strict_fields_and_invalid_patch_preserve_parent_and_sibling) ... ok
+test_valid_embedded_target_is_constructed_without_second_api_and_keeps_tool (test_code_proposer_binding.CodeProposerBindingTests.test_valid_embedded_target_is_constructed_without_second_api_and_keeps_tool) ... ok
+test_wrong_reference_task_step_and_scores_only_task_are_invalid (test_code_proposer_binding.CodeProposerBindingTests.test_wrong_reference_task_step_and_scores_only_task_are_invalid) ... ok
+test_all_tool_only_batches_skip_actor_update_and_keep_returns_costs (test_environment_events.EnvironmentEventTests.test_all_tool_only_batches_skip_actor_update_and_keep_returns_costs) ... ok
+test_call_audit_records_public_parameters_results_and_terminal_event_before_failure (test_environment_events.EnvironmentEventTests.test_call_audit_records_public_parameters_results_and_terminal_event_before_failure) ... ok
+test_empty_event_ledger_is_authoritative_and_old_trajectory_still_loads (test_environment_events.EnvironmentEventTests.test_empty_event_ledger_is_authoritative_and_old_trajectory_still_loads) ... ok
+test_event_and_public_call_serialization_round_trip_including_no_response (test_environment_events.EnvironmentEventTests.test_event_and_public_call_serialization_round_trip_including_no_response) ... ok
+test_mixed_batch_only_real_decision_gets_its_own_episode_return (test_environment_events.EnvironmentEventTests.test_mixed_batch_only_real_decision_gets_its_own_episode_return) ... /usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py:824: UserWarning: CUDA initialization: Unexpected error from cudaGetDeviceCount(). Did you run some cuda functions before calling NumCudaDevices() that might have already set an error? Error 304: OS call failed or operation not supported on this OS (Triggered internally at /opt/pytorch/pytorch/c10/cuda/CUDAFunctions.cpp:109.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+ok
+test_multiple_environment_calls_count_once_across_prepare_and_execute (test_environment_events.EnvironmentEventTests.test_multiple_environment_calls_count_once_across_prepare_and_execute) ... ok
+test_prepare_environment_and_execute_local_tool_both_have_records_and_costs (test_environment_events.EnvironmentEventTests.test_prepare_environment_and_execute_local_tool_both_have_records_and_costs) ... ok
+test_prepare_terminal_reward_without_student_or_auxiliary_generation (test_environment_events.EnvironmentEventTests.test_prepare_terminal_reward_without_student_or_auxiliary_generation) ... ok
+test_proposer_sees_prepare_operations_even_when_there_are_no_student_actions (test_environment_events.EnvironmentEventTests.test_proposer_sees_prepare_operations_even_when_there_are_no_student_actions) ... ok
+test_skipped_batch_does_not_drift_policy_before_following_real_batch (test_environment_events.EnvironmentEventTests.test_skipped_batch_does_not_drift_policy_before_following_real_batch) ... ok
+test_terminal_next_prepare_credits_previous_real_decision_without_extra_tokens (test_environment_events.EnvironmentEventTests.test_terminal_next_prepare_credits_previous_real_decision_without_extra_tokens) ... ok
+
+======================================================================
+ERROR: test_real_proposer_subprocess_returns_embedded_snapshot_and_one_call_cost (test_code_proposer_binding.CodeProposerBindingTests.test_real_proposer_subprocess_returns_embedded_snapshot_and_one_call_cost)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/data/miyapeng/harness-internalization/tests/test_code_proposer_binding.py", line 209, in test_real_proposer_subprocess_returns_embedded_snapshot_and_one_call_cost
+    backend=CommandBackend({'cwd':str(ROOT),'execution':{'mode':'evolution_only','device':'cpu','proposer':{'model':'mock'}},
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/miyapeng/harness-internalization/src/internalization/command_backend.py", line 79, in __init__
+    self.execution_config = resolve_execution(config.get("execution"), benchmark_limits=limits)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/miyapeng/harness-internalization/src/internalization/core/execution_config.py", line 47, in resolve_execution
+    _merge(value, {} if raw is None else raw)
+  File "/data/miyapeng/harness-internalization/src/internalization/core/execution_config.py", line 40, in _merge
+    if isinstance(base[key], dict): _merge(base[key], value, path+"."+key)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/miyapeng/harness-internalization/src/internalization/core/execution_config.py", line 39, in _merge
+    if key not in base: raise ValueError(f"Unknown configuration field: {path}.{key}")
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Unknown configuration field: execution.proposer.model
+
+----------------------------------------------------------------------
+Ran 30 tests in 5.123s
+
+FAILED (errors=1)

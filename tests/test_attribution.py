@@ -82,11 +82,9 @@ class AttributionTests(unittest.TestCase):
                     config['controls'].append({'id':cid,'entrypoint':f'controls/{cid}.py:run','enabled':True})
                     changes=[{'path':'config/harness.json','content':json.dumps(config)},
                         {'path':f'controls/{cid}.py','content':'def run(api,payload): return {"suffix":"diagnostic","selected":True}\n'}]
-                    result.append(HarnessCandidate.create(store,request.harness,store.bind_patch(request.harness,changes),cid))
+                    candidate=HarnessCandidate.create(store,request.harness,store.bind_patch(request.harness,changes),cid)
+                    result.append(candidate.with_internalization(InternalizationTarget.from_control(store,candidate.full_revision,cid,cid)))
                 return tuple(result)
-            def propose_target(self,request):
-                cid=request.harness.config['controls'][-1]['id']
-                return InternalizationTarget.from_control(store,request.harness,cid,cid)
         class Runner:
             def rollout(self, model, harness, tasks, *, seeds, output, training=False):
                 label = output.name

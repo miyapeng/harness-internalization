@@ -184,3 +184,18 @@ fresh CLI/循环要求 benchmark 对应注册 seed，启动记录 revision/hash�
 45 个受保护文件哈希一致（包括全部 budget_v1 配置、训练/统计/采样及 ALFWorld/HotpotQA 实现）；没有数据划分或 A/B/C/D/退役规则变更。全量 **217 项测试通过**（245.584 秒，0 skip），新增 7 项 seed 回归及 4 个 CLI help 通过。测试与实际执行记录见 [validation/seeds/results.json](validation/seeds/results.json)。真实模型、GPU 更新、完整官方环境与大规模评价未执行，WebShop 官方资源状态仍为 not ready。
 
 本次从 commit `80e985af4429061417a4979d13daa5998afb0b34` 的干净工作区开始，先检查实际 adapter/runtime/state 入口及测试，然后核验固定上游小型源码。测试中的通用候选恢复链显式标为历史接受状态，未删除行为断言；新增 fixture 的 HotpotQA final 工具计数与 catalog 独占写入问题只修正测试，失败日志保留。本轮未提交或推送。
+
+
+## 2026-09-15：一次结构化 proposer 调用
+
+CodeProposer 一次 API 返回两个独立候选，包含完整 patch、rationale、精确 search evidence_refs 和可选 removable-control 声明；宿主在同一子进程构造并返回 H+/H− 快照。删除独立 target contract、propose_target、Components.targets 与 target stage；internalization 后端只要求 propose/check_internalization/evaluate/train。
+
+合法 H+ 的可撤除声明错误时降为 harness-only、保存错误、不请求 LLM 修复。无目标不惩罚；完整 H+ 通过 dev 后仍可部署。拒绝伪造引用、本轮精确 task ID 硬编码及重复 full revision。preflight、A/B、同 batch old-policy 训练、退役与 rollback 保持原规则。下一轮 proposer 只读 dev 前产生的 search 反馈，不经 eligible/no_gain 状态泄露 dev 结果。
+
+全部 budget_v1 执行参数、训练/评分/采样/统计实现、benchmark 与 seed 未改；五份 backend 仅删 target 命令。入口迁移、产物、测试调整与验证边界见 [STRUCTURED_PROPOSALS.md](STRUCTURED_PROPOSALS.md)。没有运行真实 proposer API、官方任务或 GPU 训练。
+
+从 e5ec547 开始；README.md 与 requirement.txt 已有安装说明改动，保持不动且不并入本次提交。先审计 proposer/candidate/loop/target subprocess/config/test 引用，再逐项迁移。旧 target 调用测试改成同次结构化候选测试；CPU 合成 DemoProposer 也在 propose 中附带现成目标，不保留第二次 API shim。旧 schema-1 运行和状态支持不删。
+
+首轮新增子进程 fixture 缺 proposer 模型环境变量，并误用不存在的 execution.proposer.model；改为项目既有 HI_PROPOSER_MODEL 配置，不放宽生产 schema。新增候选去重测试初次调用 create 的参数顺序错误，已修正测试。首轮全量回归另有旧历史状态 failed/search_failed 断言迁移，保留原失败隔离检查。失败日志与最终复验分别保存，不改写历史报告。
+
+全量 **224 项 CPU 回归通过**（250.012 秒，0 skip）；其中 19 项单次 proposer 测试及 4 个 CLI help 通过。沙箱执行和 JSON 子进程为实际运行，API/任务模型使用 scripted fixture，既有小模型 CPU 更新测试保留。`git diff --check` 与当前文档链接检查通过。完整结果、首轮失败日志和不变性检查见 [validation/structured-proposals/results.json](validation/structured-proposals/results.json)。真实 API、官方 benchmark 与 GPU 训练未执行。

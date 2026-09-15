@@ -33,8 +33,6 @@ class RevisionDecisionTests(unittest.TestCase):
                 return RolloutResult((),tuple(EpisodeResult(t,s,success,Cost(10,1,1)) for t in tasks for s in seeds))
         class Trainer:
             def train(*a,**kw):raise AssertionError('Trainer must not run')
-        if mode=='bad_target':
-            proposer.propose_target=lambda request:[reduction(self.store,improvement(self.store,self.parent).full_revision)]
         result=run_outer_loop(Components(proposer,Runner(),Trainer()),manifest,'old-model',self.root/'loop',
             LoopConfig(cycles=cycles,total_train_steps=cycles,seeds=(0,)),initial_harness=self.parent)
         return result,proposer,seen
@@ -58,11 +56,11 @@ class RevisionDecisionTests(unittest.TestCase):
         self.assertFalse(any(t.startswith(('retirement','test')) for _,_,tasks in seen for t in tasks))
         self.assertEqual(result['archive'][1]['reason'],'no_useful_candidate')
 
-    def test_invalid_multiple_targets_keeps_accepted_candidate(self):
-        result,_,_=self.run_loop('bad_target')
+    def test_null_embedded_target_keeps_accepted_candidate(self):
+        result,_,_=self.run_loop('tool_only')
         state=result['archive'][0]
         self.assertEqual(state['reason'],'accepted_without_internalization')
-        self.assertIn('at most one',state['detail'])
+        self.assertEqual(state['detail'],'no_embedded_internalization_target')
         self.assertNotEqual(result['harness_revision']['version'],self.parent.version)
 
     def test_supervision_rejects_removal_of_non_target_tool_registration(self):
@@ -79,8 +77,8 @@ class RevisionDecisionTests(unittest.TestCase):
             def request_json(self,contract,public,output):
                 output.mkdir(parents=True)
                 self.public=public
-                return {'candidates':[{'patch':[{'path':'../trainer.py','content':'pass'}],'rationale':'bad'},
-                    {'patch':[{"path":p.path,"content":p.content} for p in candidate.patch],'rationale':'new tool'}]}
+                return {'candidates':[{'patch':[{'path':'../trainer.py','content':'pass'}],'rationale':'bad','evidence_refs':[],'internalization':None},
+                    {'patch':[{"path":p.path,"content":p.content} for p in candidate.patch],'rationale':'new tool','evidence_refs':[],'internalization':None}]}
         proposer=MockProposer(self.store)
         request=ProposalRequest('old',self.parent,('search',),(),(),(),0,2,self.root/'proposals')
         proposals=proposer.propose(request)

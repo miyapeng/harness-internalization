@@ -171,7 +171,7 @@ def run(api,payload):
         self.assertEqual(selected.candidate.candidate_id,good.candidate_id)
         self.parent.files()
         history=public_history(journal)
-        self.assertEqual(history[0]['status'],'failed')
+        self.assertEqual(history[0]['status'],'search_failed')
         self.assertFalse(any('dev_gain' in row for row in history))
 
 

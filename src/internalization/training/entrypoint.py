@@ -18,7 +18,7 @@ from .teacher_backend import FrozenHFBackend
 
 def main(default_stage=None):
     parser = argparse.ArgumentParser()
-    if default_stage is None: parser.add_argument("stage", choices=("propose", "target", "check_internalization", "evaluate", "train"))
+    if default_stage is None: parser.add_argument("stage", choices=("propose", "check_internalization", "evaluate", "train"))
     parser.add_argument("--request", type=Path, required=True)
     parser.add_argument("--response", type=Path, required=True)
     parser.add_argument("--device", help="Legacy requests only; must match resolved config if supplied")
@@ -35,7 +35,6 @@ def main(default_stage=None):
     common = {"schema_version", "stage", "effective_config", "effective_config_hash"}
     fields = {
         "propose": {"checkpoint","harness","task_ids","cycle","candidate_count","trajectories","scores","history"},
-        "target": {"checkpoint","harness","task_ids","cycle","candidate_count","trajectories","scores","history"},
         "evaluate": {"checkpoint","harness","task_ids","seeds"},
         "check_internalization": {"checkpoint","target","task_ids"},
         "train": {"teacher_checkpoint","student_checkpoint","full_harness","reduced_harness","target","task_ids","planned_update_batches","optimizer_steps","sampling_state"},
@@ -43,7 +42,7 @@ def main(default_stage=None):
     if set(request)-common-fields[stage]: raise ValueError("Unknown stage request fields")
     if execution is not None and args.device is not None and args.device != execution["device"]:
         raise ValueError("--device conflicts with effective configuration")
-    if execution is not None and execution["mode"] == "evolution_only" and stage in ("target","check_internalization","train"):
+    if execution is not None and execution["mode"] == "evolution_only" and stage in ("check_internalization","train"):
         raise ValueError("evolution_only mode cannot enter internalization stages")
     if stage == "train" and not isinstance(request["target"],dict):
         raise ValueError("Training requires an executable InternalizationTarget; legacy module names are retired")
@@ -56,7 +55,7 @@ def main(default_stage=None):
         from ..core.sampling import seed_process
         seed_process(execution["seeds"]["model_sampling_seed"])
         write_json(out/"seed_config.json",execution["seeds"])
-    if stage in ("propose","target"):
+    if stage == "propose":
         proposal = ProposalRequest(request["checkpoint"], harness_from_dict(request["harness"]),
             tuple(request["task_ids"]), tuple(trajectory_from_dict(t) for t in request["trajectories"]),
             tuple(EpisodeResult(**{**r, "cost": Cost(**r["cost"])}) for r in request["scores"]),
@@ -66,12 +65,8 @@ def main(default_stage=None):
             from ..evolution.code_proposer import CodeProposer
             proposer=CodeProposer(RevisionStore(Path(proposal.harness.path).parent,proposal.harness.policy),
                 **(execution["proposer"] if execution else {}))
-            if stage=="target":
-                target=proposer.propose_target(proposal)
-                result={"target":target.to_dict() if target else None,"cost":asdict(proposer.last_cost)}
-            else:
-                candidates=proposer.propose(proposal)
-                result={"candidates":[c.to_dict() if hasattr(c,"to_dict") else c for c in candidates],"cost":asdict(proposer.last_cost)}
+            candidates=proposer.propose(proposal)
+            result={"candidates":[c.to_dict() if hasattr(c,"to_dict") else c for c in candidates],"cost":asdict(proposer.last_cost)}
         else:
             raise ValueError("Proposal requires an executable HarnessRevision; legacy templates are retired")
     else:

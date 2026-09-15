@@ -1,6 +1,6 @@
 # 当前运行入口
 
-从仓库根目录执行。正式参数、数据准备、五个阶段入口、两批真实 smoke 和最终评价命令统一以 [BUDGET_V1.md](BUDGET_V1.md) 为准；其他 benchmark 的专属权限与评价说明保留在 [AppWorld](benchmarks/APPWORLD.md) 和 [适配说明](benchmarks/ADAPTERS.md)。本轮未执行真实 API、官方环境或 GPU 训练。
+从仓库根目录执行。正式参数、数据准备、四个阶段入口、两批真实 smoke 和最终评价命令统一以 [BUDGET_V1.md](BUDGET_V1.md) 为准；其他 benchmark 的专属权限与评价说明保留在 [AppWorld](benchmarks/APPWORLD.md) 和 [适配说明](benchmarks/ADAPTERS.md)。本轮未执行真实 API、官方环境或 GPU 训练。
 
 ```bash
 export PYTHONPATH="$PWD/src${PYTHONPATH:+:$PYTHONPATH}"

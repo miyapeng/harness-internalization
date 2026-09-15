@@ -35,14 +35,6 @@ class CommandBackend:
                     return tuple(HarnessCandidate.from_dict(row) if "candidate_id" in row else row for row in result["candidates"])
                 raise ValueError("Proposer must return versioned candidates; candidate_sources is retired")
 
-            def propose_target(self,request):
-                if "target" not in owner.config: return None
-                from .harness.revision import InternalizationTarget
-                result=owner._call("target",{"checkpoint":request.checkpoint,"harness":serialize_harness(request.harness),
-                    "task_ids":request.tasks,"cycle":request.cycle,"candidate_count":1,
-                    "trajectories":[],"scores":[],"history":request.history},request.output)
-                return InternalizationTarget.from_dict(result["target"]) if result["target"] is not None else None
-
         class Runner:
             def rollout(self, model, harness, tasks, *, seeds, output, training=False):
                 if training: raise ValueError("Command trainer owns its fresh rollout collection")
@@ -64,7 +56,7 @@ class CommandBackend:
 
     def __init__(self, config: dict, ledger: Path):
         from .core.execution_config import resolve_execution
-        allowed = {"propose", "target", "check_internalization", "evaluate", "train", "cwd", "timeout_s", "benchmark", "execution"}
+        allowed = {"propose", "check_internalization", "evaluate", "train", "cwd", "timeout_s", "benchmark", "execution"}
         if set(config)-allowed: raise ValueError(f"Unknown backend fields: {sorted(set(config)-allowed)}")
         self.config = config
         self.sampling_state = {}
@@ -86,10 +78,10 @@ class CommandBackend:
                 limits = {"max_steps":env.max_steps, "model":{**env.model_options,"max_prompt_tokens":env.max_prompt_tokens}}
         self.execution_config = resolve_execution(config.get("execution"), benchmark_limits=limits)
         self.ledger = Journal(ledger)
-        required = ("propose", "target", "check_internalization", "evaluate", "train") if self.execution_config["mode"] == "internalization" else ("propose", "evaluate")
+        required = ("propose", "check_internalization", "evaluate", "train") if self.execution_config["mode"] == "internalization" else ("propose", "evaluate")
         for key in required:
             if key not in config: raise ValueError(f"{self.execution_config['mode']} mode requires {key} entrypoint")
-        for key in set(config) & {"propose", "target", "check_internalization", "evaluate", "train"}:
+        for key in set(config) & {"propose", "check_internalization", "evaluate", "train"}:
             command = config[key]
             if not isinstance(command, list) or not command or any(not isinstance(s, str) for s in command):
                 raise ValueError("Commands must be nonempty argv arrays; shell strings are not allowed")

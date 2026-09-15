@@ -1,0 +1,40 @@
+[
+  {
+    "command": [
+      "/usr/bin/python3.12",
+      "-m",
+      "internalization.cli",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: hi [-h] {retirement,run} ...\n\npositional arguments:\n  {retirement,run}\n\noptions:\n  -h, --help        show this help message and exit\n"
+  },
+  {
+    "command": [
+      "/usr/bin/python3.12",
+      "-m",
+      "internalization.training.entrypoint",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: entrypoint.py [-h] --request REQUEST --response RESPONSE\n                     [--device DEVICE]\n                     [--benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}]\n                     [--env-config ENV_CONFIG] [--final-evaluation]\n                     {propose,check_internalization,evaluate,train}\n\npositional arguments:\n  {propose,check_internalization,evaluate,train}\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE       Legacy requests only; must match resolved config if\n                        supplied\n  --benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}\n  --env-config ENV_CONFIG\n  --final-evaluation    Held-out evaluation only, never training or search\n"
+  },
+  {
+    "command": [
+      "/usr/bin/python3.12",
+      "scripts/propose.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: propose.py [-h] --request REQUEST --response RESPONSE [--device DEVICE]\n                  [--benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}]\n                  [--env-config ENV_CONFIG] [--final-evaluation]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE       Legacy requests only; must match resolved config if\n                        supplied\n  --benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}\n  --env-config ENV_CONFIG\n  --final-evaluation    Held-out evaluation only, never training or search\n"
+  },
+  {
+    "command": [
+      "/usr/bin/python3.12",
+      "scripts/train.py",
+      "--help"
+    ],
+    "returncode": 0,
+    "stdout": "usage: train.py [-h] --request REQUEST --response RESPONSE [--device DEVICE]\n                [--benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}]\n                [--env-config ENV_CONFIG] [--final-evaluation]\n\noptions:\n  -h, --help            show this help message and exit\n  --request REQUEST\n  --response RESPONSE\n  --device DEVICE       Legacy requests only; must match resolved config if\n                        supplied\n  --benchmark {alfworld,appworld,terminalbench2,swebench_pro,hotpotqa,webshop,lawbench}\n  --env-config ENV_CONFIG\n  --final-evaluation    Held-out evaluation only, never training or search\n"
+  }
+]
